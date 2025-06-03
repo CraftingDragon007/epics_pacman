@@ -1,0 +1,6 @@
+record(bi, "$(SYSTEM):VIS_$(X)_$(Y)") {	
+  field(VAL, "$(VAL=0)")
+}
+record(bi, "$(SYSTEM):DOT_$(X)_$(Y)") {	
+  field(VAL, "$(VAL=0)")
+}

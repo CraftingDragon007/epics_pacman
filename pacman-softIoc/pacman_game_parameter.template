@@ -1,0 +1,6 @@
+
+record(ao, "$(SYSTEM):$(NAME)_$(DEVICE)_$(P)") {	
+  field(VAL, "$(VAL=0)")
+  field(DRVH, "$(DRVH=10)")
+  field(DRVL, "$(DRVL=0)")
+}

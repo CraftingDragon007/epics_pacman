@@ -1,0 +1,19 @@
+dlload /usr/lib/epics/lib/linux-x86_64/librequire.so
+
+dbLoadDatabase /usr/lib/epics/dbd/requireSup.dbd
+require_registerRecordDeviceDriver pdbbase
+
+
+# require "stream"
+#require "SynApps"
+# require array
+require seq
+
+require misc
+
+require "pacman"
+
+afterInit seq &pacman, "NAME=PACMAN"
+
+dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=PACMAN");

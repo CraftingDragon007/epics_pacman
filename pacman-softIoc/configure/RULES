@@ -1,0 +1,7 @@
+#CONFIG
+include $(EPICS_BASE)/configure/RULES
+
+include /home/julian/Dokumente/controls/seq/configure/RULES_SNCSEQ
+
+# Library should be rebuilt because LIBOBJS may have changed.
+$(LIBNAME): ../Makefile

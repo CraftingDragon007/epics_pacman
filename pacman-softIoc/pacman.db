@@ -1,0 +1,92 @@
+record (stringout, "$(NAME):SS_$(SS)")
+{
+    field (DESC, "Status for StateMachine $(SS)")
+    field (UDF, "0")
+    field (SEVR,"NO_ALARM")
+    field (VAL,"INITIAL VALUE")
+    field (FLNK, "$(NAME):$(SS)_log15")
+}
+
+record (stringin, "$(NAME):$(SS)_log0")
+{
+    field (INP,  "$(NAME):SS_$(SS)")
+}
+record (stringin, "$(NAME):$(SS)_log1")
+{
+    field (INP,  "$(NAME):$(SS)_log0")
+    field (FLNK, "$(NAME):$(SS)_log0")
+}
+record (stringin, "$(NAME):$(SS)_log2")
+{
+    field (INP,  "$(NAME):$(SS)_log1")
+    field (FLNK, "$(NAME):$(SS)_log1")
+}
+record (stringin, "$(NAME):$(SS)_log3")
+{
+    field (INP,  "$(NAME):$(SS)_log2")
+    field (FLNK, "$(NAME):$(SS)_log2")
+}
+record (stringin, "$(NAME):$(SS)_log4")
+{
+    field (INP,  "$(NAME):$(SS)_log3")
+    field (FLNK, "$(NAME):$(SS)_log3")
+}
+record (stringin, "$(NAME):$(SS)_log5")
+{
+    field (INP,  "$(NAME):$(SS)_log4")
+    field (FLNK, "$(NAME):$(SS)_log4")
+}
+record (stringin, "$(NAME):$(SS)_log6")
+{
+    field (INP,  "$(NAME):$(SS)_log5")
+    field (FLNK, "$(NAME):$(SS)_log5")
+}
+record (stringin, "$(NAME):$(SS)_log7")
+{
+    field (INP,  "$(NAME):$(SS)_log6")
+    field (FLNK, "$(NAME):$(SS)_log6")
+}
+record (stringin, "$(NAME):$(SS)_log8")
+{
+    field (INP,  "$(NAME):$(SS)_log7")
+    field (FLNK, "$(NAME):$(SS)_log7")
+}
+record (stringin, "$(NAME):$(SS)_log9")
+{
+    field (INP,  "$(NAME):$(SS)_log8")
+    field (FLNK, "$(NAME):$(SS)_log8")
+}
+
+record (stringin, "$(NAME):$(SS)_log10")
+{
+    field (INP,  "$(NAME):$(SS)_log9")
+    field (FLNK, "$(NAME):$(SS)_log9")
+}
+
+record (stringin, "$(NAME):$(SS)_log11")
+{
+    field (INP,  "$(NAME):$(SS)_log10")
+    field (FLNK, "$(NAME):$(SS)_log10")
+}
+
+record (stringin, "$(NAME):$(SS)_log12")
+{
+    field (INP,  "$(NAME):$(SS)_log11")
+    field (FLNK, "$(NAME):$(SS)_log11")
+}
+record (stringin, "$(NAME):$(SS)_log13")
+{
+    field (INP,  "$(NAME):$(SS)_log12")
+    field (FLNK, "$(NAME):$(SS)_log12")
+}
+record (stringin, "$(NAME):$(SS)_log14")
+{
+    field (INP,  "$(NAME):$(SS)_log13")
+    field (FLNK, "$(NAME):$(SS)_log13")
+}
+record (stringin, "$(NAME):$(SS)_log15")
+{
+    field (INP,  "$(NAME):$(SS)_log14")
+    field (FLNK, "$(NAME):$(SS)_log14")
+}
+

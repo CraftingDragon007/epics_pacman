@@ -1,0 +1,7 @@
+file pacman_game_parameter.template
+{ pattern
+  { NAME,	DEVICE,	P,	DRVH,	DRVL,	VAL	}
+  { PACMAN, USER, X, 1000, 0, 100}
+  { PACMAN, USER, Y, 1000, 0, 90}
+  { PACMAN, USER, DIRECTION, 3, 0, 0 }
+}
