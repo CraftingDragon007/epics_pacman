@@ -7,4 +7,4 @@ export EPICS_PATH=$EPICS_BASE
 export LD_LIBRARY_PATH=$EPICS_BASE/lib/$EPICS_HOST_ARCH
 export EPICS_CA_SERVER_PORT=5064
 
-strace -o trace.txt softIoc -D $EPICS_BASE/dbd/softIoc.dbd -v $PONG_PATH/startup.script
+softIoc -D $EPICS_BASE/dbd/softIoc.dbd -v $PONG_PATH/startup.script
