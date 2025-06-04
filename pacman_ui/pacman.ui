@@ -1225,8 +1225,20 @@
     <property name="YaxisLimitsMax_1">
      <double>1000.000000000000000</double>
     </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
     <property name="YaxisLimitsMax_2">
      <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_11">
