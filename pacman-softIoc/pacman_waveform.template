@@ -1,0 +1,4 @@
+record(waveform, "$(SYSTEM):$(NAME)_$(DEVICE)_$(P)") {
+  field(NELM, "$(NELM=10)")     # Number of elements
+  field(FTVL, "$(FTVL=UCHAR)")  # Element type (e.g., SHORT, FLOAT, DOUBLE)
+}

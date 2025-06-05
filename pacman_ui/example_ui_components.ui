@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>867</width>
+    <height>793</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caFrame" name="caframe_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>141</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caImage" name="caimage_11">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_eyes.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_eyes_direction</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_12">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_eyes_direction</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_eyes_direction</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ghost Eyes</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_9">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>20</y>
+      <width>141</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caImage" name="caimage_12">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">small_food.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">small_food_frame</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_13">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>101</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">small_food_frame</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">small_food_frame</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Small Food</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>20</y>
+      <width>151</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caNumeric" name="canumeric_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>260</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="value">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_1_direction</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_1_direction</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_1_run</string>
+     </property>
+     <property name="calc">
+      <string notr="true">(A == B * 2) ? (1 + B * 2) : (B * 2)</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_1_run</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">ghost_1_direction</string>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_5">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>70</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_1.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_1_run</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>90</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ghost 1</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_10">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>300</y>
+      <width>141</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caImage" name="caimage_13">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>60</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">large_food.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">large_food_frame</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_14">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>140</y>
+       <width>101</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">large_food_frame</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>200</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">large_food_frame</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Large Food</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_2">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>20</y>
+      <width>151</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caNumeric" name="canumeric_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>260</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_2_direction</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_2_direction</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_2_run</string>
+     </property>
+     <property name="calc">
+      <string notr="true">(A == B * 2) ? (1 + B * 2) : (B * 2)</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_2_run</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">ghost_2_direction</string>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_6">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>70</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_2.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_2_run</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>90</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ghost 2</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_3">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>360</y>
+      <width>151</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caNumeric" name="canumeric_4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>260</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_3_direction</string>
+     </property>
+     <property name="precisionMode">
+      <enum>caNumeric::SourceMode::Channel</enum>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_3_direction</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>2.000000000000000</double>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_3_run</string>
+     </property>
+     <property name="calc">
+      <string notr="true">(A == B * 2) ? (1 + B * 2) : (B * 2)</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_3_run</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">ghost_3_direction</string>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_7">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>70</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_3.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_3_run</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>90</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ghost 3</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_7">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>151</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Shadow::Plain</enum>
+    </property>
+    <widget class="caLabel" name="calabel_7">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>10</y>
+       <width>61</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Death</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">pacdestroy</string>
+     </property>
+     <property name="calc">
+      <string notr="true">(A&lt;19)?(A+1):8</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pacdestroy</string>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>8.000000000000000</double>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>190</y>
+       <width>91</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">pacman.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pacdestroy</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_4">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>360</y>
+      <width>151</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caNumeric" name="canumeric_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>260</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_4_direction</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_4_direction</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">ghost_4_run</string>
+     </property>
+     <property name="calc">
+      <string notr="true">(A == B * 2) ? (1 + B * 2) : (B * 2)</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_4_run</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">ghost_4_direction</string>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_8">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>70</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_4.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">ghost_4_run</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>90</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ghost 4</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caFrame" name="caframe_8">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>360</y>
+      <width>201</width>
+      <height>120</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caImage" name="caimage_10">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">cherries.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true"/>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>300</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_9">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>20</y>
+       <width>70</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">ghost_edible.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true"/>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>300</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>867</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caFrame</class>
+   <extends>QFrame</extends>
+   <header>caFrame</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caImage</class>
+   <extends>QWidget</extends>
+   <header>caImage</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

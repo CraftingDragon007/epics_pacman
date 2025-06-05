@@ -4,4 +4,14 @@ file pacman_game_parameter.template
   { PACMAN, USER, X, 1000, 0, 100}
   { PACMAN, USER, Y, 1000, 0, 90}
   { PACMAN, USER, DIRECTION, 3, 0, 0 }
+  { PACMAN, FIELD, SIZE, 1024, 0, 1024 }
+  { PACMAN, ARRAY, X_SIZE, 32, 0, 32 }
+  { PACMAN, ARRAY, X_FACTOR, 25, 0, 25 }
+  { PACMAN, PACMAN, STATE, 10, 0, 0 }
+}
+
+file pacman_waveform.template
+{ pattern
+  { NAME,	DEVICE,	P,	NELM,	FTVL }
+  { PACMAN, PLAY, FIELD, 1024, SHORT }
 }
