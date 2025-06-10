@@ -5265,10 +5265,10 @@
    <widget class="caImage" name="caimage_14">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>800</width>
-      <height>800</height>
+      <x>27</x>
+      <y>27</y>
+      <width>780</width>
+      <height>780</height>
      </rect>
     </property>
     <property name="filename" stdset="0">

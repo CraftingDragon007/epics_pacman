@@ -19,8 +19,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>800</width>
-      <height>800</height>
+      <width>780</width>
+      <height>780</height>
      </rect>
     </property>
     <property name="filename" stdset="0">
@@ -30,10 +30,10 @@
    <widget class="caImage" name="caimage_4">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>300</y>
-      <width>25</width>
-      <height>25</height>
+      <x>25</x>
+      <y>25</y>
+      <width>30</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="filename" stdset="0">
@@ -374,7 +374,7 @@
      <string notr="true">pacsize</string>
     </property>
     <property name="initialValue">
-     <double>15.000000000000000</double>
+     <double>30.000000000000000</double>
     </property>
    </widget>
    <widget class="caMessageButton" name="camessagebutton">
