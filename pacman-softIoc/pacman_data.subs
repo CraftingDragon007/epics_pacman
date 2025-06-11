@@ -4,6 +4,7 @@ file pacman_game_parameter.template
   { PACMAN, USER, X, 1000, 0, 100}
   { PACMAN, USER, Y, 1000, 0, 90}
   { PACMAN, USER, DIRECTION, 3, 0, 0 }
+  { PACMAN, TRY, DIRECTION, 3, -1, 0 }
   { PACMAN, STOP, DIRECTION, 3, -1, 0 }
   { PACMAN, RESERVE, SIZE, 10, 0, 4 }
   { PACMAN, FIELD, SIZE, 1024, 0, 1024 }

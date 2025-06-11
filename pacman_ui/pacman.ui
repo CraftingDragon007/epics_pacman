@@ -118,7 +118,7 @@
       <string notr="true">pacrun</string>
      </property>
      <property name="calc">
-      <string notr="true">C=1 ? B : (A=8 ? 0+B : (A=4+B ? 8 : 4+B))</string>
+      <string notr="true">C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B))</string>
      </property>
      <property name="channel" stdset="0">
       <string notr="true">pacrun</string>
@@ -149,7 +149,7 @@
       <number>0</number>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
      </property>
      <property name="fixedFormat">
       <bool>true</bool>
@@ -184,7 +184,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
      </property>
      <property name="label">
       <string notr="true">Up</string>
@@ -203,7 +203,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
      </property>
      <property name="label">
       <string notr="true">Down</string>
@@ -222,7 +222,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
      </property>
      <property name="label">
       <string notr="true">Right</string>
@@ -244,13 +244,36 @@
       <string>Left</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
      </property>
      <property name="label">
       <string notr="true">Left</string>
      </property>
      <property name="releaseMessage">
       <string notr="true">1</string>
+     </property>
+    </widget>
+    <widget class="caLed" name="caled">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>0</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="undefinedColor">
+      <color>
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+     <property name="trueValue">
+      <string notr="true">-1</string>
      </property>
     </widget>
    </widget>
@@ -559,6 +582,11 @@
    <class>caInclude</class>
    <extends>QWidget</extends>
    <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caLed</class>
+   <extends>QWidget</extends>
+   <header>caLed</header>
   </customwidget>
   <customwidget>
    <class>caStripPlot</class>

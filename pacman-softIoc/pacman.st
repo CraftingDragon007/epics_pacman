@@ -14,6 +14,7 @@ option  +r;
 PV( int     , pv_PACMAN_USER_X			, "{NAME}:PACMAN_USER_X"		, PV_MON );   
 PV( int     , pv_PACMAN_USER_Y			, "{NAME}:PACMAN_USER_Y"		, PV_MON );
 PV( int     , pv_PACMAN_USER_DIRECTION	, "{NAME}:PACMAN_USER_DIRECTION", PV_MON );
+PV( int     , pv_PACMAN_TRY_DIRECTION	, "{NAME}:PACMAN_TRY_DIRECTION"	, PV_MON );
 PV( int     , pv_PACMAN_STOP_DIRECTION	, "{NAME}:PACMAN_STOP_DIRECTION", PV_MON );
 PV( int     , pv_PACMAN_FIELD_SIZE    	, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_RESERVE_SIZE	, "{NAME}:PACMAN_RESERVE_SIZE"	, PV_MON );
@@ -66,6 +67,26 @@ ss pacman_game {
 
     }
 
+    state TELEPORT_RIGHT {
+        entry {
+            int idx;
+            pvSetStr(pv_SS_PACMAN, "TELEPORT_RIGHT"); 
+            idx = get_x_from_index(pv_PACMAN_ARRAY_X_SIZE - 1, pv_PACMAN_FIELD_SIZE, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            pvSet(pv_PACMAN_USER_X, idx); // Reset X position to the right side
+        }
+        when () {
+            pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
+        } state MOVE_LEFT
+    }
+
+    state TELEPORT_LEFT {
+        entry { pvSetStr(pv_SS_PACMAN, "TELEPORT_LEFT"); }
+        when () {
+            pvSet(pv_PACMAN_USER_X, 0); // Reset X position to the left side
+            pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
+        } state MOVE_RIGHT
+    }
+
     state MOVE_STOP {
         entry { 
             pvSetStr(pv_SS_PACMAN, "MOVE_STOP"); 
@@ -73,14 +94,18 @@ ss pacman_game {
                 pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
             }
             pvSet(pv_PACMAN_STOP_DIRECTION, pv_PACMAN_USER_DIRECTION);
+            pvSet(pv_PACMAN_TRY_DIRECTION, -1); // Reset try direction
         }
-        when (pv_PACMAN_STOP_DIRECTION == pv_PACMAN_USER_DIRECTION) {
+        when (pv_PACMAN_STOP_DIRECTION == pv_PACMAN_USER_DIRECTION && pv_PACMAN_STOP_DIRECTION == -1) {
             // If already stopped, stay in this state
         } state MOVE_STOP
         when (pv_PACMAN_USER_DIRECTION != pv_PACMAN_STOP_DIRECTION) {
             // If direction changes, go to MOVE_ANY
             pvSet(pv_PACMAN_STOP_DIRECTION, -1); // Reset stop direction
         } state MOVE_ANY
+        when (pv_PACMAN_TRY_DIRECTION != -1) {
+            // If try direction is set, go to TRY_MOVE_ANY
+        } state TRY_MOVE_ANY
     }
 
 	state MOVE_RIGHT {
@@ -101,6 +126,9 @@ ss pacman_game {
                     pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
                 }
             } else {
+                if (pv_PACMAN_PLAY_FIELD[idx] == 2) {
+                    pvSet(pv_PACMAN_PACMAN_STATE, 2); // Teleport Pacman to the other side
+                }
                 pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X + 1);
                 if (pv_PACMAN_PACMAN_STATE == 1) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
@@ -108,6 +136,12 @@ ss pacman_game {
             }
         }
 
+        when (pv_PACMAN_TRY_DIRECTION != -1 && pv_PACMAN_TRY_DIRECTION != 0) {
+            // If try direction is not right, change to TRY_MOVE_ANY
+        } state TRY_MOVE_ANY
+        when (pv_PACMAN_PACMAN_STATE == 2) {
+
+        } state TELEPORT_LEFT
         when (pv_PACMAN_USER_DIRECTION != 0) {
             // If direction is not right, change to MOVE_ANY
         } state MOVE_ANY
@@ -138,13 +172,22 @@ ss pacman_game {
                     pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
                 }
             } else {
+                if (pv_PACMAN_PLAY_FIELD[idx] == 2) {
+                    pvSet(pv_PACMAN_PACMAN_STATE, 2); // Teleport Pacman to the other side
+                }
                 pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X - 1);
                 if (pv_PACMAN_PACMAN_STATE == 1) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
                 }
             }
         }
+        
+        when (pv_PACMAN_TRY_DIRECTION != -1 && pv_PACMAN_TRY_DIRECTION != 1) {
+            // If try direction is not left, change to TRY_MOVE_ANY
+        } state TRY_MOVE_ANY
+        when (pv_PACMAN_PACMAN_STATE == 2) {
 
+        } state TELEPORT_RIGHT
         when (pv_PACMAN_USER_DIRECTION != 1) {
             // If direction is not left, change to MOVE_ANY
         } state MOVE_ANY
@@ -183,6 +226,9 @@ ss pacman_game {
             }
         }
 
+        when (pv_PACMAN_TRY_DIRECTION != -1 && pv_PACMAN_TRY_DIRECTION != 2) {
+            // If try direction is not up, change to TRY_MOVE_ANY
+        } state TRY_MOVE_ANY
         when (pv_PACMAN_USER_DIRECTION != 2) {
             // If direction is not up, change to MOVE_ANY
         } state MOVE_ANY
@@ -218,6 +264,9 @@ ss pacman_game {
                 }
             }
         }
+        when (pv_PACMAN_TRY_DIRECTION != -1 && pv_PACMAN_TRY_DIRECTION != 3) {
+            // If try direction is not down, change to TRY_MOVE_ANY
+        } state TRY_MOVE_ANY
         when (pv_PACMAN_USER_DIRECTION != 3) {
             // If direction is not down, change to MOVE_ANY
         } state MOVE_ANY
@@ -229,14 +278,101 @@ ss pacman_game {
         } state MOVE_DOWN
     }
 
+    state TRY_MOVE_ANY {
+        entry { 
+           pvSetStr(pv_SS_PACMAN, "TRY_MOVE_ANY");
+           pvSet(pv_PACMAN_STOP_DIRECTION, -1); // Reset stop direction
+        }
+        when (pv_PACMAN_TRY_DIRECTION == -1 || pv_PACMAN_USER_DIRECTION == pv_PACMAN_TRY_DIRECTION) {
+            // If the user direction matches the try direction, go to MOVE_ANY
+        } state MOVE_ANY
+        when (pv_PACMAN_TRY_DIRECTION == 0) {} state TRY_MOVE_RIGHT
+        when (pv_PACMAN_TRY_DIRECTION == 1) {} state TRY_MOVE_LEFT
+        when (pv_PACMAN_TRY_DIRECTION == 2) {} state TRY_MOVE_UP
+        when (pv_PACMAN_TRY_DIRECTION == 3) {} state TRY_MOVE_DOWN
+    }
+
+    state TRY_MOVE_RIGHT {
+        // check if the user can move right
+        entry {
+            int idx;
+            pvSetStr(pv_SS_PACMAN, "TRY_MOVE_RIGHT");
+            idx = get_array_index_from_xy(pv_PACMAN_USER_X + pv_PACMAN_PACMAN_SIZE + pv_PACMAN_RESERVE_SIZE, pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+                // If blocked, set try direction -1
+                pvSet(pv_PACMAN_TRY_DIRECTION, -1);
+            } else {
+                // If not blocked, set try direction to right
+                pvSet(pv_PACMAN_USER_DIRECTION, 0);
+            }
+        }
+
+        when () {
+        } state MOVE_ANY
+    }
+
+    state TRY_MOVE_LEFT {
+        // check if the user can move left
+        entry {
+            int idx;
+            pvSetStr(pv_SS_PACMAN, "TRY_MOVE_LEFT");
+            idx = get_array_index_from_xy(pv_PACMAN_USER_X - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+                // If blocked, set try direction -1
+                pvSet(pv_PACMAN_TRY_DIRECTION, -1);
+            } else {
+                // If not blocked, set try direction to left
+                pvSet(pv_PACMAN_USER_DIRECTION, 1);
+            }
+        }
+
+        when () {
+        } state MOVE_ANY
+    }
+    state TRY_MOVE_UP {
+        // check if the user can move up
+        entry {
+            int idx;
+            pvSetStr(pv_SS_PACMAN, "TRY_MOVE_UP");
+            idx = get_array_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+                // If blocked, set try direction -1
+                pvSet(pv_PACMAN_TRY_DIRECTION, -1);
+            } else {
+                // If not blocked, set try direction to up
+                pvSet(pv_PACMAN_USER_DIRECTION, 2);
+            }
+        }
+
+        when () {
+        } state MOVE_ANY
+    }
+    state TRY_MOVE_DOWN {
+        // check if the user can move down
+        entry {
+            int idx;
+            pvSetStr(pv_SS_PACMAN, "TRY_MOVE_DOWN");
+            idx = get_array_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y + pv_PACMAN_PACMAN_SIZE + pv_PACMAN_RESERVE_SIZE, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+                // If blocked, set try direction -1
+                pvSet(pv_PACMAN_TRY_DIRECTION, -1);
+            } else {
+                // If not blocked, set try direction to down
+                pvSet(pv_PACMAN_USER_DIRECTION, 3);
+            }
+        }
+        when () {
+        } state MOVE_ANY
+    }
+
     state MOVE_ANY {
 		entry { pvSetStr(pv_SS_PACMAN, "MOVE_ANY"); }
         when (pv_PACMAN_USER_DIRECTION == pv_PACMAN_STOP_DIRECTION) {
             // If stopped, go to MOVE_STOP
         } state MOVE_STOP
-        when (pv_PACMAN_USER_DIRECTION == 0) { } state MOVE_RIGHT
-        when (pv_PACMAN_USER_DIRECTION == 1) { } state MOVE_LEFT
-        when (pv_PACMAN_USER_DIRECTION == 2) { } state MOVE_UP
-        when (pv_PACMAN_USER_DIRECTION == 3) { } state MOVE_DOWN
+        when (pv_PACMAN_USER_DIRECTION == 0) { } state MOVE_RIGHT_CHECK
+        when (pv_PACMAN_USER_DIRECTION == 1) { } state MOVE_LEFT_CHECK
+        when (pv_PACMAN_USER_DIRECTION == 2) { } state MOVE_UP_CHECK
+        when (pv_PACMAN_USER_DIRECTION == 3) { } state MOVE_DOWN_CHECK
     }
 }
