@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1414</width>
-    <height>1256</height>
+    <width>979</width>
+    <height>973</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -5278,17 +5278,17 @@
    <zorder>caimage_14</zorder>
    <zorder>cawavetable</zorder>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1414</width>
+     <width>979</width>
      <height>30</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>

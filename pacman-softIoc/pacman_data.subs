@@ -11,7 +11,7 @@ file pacman_game_parameter.template
   { PACMAN, ARRAY, X_SIZE, 32, 0, 32 }
   { PACMAN, ARRAY, X_FACTOR, 25, 0, 25 }
   { PACMAN, PACMAN, STATE, 10, 0, 0 }
-  { PACMAN, PACMAN, SIZE, 50, 0, 30 }
+  { PACMAN, PACMAN, SIZE, 50, 0, 35 }
 }
 
 file pacman_waveform.template

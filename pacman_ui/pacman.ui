@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1143</width>
-    <height>1083</height>
+    <height>1145</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
       <x>820</x>
       <y>300</y>
       <width>301</width>
-      <height>251</height>
+      <height>311</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -65,7 +65,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>140</y>
+       <y>190</y>
        <width>91</width>
        <height>101</height>
       </rect>
@@ -137,7 +137,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>80</y>
+       <y>110</y>
        <width>100</width>
        <height>50</height>
       </rect>
@@ -149,13 +149,16 @@
       <number>0</number>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_PACMAN_SIZE</string>
      </property>
      <property name="fixedFormat">
       <bool>true</bool>
      </property>
+     <property name="limitsMode">
+      <enum>caNumeric::SourceMode::User</enum>
+     </property>
      <property name="maxValue">
-      <double>3.000000000000000</double>
+      <double>50.000000000000000</double>
      </property>
      <property name="minValue">
       <double>0.000000000000000</double>
@@ -274,6 +277,34 @@
      </property>
      <property name="trueValue">
       <string notr="true">-1</string>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
      </property>
     </widget>
    </widget>
@@ -396,6 +427,12 @@
     <property name="variable">
      <string notr="true">pacsize</string>
     </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_PACMAN_SIZE</string>
+    </property>
     <property name="initialValue">
      <double>30.000000000000000</double>
     </property>
@@ -507,8 +544,8 @@
    <widget class="caInclude" name="cainclude_2">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>560</y>
+      <x>830</x>
+      <y>630</y>
       <width>291</width>
       <height>491</height>
      </rect>
