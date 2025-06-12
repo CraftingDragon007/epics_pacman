@@ -1,0 +1,6 @@
+require "pacman_softIoc"
+
+afterInit seq &pacman, "NAME=PACMAN"
+
+dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=PACMAN");

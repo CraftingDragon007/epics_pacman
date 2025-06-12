@@ -1,6 +1,6 @@
 include /ioc/tools/driver.makefile
-EPICS_VERSIONS=7.0.7
-ARCH_FILTER=RHEL7-x86_64
+EPICS_VERSIONS=7.0.9
+ARCH_FILTER=RHEL8-x86_64
 BUILDCLASSES += Linux
 
 
