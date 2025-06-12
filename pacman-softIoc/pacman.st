@@ -21,6 +21,7 @@ PV( int     , pv_PACMAN_RESERVE_SIZE	, "{NAME}:PACMAN_RESERVE_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_ARRAY_X_SIZE	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_ARRAY_X_FACTOR	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
 PV( int     , pv_PACMAN_PACMAN_STATE	, "{NAME}:PACMAN_PACMAN_STATE"	, PV_MON );
+PV( int     , pv_PACMAN_PACMAN_ABORT	, "{NAME}:PACMAN_PACMAN_ABORT"	, PV_MON );
 PV( int     , pv_PACMAN_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
 PV( string  , pv_SS_PACMAN				, "{NAME}:SS_PACMAN"			, PV_NONE );
 PVA( short	, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD"	, PV_MON);
@@ -50,6 +51,12 @@ PVA( short	, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD"	, PV_MON);
 		}
 		return (index / PACMAN_ARRAY_X_SIZE) * PACMAN_ARRAY_X_FACTOR;
 	}
+
+    static char* toString(int value) {
+        static char buffer[20];
+        snprintf(buffer, sizeof(buffer), "%d", value);
+        return buffer;
+    }
 }%
 
 ss pacman_game {
@@ -117,20 +124,33 @@ ss pacman_game {
 
     state MOVE_RIGHT_CHECK {
         entry { 
-            int idx;
+            int current_index;
+            int next_index;
+            int bl_next_index;
             pvSetStr(pv_SS_PACMAN, "MOVE_RIGHT_CHECK"); 
-            idx = get_array_index_from_xy(pv_PACMAN_USER_X + pv_PACMAN_PACMAN_SIZE + pv_PACMAN_RESERVE_SIZE, pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
-            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+            current_index = get_array_index_from_xy(pv_PACMAN_USER_X + (int)(pv_PACMAN_PACMAN_SIZE / 2), pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            next_index = current_index + 1; // Check next field to the right
+            bl_next_index = next_index + pv_PACMAN_ARRAY_X_SIZE; // Check field below the next field to the right
+            if (pv_PACMAN_PLAY_FIELD[bl_next_index] == 1 && pv_PACMAN_PLAY_FIELD[next_index] == 0) {
+                // correct position - y 1
+                pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y - pv_PACMAN_ARRAY_X_FACTOR - pv_PACMAN_RESERVE_SIZE);
+            }
+            if (pv_PACMAN_PLAY_FIELD[bl_next_index] == 0 && pv_PACMAN_PLAY_FIELD[next_index] == 1) {
+                // correct position - y 0
+                pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y + pv_PACMAN_ARRAY_X_FACTOR + pv_PACMAN_RESERVE_SIZE);
+            }
+            printf("right current_index: %d next_index: %d bl_next_index: %d x: %d y: %d\n", current_index, next_index, bl_next_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
+            printf("right current_index_state: %d next_index_state: %d bl_next_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[next_index], pv_PACMAN_PLAY_FIELD[bl_next_index]);
+            if (next_index < 0 || pv_PACMAN_PLAY_FIELD[next_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
                 // Stop walking if blocked
                 if (pv_PACMAN_PACMAN_STATE == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
                 }
             } else {
-                if (pv_PACMAN_PLAY_FIELD[idx] == 2) {
+                if (pv_PACMAN_PLAY_FIELD[next_index] == 2) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 2); // Teleport Pacman to the other side
-                }
-                pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X + 1);
-                if (pv_PACMAN_PACMAN_STATE == 1) {
+                }                
+                if (pv_PACMAN_PACMAN_STATE == 1 && pv_PACMAN_PACMAN_ABORT == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
                 }
             }
@@ -163,25 +183,39 @@ ss pacman_game {
 
     state MOVE_LEFT_CHECK {
         entry { 
-            int idx;
+            int current_index;
+            int previous_index;
+            int bl_previous_index;
             pvSetStr(pv_SS_PACMAN, "MOVE_LEFT_CHECK"); 
-            idx = get_array_index_from_xy(pv_PACMAN_USER_X - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
-            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+            current_index = get_array_index_from_xy(pv_PACMAN_USER_X - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_USER_Y, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            previous_index = current_index - 1; // Check previous field to the left
+            bl_previous_index = previous_index + pv_PACMAN_ARRAY_X_SIZE;
+            if (pv_PACMAN_PLAY_FIELD[bl_previous_index] == 1 && pv_PACMAN_PLAY_FIELD[previous_index] == 0) {
+                // correct position - y 1
+                pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y - pv_PACMAN_ARRAY_X_FACTOR - pv_PACMAN_RESERVE_SIZE);
+            }
+            if (pv_PACMAN_PLAY_FIELD[bl_previous_index] == 0 && pv_PACMAN_PLAY_FIELD[previous_index] == 1) {
+                // correct position - y 0
+                pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y + pv_PACMAN_ARRAY_X_FACTOR + pv_PACMAN_RESERVE_SIZE);
+            }
+            printf("left current_index: %d previous_index: %d bl_previous_index: %d x: %d y: %d\n", current_index, previous_index, bl_previous_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
+            printf("left current_index_state: %d previous_index_state: %d bl_previous_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[previous_index], pv_PACMAN_PLAY_FIELD[bl_previous_index]);
+            
+            if (previous_index < 0 || pv_PACMAN_PLAY_FIELD[previous_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
                 // Stop walking if blocked
                 if (pv_PACMAN_PACMAN_STATE == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
                 }
             } else {
-                if (pv_PACMAN_PLAY_FIELD[idx] == 2) {
+                if (pv_PACMAN_PLAY_FIELD[previous_index] == 2) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 2); // Teleport Pacman to the other side
                 }
-                pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X - 1);
-                if (pv_PACMAN_PACMAN_STATE == 1) {
+                if (pv_PACMAN_PACMAN_STATE == 1 && pv_PACMAN_PACMAN_ABORT == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
                 }
             }
         }
-        
+
         when (pv_PACMAN_TRY_DIRECTION != -1 && pv_PACMAN_TRY_DIRECTION != 1) {
             // If try direction is not left, change to TRY_MOVE_ANY
         } state TRY_MOVE_ANY
@@ -210,17 +244,33 @@ ss pacman_game {
 
     state MOVE_UP_CHECK {
         entry { 
-            int idx;
-            pvSetStr(pv_SS_PACMAN, "MOVE_UP_CHECK"); 
-            idx = get_array_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
-            if (idx < 0 || pv_PACMAN_PLAY_FIELD[idx] == 1) {
+            int current_index;
+            int above_index;
+            int r_above_index;
+            pvSetStr(pv_SS_PACMAN, "MOVE_UP_CHECK");
+            current_index = get_array_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y - pv_PACMAN_RESERVE_SIZE, pv_PACMAN_ARRAY_X_SIZE, pv_PACMAN_ARRAY_X_FACTOR);
+            above_index = current_index - pv_PACMAN_ARRAY_X_SIZE; // Check field above
+            r_above_index = above_index + 1; // Check field to the right of the above field
+            if (pv_PACMAN_PLAY_FIELD[r_above_index] == 1 && pv_PACMAN_PLAY_FIELD[above_index] == 0) {
+                // correct position - x 1
+                pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X + pv_PACMAN_ARRAY_X_FACTOR + pv_PACMAN_RESERVE_SIZE);
+            }
+            if (pv_PACMAN_PLAY_FIELD[r_above_index] == 0 && pv_PACMAN_PLAY_FIELD[above_index] == 1) {
+                // correct position - x 0
+                pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X - pv_PACMAN_ARRAY_X_FACTOR - pv_PACMAN_RESERVE_SIZE);
+            }
+            printf("up current_index: %d above_index: %d r_above_index: %d x: %d y: %d\n", current_index, above_index, r_above_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
+            printf("up current_index_state: %d above_index_state: %d r_above_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[above_index], pv_PACMAN_PLAY_FIELD[r_above_index]);
+            if (above_index < 0 || pv_PACMAN_PLAY_FIELD[above_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
                 // Stop walking if blocked
                 if (pv_PACMAN_PACMAN_STATE == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 1); // Change state to "blocked"
                 }
             } else {
-                pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y - 1);
-                if (pv_PACMAN_PACMAN_STATE == 1) {
+                if (pv_PACMAN_PLAY_FIELD[above_index] == 2) {
+                    pvSet(pv_PACMAN_PACMAN_STATE, 2); // Teleport Pacman to the other side
+                }
+                if (pv_PACMAN_PACMAN_STATE == 1 && pv_PACMAN_PACMAN_ABORT == 0) {
                     pvSet(pv_PACMAN_PACMAN_STATE, 0); // Change state to "walking"
                 }
             }
