@@ -10,6 +10,7 @@ program ghosts_pacman
 option  +r;
 
 /* variables  ghosts */
+PV( string  , pv_SS_GHOSTS, "{NAME}:SS_GHOSTS", PV_NONE );
 
 /* Functions */
 %{
@@ -17,30 +18,21 @@ option  +r;
 }%
 
 ss ghosts_pacman{
-    state STATE{
+    state INIT{
         entry{
-
+            pvSetStr( pv_SS_GHOSTS, "INIT_GHOST" );
         }
-        when(){
+        when(delay(0.22)){
 
         } state MOVE_RIGHT
     }
 
-        state STATE{
+    state MOVE_RIGHT{
         entry{
-
+            pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT_GHOST" );
         }
-        when(){
+        when(delay(1)){
 
-        } state MOVE_RIGHT
-    }
-
-        state STATE{
-        entry{
-
-        }
-        when(){
-
-        } state MOVE_RIGHT
+        } state INIT
     }
 }

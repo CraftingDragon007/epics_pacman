@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1143</width>
+    <height>1145</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caImage" name="caimage">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>800</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">pacman_background.png</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_4">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>25</y>
+      <width>50</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">pacman.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacrun</string>
+    </property>
+   </widget>
+   <widget class="caFrame" name="caframe_6">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>300</y>
+      <width>301</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <widget class="caImage" name="caimage_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>190</y>
+       <width>91</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">pacman.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pacrun</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_2">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>130</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">pacdirection</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>180</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">pacrun</string>
+     </property>
+     <property name="calc">
+      <string notr="true">C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B))</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pacrun</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">pacdirection</string>
+     </property>
+     <property name="channelC">
+      <string notr="true">$(NAME):PACMAN_PACMAN_STATE</string>
+     </property>
+     <property name="precision">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>110</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_PACMAN_SIZE</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="limitsMode">
+      <enum>caNumeric::SourceMode::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>90</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pacman</string>
+     </property>
+    </widget>
+    <widget class="caMessageButton" name="camessagebutton_2">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>10</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="label">
+      <string notr="true">Up</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">2</string>
+     </property>
+    </widget>
+    <widget class="caMessageButton" name="camessagebutton_3">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>60</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="label">
+      <string notr="true">Down</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">3</string>
+     </property>
+    </widget>
+    <widget class="caMessageButton" name="camessagebutton_4">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>40</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="label">
+      <string notr="true">Right</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">0</string>
+     </property>
+    </widget>
+    <widget class="caMessageButton" name="camessagebutton_5">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>40</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Left</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="label">
+      <string notr="true">Left</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">1</string>
+     </property>
+    </widget>
+    <widget class="caLed" name="caled">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>0</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="undefinedColor">
+      <color>
+       <red>160</red>
+       <green>160</green>
+       <blue>164</blue>
+      </color>
+     </property>
+     <property name="trueValue">
+      <string notr="true">-1</string>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="maxValue">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caCalc" name="cacalc_15">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>70</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">pacx</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_X</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_16">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>100</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">pacy</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_Y</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_17">
+    <property name="geometry">
+     <rect>
+      <x>829</x>
+      <y>90</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="variableType">
+     <enum>caCalc::varType::scalar</enum>
+    </property>
+    <property name="channels" stdset="0">
+     <string/>
+    </property>
+    <property name="calc">
+     <string notr="true">%QRect</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacx</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">pacy</string>
+    </property>
+    <property name="channelC">
+     <string notr="true">pacsize</string>
+    </property>
+    <property name="channelD">
+     <string notr="true">pacsize</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::eventsignal::onAnyChange</enum>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_9">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>150</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacx</string>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_10">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>210</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacy</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_18">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>140</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">pacsize</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_PACMAN_SIZE</string>
+    </property>
+    <property name="initialValue">
+     <double>30.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>180</y>
+      <width>100</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="caLineDraw" name="calinedraw">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>20</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string>$(NAME):SS_PACMAN</string>
+    </property>
+   </widget>
+   <widget class="caStripPlot" name="castripplot">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>870</y>
+      <width>531</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="channels" stdset="0">
+     <string>$(NAME):PACMAN_USER_X;$(NAME):PACMAN_USER_Y;</string>
+    </property>
+    <property name="YaxisLimitsMax_1">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_1" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+    <property name="YaxisScalingMin_1" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+    <property name="YaxisLimitsMax_2">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="YaxisScalingMax_2" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+    <property name="YaxisScalingMin_2" stdset="0">
+     <enum>caStripPlot::axisScaling::User</enum>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_11">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>880</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>3</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_X</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::SourceMode::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_12">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>940</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>3</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_Y</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::SourceMode::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_2">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>630</y>
+      <width>291</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),SS=PACMAN</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">ss_info</string>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_2">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>810</y>
+      <width>100</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_RESERVE_SIZE</string>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+    <property name="maxValue">
+     <double>3.000000000000000</double>
+    </property>
+    <property name="minValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caMessageButton</class>
+   <extends>QPushButton</extends>
+   <header>caMessageButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caFrame</class>
+   <extends>QFrame</extends>
+   <header>caFrame</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caImage</class>
+   <extends>QWidget</extends>
+   <header>caImage</header>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caLed</class>
+   <extends>QWidget</extends>
+   <header>caLed</header>
+  </customwidget>
+  <customwidget>
+   <class>caStripPlot</class>
+   <extends>QwtPlot</extends>
+   <header>caStripPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineDraw</class>
+   <extends>QWidget</extends>
+   <header>caLineDraw</header>
+  </customwidget>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc_17</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>caimage_4</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>701</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>381</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

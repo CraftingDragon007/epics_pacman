@@ -1,0 +1,4 @@
+file pacman_game_parameter.template
+{ pattern
+  { NAME,	DEVICE,	P,	DRVH,	DRVL,	VAL	}
+}
