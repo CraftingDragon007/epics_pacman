@@ -1,9 +1,11 @@
 require "pacman_softIoc"
 
 afterInit seq &pacman, "NAME=PACMAN"
-afterInit seq &ghosts_pacman, "NAME=GHOSTS"
+afterInit seq &ghosts_pacman, "NAME=PACMAN"
 
 dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
-dbLoadTemplate("ghost_data.subs", "SYSTEM=GHOSTS");
+dbLoadTemplate("ghosts_data.subs", "SYSTEM=PACMAN");
+
 dbLoadRecords("pacman.db", "NAME=PACMAN,SS=PACMAN");
-dbLoadRecords("pacman.db", "NAME=GHOSTS,SS=GHOSTS");
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GHOSTS");
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GHOSTS_RUN");
