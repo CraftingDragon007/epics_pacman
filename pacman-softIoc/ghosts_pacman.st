@@ -11,7 +11,12 @@ option  +r;
 
 /* variables  ghosts */
 PV( string, pv_SS_GHOSTS, "{NAME}:SS_GHOSTS", PV_NONE );
-PV( int, pv_GHOSTS_NPC_DIRECTION, "{NAME}:GHOSTS_NPC_DIR", PV_MON );  
+PV( int, pv_GHOSTS_NPC_DIR, "{NAME}:GHOSTS_NPC_DIR", PV_MON );  
+PV( int, pv_GHOSTS_NPC_X, "{NAME}:GHOSTS_NPC_X", PV_MON );  
+PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );  
+PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
+PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );    
+
 
 /* variables ghost run */
 PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
@@ -29,16 +34,40 @@ ss ghosts_pacman{
         entry{
             pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
         }
-        when(){
-        } state INIT
+        when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
+        } state MOVE_RIGHT
+        when(pv_GHOSTS_NPC_DIR % 4 == 1){
+        } state MOVE_LEFT
+        when(pv_GHOSTS_NPC_DIR % 4 == 2){
+        } state MOVE_UP
+        when(pv_GHOSTS_NPC_DIR % 4 == 3){
+        } state MOVE_DOWN
     }
 
-    state MOVE{
-        entry{
-            pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
-        } when(){
-            
-        }state MOVE
+    state MOVE_RIGHT{
+        when(delay(0.3)){
+            pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT" );
+            pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST));
+        }state CHECK_MOVE
+    }
+    state MOVE_LEFT{
+        when(delay(0.3)){
+            pvSetStr( pv_SS_GHOSTS, "MOVE_LEFT" );
+            printf("\n%d", pv_GHOSTS_NPC_X);
+            pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST));
+        }state CHECK_MOVE
+    }
+    state MOVE_UP{
+        when(delay(0.3)){
+            pvSetStr(pv_SS_GHOSTS, "MOVE_UP" );
+            pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST));
+        }state CHECK_MOVE
+    }
+    state MOVE_DOWN{
+        when(delay(0.3)){
+            pvSetStr( pv_SS_GHOSTS, "MOVE_DOWN" );
+            pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST));
+        }state CHECK_MOVE
     }
 }
 
@@ -53,7 +82,7 @@ ss run_ghost{
 
     state CHECK_DIRECTION{
         entry{
-            int direction = pv_GHOSTS_NPC_DIRECTION % 3;
+            int direction = pv_GHOSTS_NPC_DIR % 4;
             int FRAME_1;
             int FRAME_2;
             pvSetStr(pv_SS_GHOSTS_RUN, "CHECK_DIRECTION");
@@ -87,7 +116,7 @@ ss run_ghost{
     state FRAME_1{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_1");
-        }when (delay(0.05)){
+        }when (delay(0.2)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME1);
         }state FRAME_2
     }
@@ -95,7 +124,7 @@ ss run_ghost{
       state FRAME_2{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_2");
-        }when (delay(0.05)){
+        }when (delay(0.2)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME2);
         }state CHECK_DIRECTION
     }

@@ -2,6 +2,10 @@ file pacman_game_parameter.template
 { pattern
   { NAME,	DEVICE,	P,	DRVH,	DRVL,	VAL	}
   { GHOSTS, NPC, DIR, 10, -1, 0}
+  { GHOSTS, NPC, X, 1000, 0, 0}
+  { GHOSTS, NPC, Y, 1000, 0, 0}
+  { GHOSTS, NPC, SIZE, 1000, 1, 30}
+  { GHOSTS, NPC, MOVDIST, 100, -100, 1}
   { GHOSTS, NPC, RUN, 10, 0, 0}
   { GHOSTS, NPC, RUNFRAME1, 10, 0, 0}
   { GHOSTS, NPC, RUNFRAME2, 10, 0, 0}
