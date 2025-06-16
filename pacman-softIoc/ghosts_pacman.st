@@ -15,7 +15,9 @@ PV( int, pv_GHOSTS_NPC_DIR, "{NAME}:GHOSTS_NPC_DIR", PV_MON );
 PV( int, pv_GHOSTS_NPC_X, "{NAME}:GHOSTS_NPC_X", PV_MON );  
 PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );  
 PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
-PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );    
+PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );
+PV( int, pv_GHOSTS_NPC_IDX, "{NAME}:GHOSTS_NPC_IDX", PV_MON );
+PV( int, pv_GHOSTS_NPC_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );    
 
 
 /* variables ghost run */
@@ -24,16 +26,75 @@ PV( int, pv_GHOSTS_NPC_RUN, "{NAME}:GHOSTS_NPC_RUN", PV_MON );
 PV( int, pv_GHOSTS_NPC_RUNFRAME1, "{NAME}:GHOSTS_NPC_RUNFRAME1", PV_MON );
 PV( int, pv_GHOSTS_NPC_RUNFRAME2, "{NAME}:GHOSTS_NPC_RUNFRAME2", PV_MON );  
 
+/* variables from pcman */
+PV( int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
+PV( int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
+PVA( short, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
+
 /* Functions */
 %{
-    
+    	static int get_array_index_from_xy (int x, int y, int ARRAY_ROW_LENGTH, int ARRAY_CELL_WIDTH) {
+            int index = 0;
+            int column = (int) (x / ARRAY_CELL_WIDTH);
+            int row = (int) (y / ARRAY_CELL_WIDTH);
+            // game is quadratic --> row and columns are of equal length
+            if (column < 0 || column >= ARRAY_ROW_LENGTH || row < 0 || row >= ARRAY_ROW_LENGTH) {
+                return -1; // out of bounds
+            }
+            index = row * ARRAY_ROW_LENGTH + column;
+            return index;
+	    }
+
+      	static int get_x_from_index (int index, int PACMAN_FIELD_SIZE, int PACMAN_ARRAY_X_SIZE, int PACMAN_ARRAY_X_FACTOR) {
+            if (index < 0 || index >= PACMAN_FIELD_SIZE) {
+                return -1; // out of bounds
+            }
+            return (index % PACMAN_ARRAY_X_SIZE) * PACMAN_ARRAY_X_FACTOR;
+        }
+
+    	static int get_y_from_index (int index, int PACMAN_FIELD_SIZE, int PACMAN_ARRAY_X_SIZE, int PACMAN_ARRAY_X_FACTOR) {
+            if (index < 0 || index >= PACMAN_FIELD_SIZE) {
+                return -1; // out of bounds
+            }
+            return (index / PACMAN_ARRAY_X_SIZE) * PACMAN_ARRAY_X_FACTOR;
+        }
+
+        static char* toString(int value) {
+            static char buffer[20];
+            snprintf(buffer, sizeof(buffer), "%d", value);
+            return buffer;
+        }
+
 }%
 
 ss ghosts_pacman{
+    state INIT{
+        entry{
+            pvSetStr(pv_SS_GHOSTS, "INIT");
+            pvSet(pv_GHOSTS_NPC_SIZE, 25);
+            pvSet(pv_GHOSTS_NPC_IDXVAL, 0);
+            pvSet(pv_GHOSTS_NPC_X, (int)pv_GHOSTS_NPC_SIZE*1.3);
+            pvSet(pv_GHOSTS_NPC_Y, (int)pv_GHOSTS_NPC_SIZE*1.3);
+            pvSet(pv_GHOSTS_NPC_IDX, get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2), pv_PACMAN_ARRAY_ROW_LENGTH, pv_PACMAN_ARRAY_CELL_WIDTH));
+        }
+        when(){
+        } state CHECK_MOVE
+    }
     state CHECK_MOVE{
         entry{
+            int idx; 
             pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
+            idx = get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2), pv_PACMAN_ARRAY_ROW_LENGTH, pv_PACMAN_ARRAY_CELL_WIDTH);
+            pvSet(pv_GHOSTS_NPC_IDX, idx);
+            pvSet(pv_GHOSTS_NPC_IDXVAL, pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX]);
         }
+        when(){
+        } state MOVE
+    }
+
+    state MOVE{
+        when(pv_GHOSTS_NPC_IDX == -1){
+        }state MOVE_MIDDLE
         when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
         } state MOVE_RIGHT
         when(pv_GHOSTS_NPC_DIR % 4 == 1){
@@ -42,31 +103,64 @@ ss ghosts_pacman{
         } state MOVE_UP
         when(pv_GHOSTS_NPC_DIR % 4 == 3){
         } state MOVE_DOWN
+        
+    }
+    
+    state MOVE_MIDDLE{
+        when(delay(0.3)){
+            int respawn = 370;
+            pvSetStr(pv_SS_GHOSTS, "MOVE_MIDDLE");
+            pvSet(pv_GHOSTS_NPC_X, respawn);
+            pvSet(pv_GHOSTS_NPC_Y, respawn);
+        } state CHECK_MOVE
     }
 
     state MOVE_RIGHT{
+        when(pv_GHOSTS_NPC_IDX == -1){
+        } state MOVE_MIDDLE
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+1)] == 1){
+        } state CHECK_MOVE
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT" );
-            pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST));
+            if(pv_GHOSTS_NPC_X < 1000 && pv_GHOSTS_NPC_X >= 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST));
+            }
         }state CHECK_MOVE
     }
     state MOVE_LEFT{
+        when(pv_GHOSTS_NPC_IDX == -1){
+        }state MOVE_MIDDLE
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-1)]){
+        } state CHECK_MOVE
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_LEFT" );
-            printf("\n%d", pv_GHOSTS_NPC_X);
-            pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST));
+            if(pv_GHOSTS_NPC_X <= 1000 && pv_GHOSTS_NPC_X > 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST));
+            }
         }state CHECK_MOVE
     }
     state MOVE_UP{
+        when(pv_GHOSTS_NPC_IDX == -1){
+        }state MOVE_MIDDLE
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
+        } state CHECK_MOVE
         when(delay(0.3)){
             pvSetStr(pv_SS_GHOSTS, "MOVE_UP" );
-            pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST));
+            if(pv_GHOSTS_NPC_Y < 1000 && pv_GHOSTS_NPC_Y > 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST));
+            }
         }state CHECK_MOVE
     }
     state MOVE_DOWN{
+        when(pv_GHOSTS_NPC_IDX == -1){
+        }state MOVE_MIDDLE
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
+        } state CHECK_MOVE
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_DOWN" );
-            pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST));
+            if(pv_GHOSTS_NPC_Y <= 1000 && pv_GHOSTS_NPC_Y >= 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST));
+            }
         }state CHECK_MOVE
     }
 }
@@ -116,7 +210,7 @@ ss run_ghost{
     state FRAME_1{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_1");
-        }when (delay(0.2)){
+        }when (delay(0.4)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME1);
         }state FRAME_2
     }
@@ -124,7 +218,7 @@ ss run_ghost{
       state FRAME_2{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_2");
-        }when (delay(0.2)){
+        }when (delay(0.4)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME2);
         }state CHECK_DIRECTION
     }
