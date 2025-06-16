@@ -4,6 +4,7 @@ program ghosts_pacman
 %%#include "math.h"
 %%#include "stdlib.h"
 %%#include "errlog.h"
+%%#include "time.h"
 %%#define PRINTF errlogPrintf
 
 /* options */
@@ -65,6 +66,13 @@ PVA( short, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
             return buffer;
         }
 
+        static int randomNr(){
+            int nr;
+            srand(time(NULL));
+            nr = rand();
+            return nr;
+        }
+
 }%
 
 ss ghosts_pacman{
@@ -73,6 +81,7 @@ ss ghosts_pacman{
             pvSetStr(pv_SS_GHOSTS, "INIT");
             pvSet(pv_GHOSTS_NPC_SIZE, 25);
             pvSet(pv_GHOSTS_NPC_IDXVAL, 0);
+            pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
             pvSet(pv_GHOSTS_NPC_X, (int)pv_GHOSTS_NPC_SIZE*1.3);
             pvSet(pv_GHOSTS_NPC_Y, (int)pv_GHOSTS_NPC_SIZE*1.3);
             pvSet(pv_GHOSTS_NPC_IDX, get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2), pv_PACMAN_ARRAY_ROW_LENGTH, pv_PACMAN_ARRAY_CELL_WIDTH));
@@ -115,11 +124,37 @@ ss ghosts_pacman{
         } state CHECK_MOVE
     }
 
+    state CHECK_MOVEABLE_DIRECTIONS{
+        entry{
+            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTIONS");
+            pvSet(pv_GHOSTS_NPC_DIR, randomNr());
+        }when(){
+        } state CHECK_MOVE
+        /*
+        // CHECK RIGHT
+        when((int)pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX+1] == 0){
+            pvSet(pv_GHOSTS_NPC_DIR, 0);
+        } state CHECK_MOVE
+        // CHECK LEFT
+        when((int)pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX-1] == 0){
+            pvSet(pv_GHOSTS_NPC_DIR, 1);
+        } state CHECK_MOVE
+        // CHECK UP
+        when((int)pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH] == 0){
+            pvSet(pv_GHOSTS_NPC_DIR, 2);
+        } state CHECK_MOVE
+        // CHECK DOWN
+        when((int)pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH] == 0){
+            pvSet(pv_GHOSTS_NPC_DIR, 3);
+        } state CHECK_MOVE
+    */
+    }
+
     state MOVE_RIGHT{
         when(pv_GHOSTS_NPC_IDX == -1){
         } state MOVE_MIDDLE
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+1)] == 1){
-        } state CHECK_MOVE
+        } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT" );
             if(pv_GHOSTS_NPC_X < 1000 && pv_GHOSTS_NPC_X >= 0){
@@ -131,7 +166,7 @@ ss ghosts_pacman{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-1)]){
-        } state CHECK_MOVE
+        } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_LEFT" );
             if(pv_GHOSTS_NPC_X <= 1000 && pv_GHOSTS_NPC_X > 0){
@@ -143,7 +178,7 @@ ss ghosts_pacman{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
-        } state CHECK_MOVE
+        } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.3)){
             pvSetStr(pv_SS_GHOSTS, "MOVE_UP" );
             if(pv_GHOSTS_NPC_Y < 1000 && pv_GHOSTS_NPC_Y > 0){
@@ -155,7 +190,7 @@ ss ghosts_pacman{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
-        } state CHECK_MOVE
+        } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.3)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_DOWN" );
             if(pv_GHOSTS_NPC_Y <= 1000 && pv_GHOSTS_NPC_Y >= 0){
