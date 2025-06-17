@@ -33,34 +33,38 @@ PV( int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
 PV( int, pv_PACMAN_USER_X, "{NAME}:PACMAN_USER_X", PV_MON );
 PV( int, pv_PACMAN_USER_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
 PVA( short, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
-PV( int, pv_PACMAN_FIELD_SIZE    	, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
+PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
 
 /* Functions */
 %{
-    	static int get_array_index_from_xy (int x, int y, int ARRAY_ROW_LENGTH, int ARRAY_CELL_WIDTH) {
+    int CONST_ARRAY_ROW_LENGTH = 32;
+    int CONST_ARRAY_CELL_WIDTH = 25;
+    int CONST_PACMAN_FIELD_SIZE = 32*32;
+
+    	static int get_array_index_from_xy (int x, int y) {
             int index = 0;
-            int column = (int) (x / ARRAY_CELL_WIDTH);
-            int row = (int) (y / ARRAY_CELL_WIDTH);
+            int column = (int) (x / CONST_ARRAY_CELL_WIDTH);
+            int row = (int) (y / CONST_ARRAY_CELL_WIDTH);
             // game is quadratic --> row and columns are of equal length
-            if (column < 0 || column >= ARRAY_ROW_LENGTH || row < 0 || row >= ARRAY_ROW_LENGTH) {
+            if (column < 0 || column >= CONST_ARRAY_ROW_LENGTH || row < 0 || row >= CONST_ARRAY_ROW_LENGTH) {
                 return -1; // out of bounds
             }
-            index = row * ARRAY_ROW_LENGTH + column;
+            index = row * CONST_ARRAY_ROW_LENGTH + column;
             return index;
 	    }
 
-      	static int get_x_from_index (int index, int PACMAN_FIELD_SIZE, int PACMAN_ARRAY_ROW_LENGTH, int PACMAN_ARRAY_CELL_WIDTH) {
-            if (index < 0 || index >= PACMAN_FIELD_SIZE) {
+      	static int get_x_from_index (int index) {
+            if (index < 0 || index >= CONST_PACMAN_FIELD_SIZE) {
                 return -1; // out of bounds
             }
-            return (index % PACMAN_ARRAY_ROW_LENGTH) * PACMAN_ARRAY_CELL_WIDTH;
+            return (index % CONST_ARRAY_ROW_LENGTH) * CONST_ARRAY_CELL_WIDTH;
         }
 
-    	static int get_y_from_index (int index, int PACMAN_FIELD_SIZE, int PACMAN_ARRAY_ROW_LENGTH, int PACMAN_ARRAY_CELL_WIDTH) {
-            if (index < 0 || index >= PACMAN_FIELD_SIZE) {
+    	static int get_y_from_index (int index) {
+            if (index < 0 || index >= CONST_PACMAN_FIELD_SIZE) {
                 return -1; // out of bounds
             }
-            return (index / PACMAN_ARRAY_ROW_LENGTH) * PACMAN_ARRAY_CELL_WIDTH;
+            return (index / CONST_ARRAY_ROW_LENGTH) * CONST_ARRAY_CELL_WIDTH;
         }
 
         static char* toString(int value) {
@@ -84,27 +88,74 @@ PV( int, pv_PACMAN_FIELD_SIZE    	, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
             return difference;
         }
 
-        static int get_shortest_direction_to_pacman(int index, int pacx, int pacy, int PACMAN_FIELD_SIZE, int PACMAN_ARRAY_ROW_LENGTH, int PACMAN_ARRAY_CELL_WIDTH){
+        static int get_shortest_direction_to_pacman(int index, int pacx, int pacy){
+            int distance[4];
             int idx[4] = {
                 index + 1, // right
                 index - 1, // left
-                index - PACMAN_ARRAY_ROW_LENGTH, // up
-                index + PACMAN_ARRAY_ROW_LENGTH  // down
-            }
-            int distance[4];
+                index - CONST_ARRAY_ROW_LENGTH, // up
+                index + CONST_ARRAY_ROW_LENGTH  // down
+            };
             for(int i = 0; i < 4; i++){
-                distance[i] = get_distance_from_pacman(pacx, pacy, get_x_from_index(idx[i], PACMAN_FIELD_SIZE, PACMAN_ARRAY_ROW_LENGTH, PACMAN_ARRAY_CELL_WIDTH), get_y_from_index(idx[i], PACMAN_FIELD_SIZE, PACMAN_ARRAY_ROW_LENGTH, PACMAN_ARRAY_CELL_WIDTH));
+                distance[i] = get_distance_from_pacman(pacx, pacy, get_x_from_index(idx[i]), get_y_from_index(idx[i]));
             }
 
-                // Find index of lowest number
+            // Find index of lowest number
             int min_idx = 0;
             for(int i = 1; i < 4; i++){
                 if(distance[i] < distance[min_idx]){
                     min_idx = i;
                 }
             }
+            printf("\nShortest direction to pacman: %d", min_idx);
             return min_idx;
+        }
+
+        static int get_second_shortest_direction_to_pacman(int index, int pacx, int pacy){
+            int distance[4];
+            int idx[4] = {
+                index + 1, // right
+                index - 1, // left
+                index - CONST_ARRAY_ROW_LENGTH, // up
+                index + CONST_ARRAY_ROW_LENGTH  // down
+            };
+            for(int i = 0; i < 4; i++){
+                distance[i] = get_distance_from_pacman(pacx, pacy, get_x_from_index(idx[i]), get_y_from_index(idx[i]));
             }
+
+            // Find index of second lowest number
+            int min_idx = 0;
+            int second_min_idx = 1;
+            if(distance[1] < distance[0]){
+                min_idx = 1;
+                second_min_idx = 0;
+            }
+            for(int i = 2; i < 4; i++){
+                if(distance[i] < distance[min_idx]){
+                    second_min_idx = min_idx;
+                    min_idx = i;
+                } else if(distance[i] < distance[second_min_idx]){
+                    second_min_idx = i;
+                }
+            }
+            printf("\nSecond shortest direction to pacman: %d", second_min_idx);
+            return second_min_idx;
+        }
+
+        static int get_index_from_direction(int index, int direction){
+            switch(direction){
+                case 0: // right
+                    return index + 1;
+                case 1: // left
+                    return index - 1;
+                case 2: // up
+                    return index - CONST_ARRAY_ROW_LENGTH;
+                case 3: // down
+                    return index + CONST_ARRAY_ROW_LENGTH;
+                default:
+                    return -1; // invalid direction
+            }
+        }
 
 }%
 
@@ -113,12 +164,12 @@ ss ghosts_pacman{
     state INIT{
         entry{
             pvSetStr(pv_SS_GHOSTS, "INIT");
-            pvSet(pv_GHOSTS_NPC_SIZE, 45);
+            pvSet(pv_GHOSTS_NPC_SIZE, 25);
             pvSet(pv_GHOSTS_NPC_IDXVAL, 0);
             pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
             pvSet(pv_GHOSTS_NPC_X, (int)pv_GHOSTS_NPC_SIZE*1.3);
             pvSet(pv_GHOSTS_NPC_Y, (int)pv_GHOSTS_NPC_SIZE*1.3);
-            pvSet(pv_GHOSTS_NPC_IDX, get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2), pv_PACMAN_ARRAY_ROW_LENGTH, pv_PACMAN_ARRAY_CELL_WIDTH));
+            pvSet(pv_GHOSTS_NPC_IDX, get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2)));
         }
         when(){
         } state CHECK_MOVE
@@ -127,11 +178,9 @@ ss ghosts_pacman{
         entry{
             int idx; 
             pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
-            idx = get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2), pv_PACMAN_ARRAY_ROW_LENGTH, pv_PACMAN_ARRAY_CELL_WIDTH);
+            idx = get_array_index_from_xy(pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2), pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2));
             pvSet(pv_GHOSTS_NPC_IDX, idx);
-            pvSet(pv_GHOSTS_NPC_IDXVAL, pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX]);
-
-            printf("\nDISTANCE: %d", get_distance_from_pacman(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y));
+            pvSet(pv_GHOSTS_NPC_IDXVAL, pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX+1]);
         }
         when(){
         } state MOVE
@@ -152,7 +201,7 @@ ss ghosts_pacman{
     }
     
     state MOVE_MIDDLE{
-        when(delay(0.3)){
+        when(delay(0.1)){
             int respawn = 370;
             pvSetStr(pv_SS_GHOSTS, "MOVE_MIDDLE");
             pvSet(pv_GHOSTS_NPC_X, respawn);
@@ -162,9 +211,20 @@ ss ghosts_pacman{
 
     state CHECK_MOVEABLE_DIRECTIONS{
         entry{
+            int rnd = randomNr();
+            int dir;
+            int scnd_dir;
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTIONS");
+            dir = get_shortest_direction_to_pacman(pv_GHOSTS_NPC_IDX, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
+            scnd_dir = get_second_shortest_direction_to_pacman(pv_GHOSTS_NPC_IDX, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
 
-            pvSet(pv_GHOSTS_NPC_DIR, randomNr());
+            if(pv_PACMAN_PLAY_FIELD[get_index_from_direction(pv_GHOSTS_NPC_IDX, dir)] == 1){
+                pvSet(pv_GHOSTS_NPC_DIR, scnd_dir);
+            }else{
+                pvSet(pv_GHOSTS_NPC_DIR, dir);
+            }
+            
+            
         }when(){
         } state CHECK_MOVE
     }
@@ -174,7 +234,7 @@ ss ghosts_pacman{
         } state MOVE_MIDDLE
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+1)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
-        when(delay(0.3)){
+        when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT" );
             if(pv_GHOSTS_NPC_X < 1000 && pv_GHOSTS_NPC_X >= 0){
                 pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST));
@@ -184,9 +244,9 @@ ss ghosts_pacman{
     state MOVE_LEFT{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
-        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-1)]){
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-1)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
-        when(delay(0.3)){
+        when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_LEFT" );
             if(pv_GHOSTS_NPC_X <= 1000 && pv_GHOSTS_NPC_X > 0){
                 pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST));
@@ -196,9 +256,9 @@ ss ghosts_pacman{
     state MOVE_UP{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
-        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
-        when(delay(0.3)){
+        when(delay(0.1)){
             pvSetStr(pv_SS_GHOSTS, "MOVE_UP" );
             if(pv_GHOSTS_NPC_Y < 1000 && pv_GHOSTS_NPC_Y > 0){
                 pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST));
@@ -208,9 +268,9 @@ ss ghosts_pacman{
     state MOVE_DOWN{
         when(pv_GHOSTS_NPC_IDX == -1){
         }state MOVE_MIDDLE
-        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH)]){
+        when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
-        when(delay(0.3)){
+        when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_DOWN" );
             if(pv_GHOSTS_NPC_Y <= 1000 && pv_GHOSTS_NPC_Y >= 0){
                 pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST));
