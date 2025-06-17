@@ -15,9 +15,11 @@ DB += pacman_game_parameter.template
 pacman_SRCS += pacman_registerRecordDeviceDriver.cpp
 pacman_SRCS += pacman.st
 pacman_DBD += base.dbd
-pacman_LIBS += seq pv
+pacman_LIBS += seq pv png z
 pacman_LIBS += $(EPICS_BASE_IOC_LIBS)
 
+png_DIR = /usr/lib
+z_DIR = /usr/lib
 
 
 #----------------------------------------
