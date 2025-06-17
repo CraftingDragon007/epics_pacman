@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caCamera" name="cacamera">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>681</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="channelData" stdset="0">
+     <string notr="true">$(NAME):PACMAN_PNG_DATA</string>
+    </property>
+    <property name="channelWidth" stdset="0">
+     <string notr="true">$(NAME):PACMAN_PNG_WIDTH</string>
+    </property>
+    <property name="channelHeight" stdset="0">
+     <string notr="true">$(NAME):PACMAN_PNG_HEIGHT</string>
+    </property>
+    <property name="colorMode" stdset="0">
+     <enum>caCamera::colormode::RGB1_CA</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caCamera</class>
+   <extends>QWidget</extends>
+   <header>caCamera</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

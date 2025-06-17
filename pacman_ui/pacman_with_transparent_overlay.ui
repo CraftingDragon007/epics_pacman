@@ -5884,6 +5884,70 @@
      </property>
     </item>
    </widget>
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>210</y>
+      <width>51</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ROW</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_2">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>240</y>
+      <width>41</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>COL</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_3">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>220</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_ARRAY_ROW</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_4">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>250</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_ARRAY_COL</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
