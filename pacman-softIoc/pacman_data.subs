@@ -10,6 +10,8 @@ file pacman_game_parameter.template
   { PACMAN, FIELD, SIZE, 1024, 0, 1024 }
   { PACMAN, ARRAY, X_SIZE, 32, 0, 32 }
   { PACMAN, ARRAY, X_FACTOR, 25, 0, 25 }
+  { PACMAN, ARRAY, ROW, 31, 0, 0 }
+  { PACMAN, ARRAY, COL, 31, 0, 0 }
   { PACMAN, PACMAN, STATE, 10, 0, 0 }
   { PACMAN, PACMAN, ABORT, 10, 0, 0 }
   { PACMAN, PACMAN, SIZE, 50, 0, 35 }
