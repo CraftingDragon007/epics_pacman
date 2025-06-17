@@ -88,61 +88,39 @@ PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
             return difference;
         }
 
-        static int get_shortest_direction_to_pacman(int index, int pacx, int pacy){
+        static void get_shortest_direction_to_pacman(int index, int pacx, int pacy, int* first, int* second, int* third, int* fourth) {
             int distance[4];
+            int dir[4] = {0, 1, 2, 3}; // 0=right, 1=left, 2=up, 3=down
             int idx[4] = {
                 index + 1, // right
                 index - 1, // left
                 index - CONST_ARRAY_ROW_LENGTH, // up
                 index + CONST_ARRAY_ROW_LENGTH  // down
             };
-            for(int i = 0; i < 4; i++){
+
+            for(int i = 0; i < 4; i++) {
                 distance[i] = get_distance_from_pacman(pacx, pacy, get_x_from_index(idx[i]), get_y_from_index(idx[i]));
             }
 
-            // Find index of lowest number
-            int min_idx = 0;
-            for(int i = 1; i < 4; i++){
-                if(distance[i] < distance[min_idx]){
-                    min_idx = i;
+            // Sort directions by distance (ascending)
+            for(int i = 0; i < 3; i++) {
+                for(int j = i + 1; j < 4; j++) {
+                    if(distance[dir[j]] < distance[dir[i]]) {
+                        int tmp = dir[i];
+                        dir[i] = dir[j];
+                        dir[j] = tmp;
+                    }
                 }
             }
-            printf("\nShortest direction to pacman: %d", min_idx);
-            return min_idx;
+
+            // Save sorted directions to pointers
+            if (first)  *first  = dir[0];
+            if (second) *second = dir[1];
+            if (third)  *third  = dir[2];
+            if (fourth) *fourth = dir[3];
         }
 
-        static int get_second_shortest_direction_to_pacman(int index, int pacx, int pacy){
-            int distance[4];
-            int idx[4] = {
-                index + 1, // right
-                index - 1, // left
-                index - CONST_ARRAY_ROW_LENGTH, // up
-                index + CONST_ARRAY_ROW_LENGTH  // down
-            };
-            for(int i = 0; i < 4; i++){
-                distance[i] = get_distance_from_pacman(pacx, pacy, get_x_from_index(idx[i]), get_y_from_index(idx[i]));
-            }
-
-            // Find index of second lowest number
-            int min_idx = 0;
-            int second_min_idx = 1;
-            if(distance[1] < distance[0]){
-                min_idx = 1;
-                second_min_idx = 0;
-            }
-            for(int i = 2; i < 4; i++){
-                if(distance[i] < distance[min_idx]){
-                    second_min_idx = min_idx;
-                    min_idx = i;
-                } else if(distance[i] < distance[second_min_idx]){
-                    second_min_idx = i;
-                }
-            }
-            printf("\nSecond shortest direction to pacman: %d", second_min_idx);
-            return second_min_idx;
-        }
-
-        static int get_index_from_direction(int index, int direction){
+        static int get_surrounding_index_from_direction(int index, int direction){
             switch(direction){
                 case 0: // right
                     return index + 1;
@@ -212,19 +190,21 @@ ss ghosts_pacman{
     state CHECK_MOVEABLE_DIRECTIONS{
         entry{
             int rnd = randomNr();
-            int dir;
-            int scnd_dir;
+            int sorted_dir[4];
+            int first, second, third, fourth;
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTIONS");
-            dir = get_shortest_direction_to_pacman(pv_GHOSTS_NPC_IDX, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
-            scnd_dir = get_second_shortest_direction_to_pacman(pv_GHOSTS_NPC_IDX, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
-
-            if(pv_PACMAN_PLAY_FIELD[get_index_from_direction(pv_GHOSTS_NPC_IDX, dir)] == 1){
-                pvSet(pv_GHOSTS_NPC_DIR, scnd_dir);
-            }else{
-                pvSet(pv_GHOSTS_NPC_DIR, dir);
+            get_shortest_direction_to_pacman(pv_GHOSTS_NPC_IDX, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
+       
+            // Check if the ghost can move in the fastest direction of the pacman, otherwise check the others in descending order
+            if(pv_PACMAN_PLAY_FIELD[get_surrounding_index_from_direction(pv_GHOSTS_NPC_IDX, first)] != 1){
+                pvSet(pv_GHOSTS_NPC_DIR, first);
+            } else if(pv_PACMAN_PLAY_FIELD[get_surrounding_index_from_direction(pv_GHOSTS_NPC_IDX, second)] != 1){
+                pvSet(pv_GHOSTS_NPC_DIR, second);
+            } else if(pv_PACMAN_PLAY_FIELD[get_surrounding_index_from_direction(pv_GHOSTS_NPC_IDX, third)] != 1){
+                pvSet(pv_GHOSTS_NPC_DIR, third);
+            } else if(pv_PACMAN_PLAY_FIELD[get_surrounding_index_from_direction(pv_GHOSTS_NPC_IDX, fourth)] != 1){
+                pvSet(pv_GHOSTS_NPC_DIR, fourth);
             }
-            
-            
         }when(){
         } state CHECK_MOVE
     }
