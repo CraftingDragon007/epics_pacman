@@ -22,8 +22,9 @@ TOP = ../..
 #  DB += inhibit_TOMCAT.template
 #
 #pacman_ioc_SRCS += pacman_ioc.st
-#pacman_ioc_LIBS += seq pv
+pacman_ioc_LIBS += png
 pacman_ioc_LIBS += $(EPICS_BASE_IOC_LIBS)
+USR_LDFLAGS = -lpng
 #
 #  #----------------------------------------
 SOFTIOCWIN_DESC = pacman game

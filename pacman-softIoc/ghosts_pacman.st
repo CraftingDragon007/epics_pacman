@@ -23,6 +23,8 @@ PV( int, pv_GHOSTS_NPC_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );
 PV( int, pv_GHOSTS_NPC_X_CORRECT, "{NAME}:GHOSTS_NPC_X_CORRECT", PV_MON );
 PV( int, pv_GHOSTS_NPC_Y_CORRECT, "{NAME}:GHOSTS_NPC_Y_CORRECT", PV_MON );
 
+PV( int, pv_GHOSTS_NPC_INTERSECT, "{NAME}:GHOSTS_NPC_INTERSECT", PV_MON );
+
 /* variables ghost run */
 PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
 PV( int, pv_GHOSTS_NPC_RUN, "{NAME}:GHOSTS_NPC_RUN", PV_MON );
@@ -36,6 +38,7 @@ PV( int, pv_PACMAN_USER_X, "{NAME}:PACMAN_USER_X", PV_MON );
 PV( int, pv_PACMAN_USER_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
 PVA( short, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
 PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
+PV( int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
 
 /* Functions */
 %{
@@ -163,12 +166,43 @@ ss ghosts_pacman{
             pvSet(pv_GHOSTS_NPC_IDXVAL, pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX+1]);
         }
         when(){
-        } state CALCULATE_CORRECTION
+        } state CHECK_INTERSECTION
+    }
+
+    state CHECK_INTERSECTION{
+        entry{
+            int idx = pv_GHOSTS_NPC_IDX;
+            
+            int idxbelow = idx + pv_PACMAN_ARRAY_ROW_LENGTH;
+            int idxbelow_2 = idx + (pv_PACMAN_ARRAY_ROW_LENGTH * 2);
+            
+            int idxleft = idx - 1;
+            int idxleft_2 = idx - 2;
+            
+            int idxright = idx + 1;
+            int idxright_2 = idx + 2;
+            
+            int idxabove = idx - pv_PACMAN_ARRAY_ROW_LENGTH;
+            int idxabove_2 = idx - (pv_PACMAN_ARRAY_ROW_LENGTH * 2);
+
+            pvSetStr( pv_SS_GHOSTS, "CHECK_INTERSECTION" );
+            
+            if ((pv_PACMAN_PLAY_FIELD[idxbelow] == 0 && pv_PACMAN_PLAY_FIELD[idxbelow_2] == 0) ||
+                (pv_PACMAN_PLAY_FIELD[idxabove] == 0 && pv_PACMAN_PLAY_FIELD[idxabove_2] == 0) ||
+                (pv_PACMAN_PLAY_FIELD[idxleft] == 0 && pv_PACMAN_PLAY_FIELD[idxleft_2] == 0) ||
+                (pv_PACMAN_PLAY_FIELD[idxright] == 0 && pv_PACMAN_PLAY_FIELD[idxright_2] == 0)) {
+                pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
+            }else{
+                pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
+            }
+
+        } when(pv_GHOSTS_NPC_INTERSECT == 1 && delay(0.5)){} state CHECK_MOVEABLE_DIRECTIONS
+        when(){} state CALCULATE_CORRECTION
     }
 
     state CALCULATE_CORRECTION{
         entry{
-            pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
+            pvSetStr( pv_SS_GHOSTS, "CALCULATE_CORRECTION" );
         }
         when(pv_GHOSTS_NPC_DIR % 4 == 0 || pv_GHOSTS_NPC_DIR % 4 == 1){
             int idx = pv_GHOSTS_NPC_IDX;
@@ -198,21 +232,22 @@ ss ghosts_pacman{
 
     state MOVE{
         entry{
+            int correction_distance = pv_GHOSTS_NPC_MOVDIST/3;
             // Y - Correction
             if(pv_GHOSTS_NPC_Y_CORRECT > 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + 1));
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + correction_distance));
                 pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
             }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - 1));
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - correction_distance));
                 pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
             }
 
             // X-Correction
             if(pv_GHOSTS_NPC_X_CORRECT > 0){
-                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + 1));
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + correction_distance));
                 pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT - 1));
             }else if(pv_GHOSTS_NPC_X_CORRECT < 0){
-                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - 1));
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - correction_distance));
                 pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT + 1));
             }
         }
@@ -257,7 +292,10 @@ ss ghosts_pacman{
             } else if(pv_PACMAN_PLAY_FIELD[get_surrounding_index_from_direction(pv_GHOSTS_NPC_IDX, fourth)] != 1){
                 pvSet(pv_GHOSTS_NPC_DIR, fourth);
             }
-        }when(){
+        }when(pv_GHOSTS_NPC_INTERSECT == 1){
+            pvSet(pv_GHOSTS_NPC_INTERSECT, 0)
+        } state CALCULATE_CORRECTION 
+        when(){
         } state CHECK_MOVE
     }
 
@@ -268,7 +306,7 @@ ss ghosts_pacman{
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_RIGHT" );
-            if(pv_GHOSTS_NPC_X < 1000 && pv_GHOSTS_NPC_X >= 0){
+            if(pv_GHOSTS_NPC_X < pv_PACMAN_FIELD_RESOLUTION && pv_GHOSTS_NPC_X >= 0){
                 pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST));
             }
         }state CHECK_MOVE
@@ -281,22 +319,10 @@ ss ghosts_pacman{
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_LEFT" );
-            if(pv_GHOSTS_NPC_X <= 1000 && pv_GHOSTS_NPC_X > 0){
+            if(pv_GHOSTS_NPC_X <= pv_PACMAN_FIELD_RESOLUTION && pv_GHOSTS_NPC_X > 0){
                 pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST));
             }
         }state CHECK_MOVE
-    }
-    
-    state CORRECT_Y{
-        when(){
-            if(pv_GHOSTS_NPC_Y_CORRECT > 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + 1));
-                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
-            }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - 1));
-                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
-            }
-        } state CHECK_MOVE
     }
     
     state MOVE_UP{
@@ -306,7 +332,7 @@ ss ghosts_pacman{
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
             pvSetStr(pv_SS_GHOSTS, "MOVE_UP" );
-            if(pv_GHOSTS_NPC_Y < 1000 && pv_GHOSTS_NPC_Y > 0){
+            if(pv_GHOSTS_NPC_Y < pv_PACMAN_FIELD_RESOLUTION && pv_GHOSTS_NPC_Y > 0){
                 pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST));
             }
         }state CHECK_MOVE
@@ -318,7 +344,7 @@ ss ghosts_pacman{
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
             pvSetStr( pv_SS_GHOSTS, "MOVE_DOWN" );
-            if(pv_GHOSTS_NPC_Y <= 1000 && pv_GHOSTS_NPC_Y >= 0){
+            if(pv_GHOSTS_NPC_Y <= pv_PACMAN_FIELD_RESOLUTION && pv_GHOSTS_NPC_Y >= 0){
                 pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST));
             }
         }state CHECK_MOVE
