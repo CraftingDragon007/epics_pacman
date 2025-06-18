@@ -19,6 +19,7 @@ PV( int     , pv_PACMAN_USER_DIRECTION	, "{NAME}:PACMAN_USER_DIRECTION", PV_MON 
 PV( int     , pv_PACMAN_TRY_DIRECTION	, "{NAME}:PACMAN_TRY_DIRECTION"	, PV_MON );
 PV( int     , pv_PACMAN_STOP_DIRECTION	, "{NAME}:PACMAN_STOP_DIRECTION", PV_MON );
 PV( int     , pv_PACMAN_FIELD_SIZE    	, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
+PV( int     , pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
 PV( int     , pv_PACMAN_RESERVE_SIZE	, "{NAME}:PACMAN_RESERVE_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_ARRAY_X_SIZE	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_ARRAY_X_FACTOR	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
@@ -211,6 +212,30 @@ void write_rgb_into_pointer(unsigned char* original_data, unsigned char* target_
     memcpy(target_data, original_data, total_size);
 }
 
+/** Converts a position on the pv_PACMAN_FIELD_RESOLUTION * pv_PACMAN_FIELD_RESOLUTION field to an index in a png rgb (3-bit) image
+    * @param x The x-coordinate in the field.
+    * @param y The y-coordinate in the field.
+    * @param PACMAN_FIELD_RESOLUTION The resolution of the field (width and height).
+    * @param png_width The width of the PNG image.
+    * @param png_height The height of the PNG image.
+    * @return The index in the 1D RGB array for the PNG image.
+    */
+static int get_png_index_from_xy(int x, int y, int PACMAN_FIELD_RESOLUTION, int png_width, int png_height) {
+    if (x < 0 || x >= PACMAN_FIELD_RESOLUTION || y < 0 || y >= PACMAN_FIELD_RESOLUTION) {
+        return -1; // out of bounds
+    }
+
+    x = (x * png_width) / PACMAN_FIELD_RESOLUTION; // Scale x to PNG width
+    y = (y * png_height) / PACMAN_FIELD_RESOLUTION; // Scale y to PNG height
+    if (x < 0 || x >= png_width || y < 0 || y >= png_height) {
+        return -1; // out of bounds after scaling
+    }
+
+    return (y * png_width + x) * 3; // 3 bytes per pixel (RGB)
+}
+
+int previous_index = -1; // Variable to store the previous index for debugging
+
 }%
 
 %{
@@ -288,6 +313,7 @@ ss pacman_game {
             int third_index;
             int offset = (int)(pv_PACMAN_PACMAN_SIZE / 2);
             int half_offset = (int)(pv_PACMAN_PACMAN_SIZE / 4);
+            int png_index;
 
             pvSetStr(pv_SS_PACMAN, "MOVE_CHECK");
 
@@ -306,6 +332,16 @@ ss pacman_game {
                     printf("corrected position right - y 1\n");
                     printf("right current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("right current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 if (pv_PACMAN_PLAY_FIELD[third_index] == 0 && pv_PACMAN_PLAY_FIELD[second_index] == 1) {
                     // correct position + y 1 using index to get y
@@ -314,6 +350,16 @@ ss pacman_game {
                     printf("corrected position right y + 1\n");
                     printf("right current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("right current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 
                 if (second_index < 0 || (pv_PACMAN_PLAY_FIELD[second_index] == 1 && pv_PACMAN_PLAY_FIELD[third_index] == 1) || pv_PACMAN_PACMAN_ABORT == 1) {
@@ -345,6 +391,16 @@ ss pacman_game {
                     printf("corrected position left - y 1\n");
                     printf("left current_index: %d second_index: %d third_index: %d x: %d y: %d offset: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, offset);
                     printf("left current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 if (pv_PACMAN_PLAY_FIELD[third_index] == 0 && pv_PACMAN_PLAY_FIELD[second_index] == 1) {
                     // correct position + y 1 using index to get y
@@ -353,6 +409,16 @@ ss pacman_game {
                     printf("corrected position left y + 1\n");
                     printf("left current_index: %d second_index: %d third_index: %d x: %d y: %d offset: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, offset);
                     printf("left current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 
                 if (second_index < 0 || pv_PACMAN_PLAY_FIELD[second_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
@@ -384,6 +450,16 @@ ss pacman_game {
                     printf("corrected position up - x 1\n");
                     printf("up current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("up current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 if (pv_PACMAN_PLAY_FIELD[third_index] == 0 && pv_PACMAN_PLAY_FIELD[second_index] == 1) {
                     // correct position + x 1 using index to get x
@@ -392,6 +468,16 @@ ss pacman_game {
                     printf("corrected position up x + 1\n");
                     printf("up current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("up current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 
                 if (second_index < 0 || pv_PACMAN_PLAY_FIELD[second_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
@@ -424,6 +510,16 @@ ss pacman_game {
 
                     printf("down current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("down current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 if (pv_PACMAN_PLAY_FIELD[third_index] == 0 && pv_PACMAN_PLAY_FIELD[second_index] == 1) {
                     // correct position + x 1
@@ -433,6 +529,16 @@ ss pacman_game {
 
                     printf("down current_index: %d second_index: %d third_index: %d x: %d y: %d\n", current_index, second_index, third_index, pv_PACMAN_USER_X, pv_PACMAN_USER_Y);
                     printf("down current_index_state: %d second_index_state: %d third_index_state: %d\n", pv_PACMAN_PLAY_FIELD[current_index], pv_PACMAN_PLAY_FIELD[second_index], pv_PACMAN_PLAY_FIELD[third_index]);
+                    png_index = get_png_index_from_xy(pv_PACMAN_USER_X, pv_PACMAN_USER_Y, pv_PACMAN_FIELD_RESOLUTION, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT);
+                    if (png_index >= 0 && png_index < pv_PACMAN_DATA_SIZE) {
+                        // Set the color of red for debugging purposes
+                        pv_PACMAN_PNG_DATA[png_index] = 255; // Red channel
+                        pv_PACMAN_PNG_DATA[png_index + 1] = 0; // Green channel
+                        pv_PACMAN_PNG_DATA[png_index + 2] = 0; // Blue channel
+                        pvPut(pv_PACMAN_PNG_DATA);
+                    } else {
+                        printf("Error: PNG index out of bounds: %d\n", png_index);
+                    }
                 }
                 
                 if (second_index < 0 || pv_PACMAN_PLAY_FIELD[second_index] == 1 || pv_PACMAN_PACMAN_ABORT == 1) {
@@ -501,6 +607,42 @@ ss pacman_game {
         } state MOVE
     }
 
+    state DRAW_PACMAN {
+        entry { pvSetStr(pv_SS_PACMAN, "DRAW_PACMAN"); }
+        when () {
+            // Draw Pacman at the current position in the png data array
+            int x = pv_PACMAN_USER_X;
+            int y = pv_PACMAN_USER_Y;
+            int width = pv_PACMAN_PNG_WIDTH;
+            int height = pv_PACMAN_PNG_HEIGHT;
+            int data_size = pv_PACMAN_DATA_SIZE;
+
+            // Calculate the index in the 1D array
+            int index = get_png_index_from_xy(x, y, pv_PACMAN_FIELD_RESOLUTION, width, height);
+            if (index < 0 || index + 2 >= data_size) {
+                printf("Error: Index out of bounds for drawing Pacman: %d\n", index);
+            } else {
+                // Set the color for Pacman (yellow)
+                pv_PACMAN_PNG_DATA[index] = 255;     // Red
+                pv_PACMAN_PNG_DATA[index + 1] = 255; // Green
+                pv_PACMAN_PNG_DATA[index + 2] = 0;   // Blue
+
+                if (previous_index >= 0 && previous_index + 2 < data_size) {
+                    // Clear the previous position (set it to green)
+                    pv_PACMAN_PNG_DATA[previous_index] = 0;   // Red
+                    pv_PACMAN_PNG_DATA[previous_index + 1] = 255; // Green
+                    pv_PACMAN_PNG_DATA[previous_index + 2] = 0;   // Blue
+                }
+
+                // Store the current index as the previous index for the next draw
+                previous_index = index;
+
+                // Update the PV with the modified image data
+                pvPut(pv_PACMAN_PNG_DATA);
+            }
+        } state MOVE_CHECK
+    }
+
     state MOVE {
         entry {
             pvSetStr(pv_SS_PACMAN, "MOVE");
@@ -509,28 +651,28 @@ ss pacman_game {
             // Move right
             pvSetStr(pv_SS_PACMAN, "MOVE_RIGHT");
             pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X + 1);
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
         when (pv_PACMAN_USER_DIRECTION == 1) {
             // Move left
             pvSetStr(pv_SS_PACMAN, "MOVE_LEFT");
             pvSet(pv_PACMAN_USER_X, pv_PACMAN_USER_X - 1);
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
         when (pv_PACMAN_USER_DIRECTION == 2) {
             // Move up
             pvSetStr(pv_SS_PACMAN, "MOVE_UP");
             pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y - 1);
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
         when (pv_PACMAN_USER_DIRECTION == 3) {
             // Move down
             pvSetStr(pv_SS_PACMAN, "MOVE_DOWN");
             pvSet(pv_PACMAN_USER_Y, pv_PACMAN_USER_Y + 1);
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
         when (pv_PACMAN_USER_DIRECTION == -1) {
             // If no direction is set, stay in this state
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
         when () {
             // If no conditions are met, do nothing
-        } state MOVE_CHECK
+        } state DRAW_PACMAN
     }
 
     state MOVE_STOP {
