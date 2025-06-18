@@ -4,6 +4,8 @@ file pacman_game_parameter.template
   { GHOSTS, NPC, DIR, 10, -1, 0}
   { GHOSTS, NPC, X, 1000, 0, 0}
   { GHOSTS, NPC, Y, 1000, 0, 0}
+  { GHOSTS, NPC, Y_CORRECT, 1000, 0, 0}
+  { GHOSTS, NPC, X_CORRECT, 1000, 0, 0}
   { GHOSTS, NPC, IDX, 1000, -1, 0}
   { GHOSTS, NPC, IDXVAL, 1000, -1, 0}
   { GHOSTS, NPC, SIZE, 1000, 1, 30}

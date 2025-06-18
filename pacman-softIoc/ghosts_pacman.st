@@ -18,8 +18,10 @@ PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );
 PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
 PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );
 PV( int, pv_GHOSTS_NPC_IDX, "{NAME}:GHOSTS_NPC_IDX", PV_MON );
-PV( int, pv_GHOSTS_NPC_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );    
+PV( int, pv_GHOSTS_NPC_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );
 
+PV( int, pv_GHOSTS_NPC_X_CORRECT, "{NAME}:GHOSTS_NPC_X_CORRECT", PV_MON );
+PV( int, pv_GHOSTS_NPC_Y_CORRECT, "{NAME}:GHOSTS_NPC_Y_CORRECT", PV_MON );
 
 /* variables ghost run */
 PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
@@ -161,12 +163,61 @@ ss ghosts_pacman{
             pvSet(pv_GHOSTS_NPC_IDXVAL, pv_PACMAN_PLAY_FIELD[(int)pv_GHOSTS_NPC_IDX+1]);
         }
         when(){
+        } state CALCULATE_CORRECTION
+    }
+
+    state CALCULATE_CORRECTION{
+        entry{
+            pvSetStr( pv_SS_GHOSTS, "CHECK_MOVE" );
+        }
+        when(pv_GHOSTS_NPC_DIR % 4 == 0 || pv_GHOSTS_NPC_DIR % 4 == 1){
+            int idx = pv_GHOSTS_NPC_IDX;
+            int above = idx - pv_PACMAN_ARRAY_ROW_LENGTH;
+            int below = idx + pv_PACMAN_ARRAY_ROW_LENGTH;
+            int distance = get_y_from_index(pv_GHOSTS_NPC_IDX);
+
+            if(pv_PACMAN_PLAY_FIELD[above] == 1 && pv_PACMAN_PLAY_FIELD[below] == 0){
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (distance - pv_GHOSTS_NPC_Y));
+            }else if(pv_PACMAN_PLAY_FIELD[above] == 0 && pv_PACMAN_PLAY_FIELD[below] == 1){
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, pv_GHOSTS_NPC_Y - distance);
+            }
+        } state MOVE 
+        when(pv_GHOSTS_NPC_DIR % 4 == 2 || pv_GHOSTS_NPC_DIR % 4 == 3){
+            int idx = pv_GHOSTS_NPC_IDX;
+            int left = idx - 1;
+            int right = idx + 1;
+            int distance = get_x_from_index(pv_GHOSTS_NPC_IDX);
+
+            if(pv_PACMAN_PLAY_FIELD[left] == 1 && pv_PACMAN_PLAY_FIELD[right] == 0){
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (distance - pv_GHOSTS_NPC_X));
+            }else if(pv_PACMAN_PLAY_FIELD[left] == 0 && pv_PACMAN_PLAY_FIELD[right] == 1){
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X - distance));
+            }
         } state MOVE
     }
 
     state MOVE{
+        entry{
+            // Y - Correction
+            if(pv_GHOSTS_NPC_Y_CORRECT > 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + 1));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
+            }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - 1));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
+            }
+
+            // X-Correction
+            if(pv_GHOSTS_NPC_X_CORRECT > 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + 1));
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT - 1));
+            }else if(pv_GHOSTS_NPC_X_CORRECT < 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - 1));
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT + 1));
+            }
+        }
         when(pv_GHOSTS_NPC_IDX == -1){
-        }state MOVE_MIDDLE
+        }state TELEPORT_CENTER
         when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
         } state MOVE_RIGHT
         when(pv_GHOSTS_NPC_DIR % 4 == 1){
@@ -177,11 +228,12 @@ ss ghosts_pacman{
         } state MOVE_DOWN
         
     }
+
     
-    state MOVE_MIDDLE{
+    state TELEPORT_CENTER{
         when(delay(0.1)){
             int respawn = 370;
-            pvSetStr(pv_SS_GHOSTS, "MOVE_MIDDLE");
+            pvSetStr(pv_SS_GHOSTS, "TELEPORT_CENTER");
             pvSet(pv_GHOSTS_NPC_X, respawn);
             pvSet(pv_GHOSTS_NPC_Y, respawn);
         } state CHECK_MOVE
@@ -211,7 +263,7 @@ ss ghosts_pacman{
 
     state MOVE_RIGHT{
         when(pv_GHOSTS_NPC_IDX == -1){
-        } state MOVE_MIDDLE
+        } state TELEPORT_CENTER
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+1)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
@@ -221,9 +273,10 @@ ss ghosts_pacman{
             }
         }state CHECK_MOVE
     }
+
     state MOVE_LEFT{
         when(pv_GHOSTS_NPC_IDX == -1){
-        }state MOVE_MIDDLE
+        }state TELEPORT_CENTER
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-1)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
@@ -233,9 +286,22 @@ ss ghosts_pacman{
             }
         }state CHECK_MOVE
     }
+    
+    state CORRECT_Y{
+        when(){
+            if(pv_GHOSTS_NPC_Y_CORRECT > 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + 1));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
+            }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - 1));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
+            }
+        } state CHECK_MOVE
+    }
+    
     state MOVE_UP{
         when(pv_GHOSTS_NPC_IDX == -1){
-        }state MOVE_MIDDLE
+        }state TELEPORT_CENTER
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX-(int)pv_PACMAN_ARRAY_ROW_LENGTH)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
@@ -247,7 +313,7 @@ ss ghosts_pacman{
     }
     state MOVE_DOWN{
         when(pv_GHOSTS_NPC_IDX == -1){
-        }state MOVE_MIDDLE
+        }state TELEPORT_CENTER
         when(pv_PACMAN_PLAY_FIELD[((int)pv_GHOSTS_NPC_IDX+(int)pv_PACMAN_ARRAY_ROW_LENGTH)] == 1){
         } state CHECK_MOVEABLE_DIRECTIONS
         when(delay(0.1)){
