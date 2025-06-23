@@ -14,4 +14,13 @@ file pacman_game_parameter.template
   { GHOSTS, NPC, RUN, 10, 0, 0}
   { GHOSTS, NPC, RUNFRAME1, 10, 0, 0}
   { GHOSTS, NPC, RUNFRAME2, 10, 0, 0}
+  { GHOSTS, PNG, WIDTH, 800, 0, 800 }
+  { GHOSTS, PNG, HEIGHT, 600, 0, 600 }
+  { GHOSTS, PNG, DATA_SIZE, 200000, 0, 200000 }
+}
+
+file pacman_waveform.template
+{ pattern
+  { NAME,	DEVICE,	P,	NELM,	FTVL }
+  { GHOSTS, PNG, DATA, 200000, UCHAR }
 }
