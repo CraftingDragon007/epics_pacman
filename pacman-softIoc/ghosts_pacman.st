@@ -185,18 +185,30 @@ ss ghosts_pacman{
             int idxabove = idx - pv_PACMAN_ARRAY_ROW_LENGTH;
             int idxabove_2 = idx - (pv_PACMAN_ARRAY_ROW_LENGTH * 2);
 
+            int horizontal_intersection = 0;
+            int vertical_intersection = 0;
+
             pvSetStr( pv_SS_GHOSTS, "CHECK_INTERSECTION" );
             
             if ((pv_PACMAN_PLAY_FIELD[idxbelow] == 0 && pv_PACMAN_PLAY_FIELD[idxbelow_2] == 0) ||
-                (pv_PACMAN_PLAY_FIELD[idxabove] == 0 && pv_PACMAN_PLAY_FIELD[idxabove_2] == 0) ||
-                (pv_PACMAN_PLAY_FIELD[idxleft] == 0 && pv_PACMAN_PLAY_FIELD[idxleft_2] == 0) ||
+                (pv_PACMAN_PLAY_FIELD[idxabove] == 0 && pv_PACMAN_PLAY_FIELD[idxabove_2] == 0)){
+                vertical_intersection = 1;
+            }
+
+            if((pv_PACMAN_PLAY_FIELD[idxleft] == 0 && pv_PACMAN_PLAY_FIELD[idxleft_2] == 0) ||
                 (pv_PACMAN_PLAY_FIELD[idxright] == 0 && pv_PACMAN_PLAY_FIELD[idxright_2] == 0)) {
+                horizontal_intersection = 1;
+            }
+
+            if(horizontal_intersection == 1 && vertical_intersection == 1){
                 pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
             }else{
                 pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
             }
 
-        } when(pv_GHOSTS_NPC_INTERSECT == 1 && delay(0.5)){} state CHECK_MOVEABLE_DIRECTIONS
+        } when(pv_GHOSTS_NPC_INTERSECT == 1){
+            pvSetStr(pv_SS_GHOSTS, "CHECK_INTERSECTION - INTERSECT");
+        } state CHECK_MOVEABLE_DIRECTIONS
         when(){} state CALCULATE_CORRECTION
     }
 
