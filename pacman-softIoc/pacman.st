@@ -35,19 +35,19 @@ PV( string	, pv_SS_PACMAN			, "{NAME}:SS_PACMAN"			, PV_NONE );
     {0, 490, 14, 310},
     {0, 245, 157, 105},
     {0, 400, 157, 105},
-    {71, 168, 87, 27},
-    {71, 65, 87, 52},
-    {214, 65, 115, 52},
+    {71, 168, 86, 27},
+    {71, 65, 86, 52},
+    {215, 65, 115, 52},
     {10, 0, 780, 14},
     {10, 786, 780, 14},
     {11, 630, 60, 29},
     {72, 555, 85, 26},
     {130, 580, 27, 78},
     {73, 710, 255, 26},
-    {215, 633, 28, 79},
+    {215, 632, 28, 80},
     {215, 400, 28, 103},
-    {215, 168, 28, 180},
-    {214, 555, 115, 26},
+    {215, 168, 28, 182},
+    {215, 555, 115, 26},
     {240, 245, 88, 26},
     {300, 632, 200, 26},
     {300, 477, 200, 26},
@@ -57,21 +57,21 @@ PV( string	, pv_SS_PACMAN			, "{NAME}:SS_PACMAN"			, PV_NONE );
     {387, 192, 27, 79},
     {387, 12, 27, 104},
     {301, 320, 199, 106},
-    {471, 64, 115, 52},
-    {642, 65, 87, 52},
+    {471, 65, 115, 52},
+    {644, 65, 86, 52},
     {787, 0, 14, 260},
     {787, 490, 14, 310},
     {644, 400, 157, 105},
     {644, 244, 157, 105},
     {471, 555, 115, 26},
     {473, 710, 255, 26},
-    {558, 633, 28, 79},
-    {643, 555, 85, 26},
+    {558, 632, 28, 80},
+    {644, 555, 85, 26},
     {644, 580, 27, 78},
     {730, 630, 60, 29},
     {558, 400, 28, 103},
-    {642, 168, 87, 27},
-    {558, 168, 28, 180},
+    {644, 168, 86, 27},
+    {558, 168, 28, 182},
     {472, 245, 88, 26},
 };
 
@@ -92,14 +92,16 @@ PV( string	, pv_SS_PACMAN			, "{NAME}:SS_PACMAN"			, PV_NONE );
 
 }%
 
+int internal_direction = 3;
 
 ss pacman_game {
 	state INIT {
 		entry {
 			pvSetStr( pv_SS_PACMAN, "INIT" );
-			pvSet(pv_PLAYER_X, 25);
-			pvSet(pv_PLAYER_Y, 25);
-			pvSet(pv_PLAYER_DIRECTION, 0); // (0=right, 1=left, 2=up, 3=down)
+			pvSet(pv_PLAYER_X, 400 - pv_PLAYER_SIZE / 2);
+			pvSet(pv_PLAYER_Y, 606 - pv_PLAYER_SIZE / 2);
+			pvSet(pv_PLAYER_DIRECTION, 3); // (0=right, 1=left, 2=up, 3=down)
+			internal_direction = 3;
 			pvSet(pv_PLAYER_STATE, 0);
 		}
 		 when () {
@@ -111,7 +113,7 @@ ss pacman_game {
 		entry {
 			pvSetStr( pv_SS_PACMAN, "GAME" );
 		}
-		when (delay(0.01)) {
+		when (delay(0.015)) {
 		} state CHECK_INTERSECTION
 	}
 
@@ -141,11 +143,11 @@ ss pacman_game {
 		when () {
 			int x_new = pv_PLAYER_X + pv_FIELD_WIDTH;
 			int y_new = pv_PLAYER_Y + pv_FIELD_WIDTH;			
-			if (pv_PLAYER_DIRECTION == 0) { // rigtht, increase x
+			if (internal_direction == 0) { // rigtht, increase x
 				x_new = x_new + pv_PLAYER_STEP;
-			} else if (pv_PLAYER_DIRECTION == 1) { // left, decrease x
+			} else if (internal_direction == 1) { // left, decrease x
 				x_new = x_new - pv_PLAYER_STEP; 
-			} else if (pv_PLAYER_DIRECTION == 2) { // up, decrease y (inverted axis)
+			} else if (internal_direction == 2) { // up, decrease y (inverted axis)
 				y_new = y_new - pv_PLAYER_STEP;
 			} else { // down, increase y (inverted axis)
 				y_new = y_new + pv_PLAYER_STEP;
@@ -160,5 +162,39 @@ ss pacman_game {
 			}
 
 		} state GAME
+	}
+}
+
+ss pacman_direction {
+	state INIT {
+		when () {
+		} state CHECK_DIRECTION_CHANGE
+	}
+
+	state CHECK_DIRECTION_CHANGE {
+		when (pv_PLAYER_DIRECTION != internal_direction) {
+			int new_direction = pv_PLAYER_DIRECTION;
+
+			int x_new = pv_PLAYER_X + pv_FIELD_WIDTH;
+			int y_new = pv_PLAYER_Y + pv_FIELD_WIDTH;			
+			if (new_direction == 0) { // rigtht, increase x
+				x_new = x_new + pv_PLAYER_SIZE;
+			} else if (new_direction == 1) { // left, decrease x
+				x_new = x_new - pv_PLAYER_SIZE; 
+			} else if (new_direction == 2) { // up, decrease y (inverted axis)
+				y_new = y_new - pv_PLAYER_SIZE;
+			} else { // down, increase y (inverted axis)
+				y_new = y_new + pv_PLAYER_SIZE;
+			}
+
+			x_new = x_new % pv_FIELD_WIDTH;
+			y_new = y_new % pv_FIELD_HEIGHT;
+
+			if (is_intersecting_obstacle(x_new, y_new, pv_PLAYER_SIZE)) {
+				pvSet(pv_PLAYER_DIRECTION, internal_direction);
+			} else {
+				internal_direction = new_direction;
+			}
+		} state CHECK_DIRECTION_CHANGE
 	}
 }

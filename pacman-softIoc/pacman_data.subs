@@ -5,7 +5,7 @@ file pacman_game_parameter.template
   { PACMAN, PLAYER, Y, 800, 0, 25}
   { PACMAN, PLAYER, DIRECTION, 3, 0, 0 }
   { PACMAN, PLAYER, STEP, 10, 1, 1 }
-  { PACMAN, PLAYER, SIZE, 100, 10, 50 }
+  { PACMAN, PLAYER, SIZE, 100, 10, 40 }
   { PACMAN, PLAYER, STATE, 10, 0, 0 }
   { PACMAN, FIELD, WIDTH, 800, 0, 800 }
   { PACMAN, FIELD, HEIGHT, 800, 0, 800 }
