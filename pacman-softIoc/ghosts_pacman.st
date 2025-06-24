@@ -20,6 +20,11 @@ PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );
 PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
 PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );
 
+PV( int, pv_GHOSTS_TAB_X, "{NAME}:GHOSTS_NPC_TABX", PV_MON );  
+PV( int, pv_GHOSTS_TAB_Y, "{NAME}:GHOSTS_NPC_TABY", PV_MON );  
+PV( int, pv_GHOSTS_IDX, "{NAME}:GHOSTS_NPC_IDX", PV_MON );  
+PV( int, pv_GHOSTS_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );  
+
 PV( int, pv_GHOSTS_NPC_X_CORRECT, "{NAME}:GHOSTS_NPC_X_CORRECT", PV_MON );
 PV( int, pv_GHOSTS_NPC_Y_CORRECT, "{NAME}:GHOSTS_NPC_Y_CORRECT", PV_MON );
 PV( int, pv_GHOSTS_NPC_INTERSECT, "{NAME}:GHOSTS_NPC_INTERSECT", PV_MON );
@@ -245,6 +250,35 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
         }
 }%
 
+%{
+    int NPC_SIZE;
+    int CELL_SIZE;
+
+    int gh_get_tab_coordinates(int cor, int offset){
+        double tabcor = (cor + (NPC_SIZE/2) + offset) / CELL_SIZE;
+        int tab = round(tabcor);
+        if(tabcor < 0) tabcor = 0;
+        if(tabcor > 32) tabcor = 32;
+        return tab;
+    }
+
+    int gh_get_caqtdm_coordinates(int tab_cor){
+        int cor = tab_cor;
+        if(cor < 0) cor = 0;
+        if(cor > 31) cor = 31;
+        return (cor * CELL_SIZE) - (NPC_SIZE/2);
+    }
+
+    int gh_tab_coordinates_to_index(int tab_x, int tab_y){
+        if(tab_x < 0) tab_x = 0;
+        if(tab_x > 31) tab_x = 31;
+        if(tab_y < 0) tab_y = 0;
+        if(tab_y > 31) tab_y = 31;
+        return tab_y * 32 + tab_x;
+    }
+
+}%
+
 // movement of ghosts
 ss ghosts_pacman{
     state INIT{
@@ -256,8 +290,9 @@ ss ghosts_pacman{
             pvSetStr(pv_SS_GHOSTS, "INIT");
             pvSet(pv_GHOSTS_NPC_SIZE, 40);
             pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
-            pvSet(pv_GHOSTS_NPC_X, (int)pv_GHOSTS_NPC_SIZE*1.3);
-            pvSet(pv_GHOSTS_NPC_Y, (int)pv_GHOSTS_NPC_SIZE*1.3);
+            pvSet(pv_GHOSTS_NPC_X, 25);
+            pvSet(pv_GHOSTS_NPC_Y, 25);
+            pvSet(pv_GHOSTS_NPC_DIR, 1);
 
             // PNG
             if (image_data) {
@@ -272,16 +307,56 @@ ss ghosts_pacman{
             }   
         }
         when(){
+            NPC_SIZE = pv_GHOSTS_NPC_SIZE;
+            CELL_SIZE = pv_PACMAN_ARRAY_CELL_WIDTH;
         } state CHECK_MOVE
     }
     state CHECK_MOVE{
         entry{
+            int dir = pv_GHOSTS_NPC_DIR % 4;
+            int offset = pv_GHOSTS_NPC_MOVDIST;
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVE");
+
+            // 0 = r, 1 = l, 2 = u, 3 = d
+            if(dir == 0){
+                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_SIZE/2)));
+                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
+            }else if(dir == 1){
+                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, -(pv_GHOSTS_NPC_SIZE/2) + 1.5*offset));
+                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
+            }else if(dir == 2){
+                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
+                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, -(pv_GHOSTS_NPC_SIZE/2)));
+            }else if(dir == 3){
+                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
+                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_SIZE/2) + 2.5*offset));
+            }
+            pvSet(pv_GHOSTS_IDX, gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y));
+            pvSet(pv_GHOSTS_IDXVAL, pv_PACMAN_PLAY_FIELD[pv_GHOSTS_IDX]);
         }
-        when(delay(0.2)){
+        when(delay(0.1) && pv_GHOSTS_IDXVAL == 0){
         } state MOVE
+        when(pv_GHOSTS_IDXVAL == 1){
+        } state CHECK_MOVEABLE_DIRECTION
     }
 
+    state CHECK_MOVEABLE_DIRECTION{
+        entry{
+            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE DIRECTION");
+        }
+        when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
+            pvSet(pv_GHOSTS_NPC_DIR, 1);
+        } state MOVE
+        when(pv_GHOSTS_NPC_DIR % 4 == 1){
+            pvSet(pv_GHOSTS_NPC_DIR, 0);
+        } state MOVE
+        when(pv_GHOSTS_NPC_DIR % 4 == 2){
+            pvSet(pv_GHOSTS_NPC_DIR, 3);
+        } state MOVE
+        when(pv_GHOSTS_NPC_DIR % 4 == 3){
+            pvSet(pv_GHOSTS_NPC_DIR, 2);
+        } state MOVE
+    }
 
     state MOVE{
         entry{
