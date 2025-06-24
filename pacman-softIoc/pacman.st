@@ -13,6 +13,7 @@ option  +r;
 
 PV( int		, pv_GAME_STATE			, "{NAME}:PACMAN_GAME_STATE"		, PV_MON );
 PV( int		, pv_GAME_COUNTDOWN		, "{NAME}:PACMAN_GAME_COUNTDOWN"	, PV_MON );
+PV( int		, pv_GAME_DRIFT			, "{NAME}:PACMAN_GAME_DRIFT"		, PV_MON );
 PV( int		, pv_PLAYER_X			, "{NAME}:PACMAN_PLAYER_X"			, PV_MON );   
 PV( int		, pv_PLAYER_Y			, "{NAME}:PACMAN_PLAYER_Y"			, PV_MON );
 PV( int		, pv_PLAYER_DIRECTION	, "{NAME}:PACMAN_PLAYER_DIRECTION"	, PV_MON );
@@ -190,28 +191,35 @@ ss pacman_direction {
 	}
 
 	state CHECK_DIRECTION_CHANGE {
-		when (pv_PLAYER_DIRECTION != internal_direction) {
-			int new_direction = pv_PLAYER_DIRECTION;
+		when (delay(0.1)) {
+				int new_direction = pv_PLAYER_DIRECTION;
+				if (new_direction != internal_direction) {
+				int x_new = pv_PLAYER_X + pv_FIELD_WIDTH;
+				int y_new = pv_PLAYER_Y + pv_FIELD_WIDTH;			
+				if (new_direction == 0) { // rigtht, increase x
+					x_new = x_new + pv_PLAYER_SIZE;
+				} else if (new_direction == 1) { // left, decrease x
+					x_new = x_new - pv_PLAYER_SIZE; 
+				} else if (new_direction == 2) { // up, decrease y (inverted axis)
+					y_new = y_new - pv_PLAYER_SIZE;
+				} else { // down, increase y (inverted axis)
+					y_new = y_new + pv_PLAYER_SIZE;
+				}
 
-			int x_new = pv_PLAYER_X + pv_FIELD_WIDTH;
-			int y_new = pv_PLAYER_Y + pv_FIELD_WIDTH;			
-			if (new_direction == 0) { // rigtht, increase x
-				x_new = x_new + pv_PLAYER_SIZE;
-			} else if (new_direction == 1) { // left, decrease x
-				x_new = x_new - pv_PLAYER_SIZE; 
-			} else if (new_direction == 2) { // up, decrease y (inverted axis)
-				y_new = y_new - pv_PLAYER_SIZE;
-			} else { // down, increase y (inverted axis)
-				y_new = y_new + pv_PLAYER_SIZE;
-			}
-
-			x_new = x_new % pv_FIELD_WIDTH;
-			y_new = y_new % pv_FIELD_HEIGHT;
-
-			if (is_intersecting_obstacle(x_new, y_new, pv_PLAYER_SIZE)) {
-				pvSet(pv_PLAYER_DIRECTION, internal_direction);
-			} else {
-				internal_direction = new_direction;
+				x_new = x_new % pv_FIELD_WIDTH;
+				y_new = y_new % pv_FIELD_HEIGHT;
+				
+				if (pv_GAME_DRIFT) {
+					if (!is_intersecting_obstacle(x_new, y_new, pv_PLAYER_SIZE)) {
+						internal_direction = new_direction;
+					}
+				} else {
+					if (is_intersecting_obstacle(x_new, y_new, pv_PLAYER_SIZE)) {
+						pvSet(pv_PLAYER_DIRECTION, internal_direction);
+					} else {
+						internal_direction = new_direction;
+					}
+				}
 			}
 		} state CHECK_DIRECTION_CHANGE
 	}
