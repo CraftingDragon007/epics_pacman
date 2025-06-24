@@ -11,15 +11,17 @@ program pacman
 /* options */
 option  +r;
 
-PV( int		, pv_PLAYER_X			, "{NAME}:PACMAN_PLAYER_X"		, PV_MON );   
-PV( int		, pv_PLAYER_Y			, "{NAME}:PACMAN_PLAYER_Y"		, PV_MON );
+PV( int		, pv_GAME_STATE			, "{NAME}:PACMAN_GAME_STATE"		, PV_MON );
+PV( int		, pv_GAME_COUNTDOWN		, "{NAME}:PACMAN_GAME_COUNTDOWN"	, PV_MON );
+PV( int		, pv_PLAYER_X			, "{NAME}:PACMAN_PLAYER_X"			, PV_MON );   
+PV( int		, pv_PLAYER_Y			, "{NAME}:PACMAN_PLAYER_Y"			, PV_MON );
 PV( int		, pv_PLAYER_DIRECTION	, "{NAME}:PACMAN_PLAYER_DIRECTION"	, PV_MON );
 PV( int		, pv_PLAYER_STEP		, "{NAME}:PACMAN_PLAYER_STEP"		, PV_MON );
 PV( int		, pv_PLAYER_SIZE		, "{NAME}:PACMAN_PLAYER_SIZE"		, PV_MON );
 PV( int		, pv_PLAYER_STATE		, "{NAME}:PACMAN_PLAYER_STATE"		, PV_MON );
 PV( int		, pv_FIELD_WIDTH		, "{NAME}:PACMAN_FIELD_WIDTH"		, PV_MON );
 PV( int		, pv_FIELD_HEIGHT		, "{NAME}:PACMAN_FIELD_HEIGHT"		, PV_MON );
-PV( string	, pv_SS_PACMAN			, "{NAME}:SS_PACMAN"			, PV_NONE );
+PV( string	, pv_SS_PACMAN			, "{NAME}:SS_PACMAN"				, PV_NONE );
 
 %{
 
@@ -100,19 +102,35 @@ ss pacman_game {
 			pvSetStr( pv_SS_PACMAN, "INIT" );
 			pvSet(pv_PLAYER_X, 400 - pv_PLAYER_SIZE / 2);
 			pvSet(pv_PLAYER_Y, 606 - pv_PLAYER_SIZE / 2);
-			pvSet(pv_PLAYER_DIRECTION, 3); // (0=right, 1=left, 2=up, 3=down)
-			internal_direction = 3;
-			pvSet(pv_PLAYER_STATE, 0);
+			pvSet(pv_PLAYER_DIRECTION, 1); // (0=right, 1=left, 2=up, 3=down)
+			internal_direction = 1;
+			pvSet(pv_PLAYER_STATE, 1);
 		}
-		 when () {
-	        	printf( "PACMAN Started\n" );
+		when (pv_GAME_STATE == 1) {
+	        printf( "PACMAN Started\n" );
+			pvSet(pv_GAME_COUNTDOWN, 300);		
+		} state COUNTDOWN
+    }
+	
+	state COUNTDOWN {
+		entry {
+			pvSetStr( pv_SS_PACMAN, "COUNTDOWN");
+		}
+		when (pv_GAME_COUNTDOWN == 0) {
+			pvSet(pv_PLAYER_STATE, 0);
 		} state GAME
-    	}
+		when (delay(0.01)) {
+			int new_countdown = pv_GAME_COUNTDOWN - 1;
+			pvSet(pv_GAME_COUNTDOWN, new_countdown);
+		} state COUNTDOWN 
+	}
 
 	state GAME {
 		entry {
 			pvSetStr( pv_SS_PACMAN, "GAME" );
 		}
+		when (pv_GAME_STATE == 0) {
+		} state INIT
 		when (delay(0.015)) {
 		} state CHECK_INTERSECTION
 	}
@@ -138,7 +156,7 @@ ss pacman_game {
 
 	state TRY_MOVE {
                 entry {
-                        pvSetStr( pv_SS_PACMAN, "MOVE" );
+                        pvSetStr( pv_SS_PACMAN, "TRY_MOVE" );
                 }
 		when () {
 			int x_new = pv_PLAYER_X + pv_FIELD_WIDTH;

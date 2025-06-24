@@ -1,6 +1,8 @@
 file pacman_game_parameter.template
 { pattern
   { NAME,	DEVICE,	P,	DRVH,	DRVL,	VAL	}
+  { PACMAN, GAME, STATE, 1, 0, 0}
+  { PACMAN, GAME, COUNTDOWN, 300, 0, 0}
   { PACMAN, PLAYER, X, 800, 0, 25}
   { PACMAN, PLAYER, Y, 800, 0, 25}
   { PACMAN, PLAYER, DIRECTION, 3, 0, 0 }
