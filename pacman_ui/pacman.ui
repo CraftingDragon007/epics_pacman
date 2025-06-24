@@ -494,6 +494,33 @@
      <string notr="true">ss_info</string>
     </property>
    </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>800</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">map.ui</string>
+    </property>
+   </widget>
+   <zorder>cainclude</zorder>
+   <zorder>caimage</zorder>
+   <zorder>caframe_6</zorder>
+   <zorder>cacalc_15</zorder>
+   <zorder>cacalc_16</zorder>
+   <zorder>cacalc_17</zorder>
+   <zorder>canumeric_9</zorder>
+   <zorder>canumeric_10</zorder>
+   <zorder>cacalc_18</zorder>
+   <zorder>calinedraw</zorder>
+   <zorder>castripplot</zorder>
+   <zorder>canumeric_12</zorder>
+   <zorder>cainclude_2</zorder>
+   <zorder>caimage_4</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
