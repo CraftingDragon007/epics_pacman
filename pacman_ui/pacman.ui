@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1187</width>
-    <height>957</height>
+    <height>1079</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,7 +136,7 @@
     <widget class="caNumeric" name="canumeric">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>110</y>
        <width>100</width>
        <height>50</height>
@@ -279,6 +279,81 @@
       <string notr="true">-1</string>
      </property>
     </widget>
+    <widget class="caMessageButton" name="camessagebutton_6">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>240</y>
+       <width>71</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_GAME_STATE</string>
+     </property>
+     <property name="label">
+      <string notr="true">Start</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">1</string>
+     </property>
+    </widget>
+    <widget class="caMessageButton" name="camessagebutton_7">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>240</y>
+       <width>71</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_GAME_STATE</string>
+     </property>
+     <property name="label">
+      <string notr="true">Stop</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">0</string>
+     </property>
+    </widget>
+    <widget class="caNumeric" name="canumeric_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_GAME_STATE</string>
+     </property>
+     <property name="fixedFormat">
+      <bool>true</bool>
+     </property>
+     <property name="limitsMode">
+      <enum>caNumeric::Channel</enum>
+     </property>
+     <property name="maxValue">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
    </widget>
    <widget class="caCalc" name="cacalc_15">
     <property name="geometry">
@@ -371,7 +446,7 @@
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">pacx</string>
+     <string notr="true">$(NAME):PACMAN_PLAYER_X</string>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_10">
@@ -384,7 +459,7 @@
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">pacy</string>
+     <string notr="true">$(NAME):PACMAN_PLAYER_Y</string>
     </property>
    </widget>
    <widget class="caCalc" name="cacalc_18">
@@ -507,6 +582,50 @@
      <string notr="true">map.ui</string>
     </property>
    </widget>
+   <widget class="caFrame" name="caframe">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>250</y>
+      <width>271</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="visibility">
+     <enum>caFrame::IfNotZero</enum>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_GAME_COUNTDOWN</string>
+    </property>
+    <widget class="caMeter" name="cameter">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>251</width>
+       <height>201</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):PACMAN_GAME_COUNTDOWN.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:100}}</string>
+     </property>
+     <property name="maxValue">
+      <double>300.000000000000000</double>
+     </property>
+     <property name="limitsMode">
+      <enum>caMeter::User</enum>
+     </property>
+     <property name="precisionMode">
+      <enum>caMeter::User</enum>
+     </property>
+     <property name="formatType">
+      <enum>caMeter::truncated</enum>
+     </property>
+     <property name="unitsEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </widget>
    <zorder>cainclude</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
@@ -521,6 +640,7 @@
    <zorder>canumeric_12</zorder>
    <zorder>cainclude_2</zorder>
    <zorder>caimage_4</zorder>
+   <zorder>caframe</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
@@ -560,6 +680,11 @@
    <class>caLed</class>
    <extends>QWidget</extends>
    <header>caLed</header>
+  </customwidget>
+  <customwidget>
+   <class>caMeter</class>
+   <extends>QWidget</extends>
+   <header>caMeter</header>
   </customwidget>
   <customwidget>
    <class>caStripPlot</class>
