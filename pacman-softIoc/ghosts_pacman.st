@@ -349,6 +349,10 @@ ss ghosts_pacman{
             int dir = pv_GHOSTS_NPC_DIR % 4;
             int above_tab;
             int below_tab;
+            int left_tab;
+            int left2_tab;
+            int right_tab;
+            int right2_tab;
 
             int y1;
             int y2;
@@ -381,17 +385,20 @@ ss ghosts_pacman{
             
             }else if(dir == 2 || dir == 3){
                 // potential x-correction (u or d)
-                above_tab = pv_GHOSTS_TAB_X +1;
-                below_tab = pv_GHOSTS_TAB_X -1;
+                left_tab = pv_GHOSTS_TAB_X -1;
+                left2_tab = pv_GHOSTS_TAB_X -2;
+                right_tab = pv_GHOSTS_TAB_X +1;
+                right2_tab = pv_GHOSTS_TAB_X +2;
 
                 x1 = gh_get_caqtdm_coordinates(pv_GHOSTS_TAB_X);
                 x2 = pv_GHOSTS_NPC_X;
 
-                // correct 
-                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(below_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(above_tab, pv_GHOSTS_TAB_Y)] == 1){
-                    center_x = (x1-x2)/2;
-                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 1){
+                // correct right
+                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(right_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(left2_tab, pv_GHOSTS_TAB_Y)] == 1){
                     center_x = (x2-x1)/2;
+                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(left_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(right2_tab, pv_GHOSTS_TAB_Y)] == 1){
+                    // correct left
+                    center_x = (x1-x2)/2;
                 }
                 pvSet(pv_GHOSTS_NPC_X_CORRECT, center_x);
             }
