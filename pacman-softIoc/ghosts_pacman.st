@@ -16,7 +16,8 @@ option  +r;
 PV( string, pv_SS_GHOSTS, "{NAME}:SS_GHOSTS", PV_NONE );
 PV( int, pv_GHOSTS_NPC_DIR, "{NAME}:GHOSTS_NPC_DIR", PV_MON );  
 PV( int, pv_GHOSTS_NPC_X, "{NAME}:GHOSTS_NPC_X", PV_MON );  
-PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );  
+PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );
+PV( double, pv_GHOSTS_NPC_MOVE_DELAY, "{NAME}:GHOSTS_NPC_MOVE_DELAY", PV_MON );  
 PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
 PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );
 
@@ -34,6 +35,7 @@ PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
 PV( int, pv_GHOSTS_NPC_RUN, "{NAME}:GHOSTS_NPC_RUN", PV_MON );
 PV( int, pv_GHOSTS_NPC_RUNFRAME1, "{NAME}:GHOSTS_NPC_RUNFRAME1", PV_MON );
 PV( int, pv_GHOSTS_NPC_RUNFRAME2, "{NAME}:GHOSTS_NPC_RUNFRAME2", PV_MON );  
+PV( double, pv_GHOSTS_NPC_RUN_DELAY, "{NAME}:GHOSTS_NPC_RUN_DELAY", PV_MON );  
 
 /* variables from pcman */
 PV( int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
@@ -235,6 +237,7 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
             * @param png_height The height of the PNG image.
             * @return The index in the 1D RGB array for the PNG image.
             */
+        
         int gh_get_png_index_from_xy(int x, int y, int PACMAN_FIELD_RESOLUTION, int png_width, int png_height) {
             if (x < 0 || x >= PACMAN_FIELD_RESOLUTION || y < 0 || y >= PACMAN_FIELD_RESOLUTION) {
                 return -1; // out of bounds
@@ -292,7 +295,7 @@ ss ghosts_pacman{
             pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
             pvSet(pv_GHOSTS_NPC_X, 25);
             pvSet(pv_GHOSTS_NPC_Y, 25);
-            pvSet(pv_GHOSTS_NPC_DIR, 1);
+            pvSet(pv_GHOSTS_NPC_DIR,3);
 
             // PNG
             if (image_data) {
@@ -317,6 +320,7 @@ ss ghosts_pacman{
             int offset = pv_GHOSTS_NPC_MOVDIST;
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVE");
 
+            // calculate wether a ghost is able to move
             // 0 = r, 1 = l, 2 = u, 3 = d
             if(dir == 0){
                 pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_SIZE/2)));
@@ -334,10 +338,67 @@ ss ghosts_pacman{
             pvSet(pv_GHOSTS_IDX, gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y));
             pvSet(pv_GHOSTS_IDXVAL, pv_PACMAN_PLAY_FIELD[pv_GHOSTS_IDX]);
         }
-        when(delay(0.1) && pv_GHOSTS_IDXVAL == 0){
-        } state MOVE
+        when(delay(pv_GHOSTS_NPC_MOVE_DELAY) && pv_GHOSTS_IDXVAL == 0){
+        } state CHECK_CORRECTION
         when(pv_GHOSTS_IDXVAL == 1){
         } state CHECK_MOVEABLE_DIRECTION
+    }
+
+    state CHECK_CORRECTION{
+        entry{
+            int dir = pv_GHOSTS_NPC_DIR % 4;
+            int above_tab;
+            int below_tab;
+
+            int y1;
+            int y2;
+            int center_y;
+
+            int x1;
+            int x2;
+            int center_x;
+            pvSetStr(pv_SS_GHOSTS, "CHECK_CORRECTION");
+            // potential y-correction (l or r)
+            if(dir == 0 || dir == 1){
+                above_tab = pv_GHOSTS_TAB_Y -1;
+                below_tab = pv_GHOSTS_TAB_Y + 1;
+                
+                y1 = gh_get_caqtdm_coordinates(pv_GHOSTS_TAB_Y);
+                y2 = pv_GHOSTS_NPC_Y;
+
+                // correct down ()
+                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 1){
+                    center_y = (y2 - y1) / 2;
+                
+                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 1){
+                // correct up
+                    center_y = (y1 -y2) / 2;
+                }else{
+                    center_y = 0;
+                }
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, center_y);
+
+            
+            }else if(dir == 2 || dir == 3){
+                // potential x-correction (u or d)
+                above_tab = pv_GHOSTS_TAB_X +1;
+                below_tab = pv_GHOSTS_TAB_X -1;
+
+                x1 = gh_get_caqtdm_coordinates(pv_GHOSTS_TAB_X);
+                x2 = pv_GHOSTS_NPC_X;
+
+                // correct 
+                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(below_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(above_tab, pv_GHOSTS_TAB_Y)] == 1){
+                    center_x = (x1-x2)/2;
+                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 1){
+                    center_x = (x2-x1)/2;
+                }
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, center_x);
+            }
+        }
+        when(){
+
+        } state MOVE
     }
 
     state CHECK_MOVEABLE_DIRECTION{
@@ -360,7 +421,37 @@ ss ghosts_pacman{
 
     state MOVE{
         entry{
-            pvSetStr(pv_SS_GHOSTS, "MOVE_UP");
+            int png_index;
+            int correction_distance = pv_GHOSTS_NPC_MOVDIST/3;
+            pvSetStr(pv_SS_GHOSTS, "MOVE");
+        
+            png_index = gh_get_png_index_from_xy(pv_GHOSTS_NPC_X + (NPC_SIZE/2), pv_GHOSTS_NPC_Y + (NPC_SIZE/2), pv_PACMAN_FIELD_RESOLUTION, pv_GHOSTS_PNG_WIDTH, pv_GHOSTS_PNG_HEIGHT);
+            if (png_index >= 0 && png_index < pv_GHOSTS_DATA_SIZE) {
+                // Set the color of red for debugging purposes
+                pv_GHOSTS_PNG_DATA[png_index] = 0; // Red channel
+                pv_GHOSTS_PNG_DATA[png_index + 1] = 255; // Green channel
+                pv_GHOSTS_PNG_DATA[png_index + 2] = 0; // Blue channel
+                pvPut(pv_GHOSTS_PNG_DATA);
+            }
+
+            // Apply Correction
+            // Y - Correction
+            if(pv_GHOSTS_NPC_Y_CORRECT > 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + correction_distance));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
+            }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
+                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - correction_distance));
+                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
+            }
+
+            // X-Correction
+            if(pv_GHOSTS_NPC_X_CORRECT > 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + correction_distance));
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT - 1));
+            }else if(pv_GHOSTS_NPC_X_CORRECT < 0){
+                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - correction_distance));
+                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT + 1));
+            }
         }
         when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
         } state MOVE_RIGHT
@@ -458,7 +549,7 @@ ss run_ghost{
     state FRAME_1{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_1");
-        }when (delay(0.4)){
+        }when (delay(pv_GHOSTS_NPC_RUN_DELAY)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME1);
         }state FRAME_2
     }
@@ -466,7 +557,7 @@ ss run_ghost{
       state FRAME_2{
         entry{
             pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_2");
-        }when (delay(0.4)){
+        }when (delay(pv_GHOSTS_NPC_RUN_DELAY)){
             pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME2);
         }state CHECK_DIRECTION
     }

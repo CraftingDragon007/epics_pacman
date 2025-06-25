@@ -14,6 +14,8 @@ file pacman_game_parameter.template
   { GHOSTS, NPC, SIZE, 1000, 1, 30}
   { GHOSTS, NPC, MOVDIST, 100, -100, 1}
   { GHOSTS, NPC, RUN, 10, 0, 0}
+  { GHOSTS, NPC, RUN_DELAY, 10, 0, 0.2}
+  { GHOSTS, NPC, MOVE_DELAY, 10, 0, 0.2}
   { GHOSTS, NPC, RUNFRAME1, 10, 0, 0}
   { GHOSTS, NPC, RUNFRAME2, 10, 0, 0}
   { GHOSTS, PNG, WIDTH, 800, 0, 800 }
