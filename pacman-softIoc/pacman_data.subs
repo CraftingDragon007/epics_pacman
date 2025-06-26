@@ -7,10 +7,10 @@ file pacman_game_parameter.template
   { PACMAN, TRY, DIRECTION, 3, -1, 0 }
   { PACMAN, STOP, DIRECTION, 3, -1, 0 }
   { PACMAN, RESERVE, SIZE, 10, 0, 4 }
-  { PACMAN, FIELD, SIZE, 1024, 0, 1024 }
+  { PACMAN, FIELD, SIZE, 868, 0, 868 }
   { PACMAN, FIELD, RESOLUTION, 800, 0, 800 }
-  { PACMAN, ARRAY, X_SIZE, 32, 0, 32 }
-  { PACMAN, ARRAY, X_FACTOR, 25, 0, 25 }
+  { PACMAN, ARRAY, X_SIZE, 28, 0, 28 }
+  { PACMAN, ARRAY, X_FACTOR, 32, 0, 32 }
   { PACMAN, ARRAY, ROW, 31, 0, 0 }
   { PACMAN, ARRAY, COL, 31, 0, 0 }
   { PACMAN, PACMAN, STATE, 10, 0, 0 }
@@ -25,6 +25,6 @@ file pacman_game_parameter.template
 file pacman_waveform.template
 { pattern
   { NAME,	DEVICE,	P,	NELM,	FTVL }
-  { PACMAN, PLAY, FIELD, 1024, SHORT }
+  { PACMAN, PLAY, FIELD, 868, SHORT }
   { PACMAN, PNG, DATA, 200000, UCHAR }
 }

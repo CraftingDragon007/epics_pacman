@@ -42,7 +42,7 @@ PV( int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
 PV( int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
 PV( int, pv_PACMAN_USER_X, "{NAME}:PACMAN_USER_X", PV_MON );
 PV( int, pv_PACMAN_USER_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
-PVA( short, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
+PVA( short, pv_PACMAN_PLAY_FIELD, 868, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
 PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
 PV( int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
 
@@ -256,6 +256,7 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
 %{
     int NPC_SIZE;
     int CELL_SIZE;
+    int ARRAY_ROW_LENGTH = 32;
 
     int gh_get_tab_coordinates(int cor, int offset){
         double tabcor = (cor + (NPC_SIZE/2) + offset) / CELL_SIZE;
@@ -278,6 +279,55 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
         if(tab_y < 0) tab_y = 0;
         if(tab_y > 31) tab_y = 31;
         return tab_y * 32 + tab_x;
+    }
+
+    
+    int gh_get_distance_from_pacman(int pac_x, int pac_y, int ghost_x, int ghost_y){
+        int diff_x = abs(ghost_x - pac_x);
+        int diff_y = abs(ghost_y - pac_y);
+        int difference = sqrt(diff_x*diff_x + diff_y*diff_y);
+
+        return difference;
+    }
+
+    void gh_get_shortest_direction_to_pacman(int ghost_x, int ghost_y, int pac_x, int pac_y, int* first, int* second, int* third, int* fourth) {
+            int distance[4];
+            int dir[4] = {0, 1, 2, 3}; // 0=right, 1=left, 2=up, 3=down
+            int x[4] = {
+                ghost_x + CELL_SIZE, // right
+                ghost_x - CELL_SIZE, // left
+                ghost_x, // up
+                ghost_x,  // down
+            };
+
+            int y[4] = {
+                ghost_y, // right
+                ghost_y, // left
+                ghost_y - CELL_SIZE, // up
+                ghost_y + CELL_SIZE  // down 
+            };
+
+            for(int i = 0; i < 4; i++) {
+                distance[i] = gh_get_distance_from_pacman(pac_x, pac_y, x[i], y[i]);
+            }
+
+            // Sort directions by distance (ascending)
+            for(int i = 0; i < 3; i++) {
+                for(int j = i + 1; j < 4; j++) {
+                    if(distance[dir[j]] < distance[dir[i]]) {
+                        int tmp = dir[i];
+                        dir[i] = dir[j];
+                        dir[j] = tmp;
+                    }
+                }
+            }
+
+          // printf("\nDIR: %d, %d, %d, %d", dir[0], dir[1], dir[2], dir[3]);
+            // Save sorted directions to pointers
+            if (first)  *first  = dir[0];
+            if (second) *second = dir[1];
+            if (third)  *third  = dir[2];
+            if (fourth) *fourth = dir[3];
     }
 
 }%
@@ -312,6 +362,7 @@ ss ghosts_pacman{
         when(){
             NPC_SIZE = pv_GHOSTS_NPC_SIZE;
             CELL_SIZE = pv_PACMAN_ARRAY_CELL_WIDTH;
+            ARRAY_ROW_LENGTH = pv_PACMAN_ARRAY_ROW_LENGTH;
         } state CHECK_MOVE
     }
     state CHECK_MOVE{
@@ -347,83 +398,32 @@ ss ghosts_pacman{
     state CHECK_CORRECTION{
         entry{
             int dir = pv_GHOSTS_NPC_DIR % 4;
-            int above_tab;
-            int below_tab;
-            int left_tab;
-            int left2_tab;
-            int right_tab;
-            int right2_tab;
-
-            int y1;
-            int y2;
-            int center_y;
-
-            int x1;
-            int x2;
-            int center_x;
-            pvSetStr(pv_SS_GHOSTS, "CHECK_CORRECTION");
-            // potential y-correction (l or r)
-            if(dir == 0 || dir == 1){
-                above_tab = pv_GHOSTS_TAB_Y -1;
-                below_tab = pv_GHOSTS_TAB_Y + 1;
-                
-                y1 = gh_get_caqtdm_coordinates(pv_GHOSTS_TAB_Y);
-                y2 = pv_GHOSTS_NPC_Y;
-
-                // correct down ()
-                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 1){
-                    center_y = (y2 - y1) / 2;
-                
-                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, above_tab)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, below_tab)] == 1){
-                // correct up
-                    center_y = (y1 -y2) / 2;
-                }else{
-                    center_y = 0;
-                }
-                pvSet(pv_GHOSTS_NPC_Y_CORRECT, center_y);
-
-            
-            }else if(dir == 2 || dir == 3){
-                // potential x-correction (u or d)
-                left_tab = pv_GHOSTS_TAB_X -1;
-                left2_tab = pv_GHOSTS_TAB_X -2;
-                right_tab = pv_GHOSTS_TAB_X +1;
-                right2_tab = pv_GHOSTS_TAB_X +2;
-
-                x1 = gh_get_caqtdm_coordinates(pv_GHOSTS_TAB_X);
-                x2 = pv_GHOSTS_NPC_X;
-
-                // correct right
-                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(right_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(left2_tab, pv_GHOSTS_TAB_Y)] == 1){
-                    center_x = (x2-x1)/2;
-                }else if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(left_tab, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y)] == 0 && pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(right2_tab, pv_GHOSTS_TAB_Y)] == 1){
-                    // correct left
-                    center_x = (x1-x2)/2;
-                }
-                pvSet(pv_GHOSTS_NPC_X_CORRECT, center_x);
-            }
         }
         when(){
-
         } state MOVE
     }
 
     state CHECK_MOVEABLE_DIRECTION{
         entry{
+            int current_dir = pv_GHOSTS_NPC_DIR;
+            int first, second, third, fourth;
+
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE DIRECTION");
+            gh_get_shortest_direction_to_pacman(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
+           // printf("\nDIR: %d, %d, %d, %d", first, second, third, fourth);
+
+            if(first != current_dir){
+                pvSet(pv_GHOSTS_NPC_DIR, first);
+            }else if(second != current_dir){
+                pvSet(pv_GHOSTS_NPC_DIR, second);
+            }else if(third != current_dir){
+                pvSet(pv_GHOSTS_NPC_DIR, third);
+            }else if(fourth != current_dir){
+                pvSet(pv_GHOSTS_NPC_DIR, fourth);
+            }
         }
-        when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
-            pvSet(pv_GHOSTS_NPC_DIR, 1);
-        } state MOVE
-        when(pv_GHOSTS_NPC_DIR % 4 == 1){
-            pvSet(pv_GHOSTS_NPC_DIR, 0);
-        } state MOVE
-        when(pv_GHOSTS_NPC_DIR % 4 == 2){
-            pvSet(pv_GHOSTS_NPC_DIR, 3);
-        } state MOVE
-        when(pv_GHOSTS_NPC_DIR % 4 == 3){
-            pvSet(pv_GHOSTS_NPC_DIR, 2);
-        } state MOVE
+        when(){
+        } state CHECK_MOVE
     }
 
     state MOVE{

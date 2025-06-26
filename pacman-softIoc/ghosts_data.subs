@@ -8,8 +8,8 @@ file pacman_game_parameter.template
   { GHOSTS, NPC, TABY, 1000, -1, 0}
   { GHOSTS, NPC, IDX, 1000, -1, 0}
   { GHOSTS, NPC, IDXVAL, 1000, -1, 0}
-  { GHOSTS, NPC, Y_CORRECT, 1000, 0, 0}
-  { GHOSTS, NPC, X_CORRECT, 1000, 0, 0}
+  { GHOSTS, NPC, Y_CORRECT, 100, -100, 0}
+  { GHOSTS, NPC, X_CORRECT, 100, -100, 0}
   { GHOSTS, NPC, INTERSECT, 1000, -1, 0}
   { GHOSTS, NPC, SIZE, 1000, 1, 30}
   { GHOSTS, NPC, MOVDIST, 100, -100, 1}
