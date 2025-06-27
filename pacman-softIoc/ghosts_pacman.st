@@ -255,7 +255,7 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
 
 %{
     int NPC_SIZE;
-    int CELL_SIZE;
+    int CELL_SIZE = 32;
     int ARRAY_ROW_LENGTH = 32;
 
     int gh_get_tab_coordinates(int cor, int offset){
@@ -275,10 +275,10 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
 
     int gh_tab_coordinates_to_index(int tab_x, int tab_y){
         if(tab_x < 0) tab_x = 0;
-        if(tab_x > 31) tab_x = 31;
+        if(tab_x > 27) tab_x = 27;
         if(tab_y < 0) tab_y = 0;
-        if(tab_y > 31) tab_y = 31;
-        return tab_y * 32 + tab_x;
+        if(tab_y > 30) tab_y = 30;
+        return tab_y * 28 + tab_x;
     }
 
     
@@ -345,7 +345,7 @@ ss ghosts_pacman{
             pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
             pvSet(pv_GHOSTS_NPC_X, 25);
             pvSet(pv_GHOSTS_NPC_Y, 25);
-            pvSet(pv_GHOSTS_NPC_DIR,3);
+            pvSet(pv_GHOSTS_NPC_DIR,2);
 
             // PNG
             if (image_data) {
@@ -369,23 +369,12 @@ ss ghosts_pacman{
         entry{
             int dir = pv_GHOSTS_NPC_DIR % 4;
             int offset = pv_GHOSTS_NPC_MOVDIST;
-            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVE");
+            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVE2");
 
             // calculate wether a ghost is able to move
-            // 0 = r, 1 = l, 2 = u, 3 = d
-            if(dir == 0){
-                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_SIZE/2)));
-                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
-            }else if(dir == 1){
-                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, -(pv_GHOSTS_NPC_SIZE/2) + 1.5*offset));
-                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
-            }else if(dir == 2){
-                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
-                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, -(pv_GHOSTS_NPC_SIZE/2)));
-            }else if(dir == 3){
-                pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
-                pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_SIZE/2) + 2.5*offset));
-            }
+            pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
+            pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
+            
             pvSet(pv_GHOSTS_IDX, gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y));
             pvSet(pv_GHOSTS_IDXVAL, pv_PACMAN_PLAY_FIELD[pv_GHOSTS_IDX]);
         }
@@ -398,32 +387,104 @@ ss ghosts_pacman{
     state CHECK_CORRECTION{
         entry{
             int dir = pv_GHOSTS_NPC_DIR % 4;
+            int tab_x = gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0);
+            int tab_y = gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0);
+            int y;
+            int x;
+            int xx;
+            int size = 32;
+
+            if(dir == 0 || dir == 1){
+                y = tab_y * size;
+                if(pv_GHOSTS_NPC_Y > y){
+                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, y - pv_GHOSTS_NPC_Y);
+                }else if(y > pv_GHOSTS_NPC_Y){
+                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, -(pv_GHOSTS_NPC_Y - y));
+                }else{
+                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, 0);
+                }
+            }else if(dir == 2 || dir == 3){
+                x = tab_x * size;
+                xx = pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/4);
+                if(pv_GHOSTS_NPC_X> x){
+                    pvSet(pv_GHOSTS_NPC_X_CORRECT, x - xx);
+                }else if(x > pv_GHOSTS_NPC_X){
+                    pvSet(pv_GHOSTS_NPC_X_CORRECT, -(xx - x));
+                }else{
+                    pvSet(pv_GHOSTS_NPC_X_CORRECT, 0);
+                }
+            }
         }
         when(){
-        } state MOVE
+        } state CHECK_INTERSECTION
     }
 
     state CHECK_MOVEABLE_DIRECTION{
         entry{
-            int current_dir = pv_GHOSTS_NPC_DIR;
+            int dir = pv_GHOSTS_NPC_DIR % 4;
             int first, second, third, fourth;
+            int opposite;
+            int new_dir;
 
             pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE DIRECTION");
             gh_get_shortest_direction_to_pacman(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
-           // printf("\nDIR: %d, %d, %d, %d", first, second, third, fourth);
+           
+            // Avoid reversing direction
+            if(dir == 0) new_dir = 1;
+            if(dir == 1) new_dir = 0;
+            if(dir == 2) new_dir = 3;
+            if(dir == 3) new_dir = 2;
 
-            if(first != current_dir){
-                pvSet(pv_GHOSTS_NPC_DIR, first);
-            }else if(second != current_dir){
-                pvSet(pv_GHOSTS_NPC_DIR, second);
-            }else if(third != current_dir){
-                pvSet(pv_GHOSTS_NPC_DIR, third);
-            }else if(fourth != current_dir){
-                pvSet(pv_GHOSTS_NPC_DIR, fourth);
+            if(first != new_dir) pvSet(pv_GHOSTS_NPC_DIR, first);
+            if(second != new_dir) pvSet(pv_GHOSTS_NPC_DIR, second);
+
+            if(pv_GHOSTS_NPC_DIR != dir){
+                pvSet(pv_GHOSTS_IDXVAL, 0);
+            }
+            
+        }
+        when(delay(pv_GHOSTS_NPC_MOVE_DELAY)){
+        } state MOVE
+    }
+
+    state CHECK_INTERSECTION{
+        entry{
+            int horizontal_count = 0;
+            int vertical_count = 0;
+            int tab_x = pv_GHOSTS_TAB_X;
+            int tab_y = pv_GHOSTS_TAB_Y;
+            pvSetStr(pv_SS_GHOSTS, "CHECK_INTERSECTION");
+        
+            // to the right
+            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x + 1, tab_y)] == 0){
+                horizontal_count++;
+            }
+
+            // to the left
+            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x-1, tab_y)] == 0){
+                horizontal_count++;
+            }
+
+            // upwards
+            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y-1)] == 0){
+                vertical_count++;
+            }
+
+            // downwards
+            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y + 1)] == 0){
+                vertical_count++;
+            }
+
+            if(vertical_count > 0 && vertical_count > 0){
+                pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
+            }else{
+                pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
             }
         }
-        when(){
-        } state CHECK_MOVE
+        when(pv_GHOSTS_NPC_INTERSECT == 0){
+        } state MOVE
+        when(pv_GHOSTS_NPC_INTERSECT == 1){
+        } state CHECK_MOVEABLE_DIRECTION
     }
 
     state MOVE{
