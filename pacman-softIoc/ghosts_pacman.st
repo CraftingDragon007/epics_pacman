@@ -29,6 +29,7 @@ PV( int, pv_GHOSTS_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );
 PV( int, pv_GHOSTS_NPC_X_CORRECT, "{NAME}:GHOSTS_NPC_X_CORRECT", PV_MON );
 PV( int, pv_GHOSTS_NPC_Y_CORRECT, "{NAME}:GHOSTS_NPC_Y_CORRECT", PV_MON );
 PV( int, pv_GHOSTS_NPC_INTERSECT, "{NAME}:GHOSTS_NPC_INTERSECT", PV_MON );
+PV( int, pv_GHOSTS_NPC_INTERSECT_DIST, "{NAME}:GHOSTS_NPC_INTERSECT_DIST", PV_MON );
 
 /* variables ghost run */
 PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
@@ -330,23 +331,42 @@ PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NO
             if (fourth) *fourth = dir[3];
     }
 
-    void gh_get_surrounding_tabs_from_direction(int* tab_x, int* tab_y, int direction){
+    int gh_get_surrounding_y_from_direction(int tab_y, int direction){
             switch(direction){
                 case 0: // right
-                    tab_x += 1;
+                    return tab_y;
                     break;
                 case 1: // left
-                    tab_x -= 1;
-                    break;
+                    return tab_y;
                 case 2: // up
-                    tab_y -= 1;
+                    return (tab_y-1);
                     break;
                 case 3: // down
-                    tab_y += 1;
+                    return (tab_y+1);
                     break;
                 default:
-                    return -1; // invalid direction
+                    return tab_y;
+                    break;
             }
+    }
+    int gh_get_surrounding_x_from_direction(int tab_x, int direction){
+        switch(direction){
+            case 0: // right
+                return (tab_x+1);
+                break;
+            case 1: // left
+                return (tab_x-1);
+                break;
+            case 2: // up
+                return (tab_x);
+                break;
+            case 3: // down
+                return (tab_x);
+                break;
+            default:
+                return tab_x;
+                break;
+        }
     }
 
 }%
@@ -449,12 +469,37 @@ ss ghosts_pacman{
             int tab_x = pv_GHOSTS_TAB_X;
             int tab_y = pv_GHOSTS_TAB_Y;
 
-            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTION");
-            gh_get_shortest_direction_to_pacman(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
-           
-            // Avoid reversing direction
+                pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTION");
+                gh_get_shortest_direction_to_pacman(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
+                
+                // Avoid reversing direction
+                if(dir == 0) new_dir = 1;
+                if(dir == 1) new_dir = 0;
+                if(dir == 2) new_dir = 3;
+                if(dir == 3) new_dir = 2;
+                
+                // CHECK IF POSSIBLE TO WALK NEAREST
+                tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, first);
+                tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, first);
+                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && first != new_dir){
+                    pvSet(pv_GHOSTS_NPC_DIR, first);
+                }else{
+                    tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, second);
+                    tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, second);
+                    if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && second != new_dir){
+                        pvSet(pv_GHOSTS_NPC_DIR, second);
+                    }else{
+                        tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, third);
+                        tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, third);
+                        if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && third != new_dir){
+                            pvSet(pv_GHOSTS_NPC_DIR, third);
+                        }else{
+                            pvSet(pv_GHOSTS_NPC_DIR, fourth);
+                        }
+                    }
+                }
 
-            pvSet(pv_GHOSTS_NPC_DIR, first);
+                
         }
         when(delay(pv_GHOSTS_NPC_MOVE_DELAY)){
         } state MOVE
@@ -489,14 +534,21 @@ ss ghosts_pacman{
             }
 
             if(vertical_count > 0 && vertical_count > 0){
-           //     pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
+                if(pv_GHOSTS_NPC_INTERSECT_DIST == 0){
+                    pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
+                    pvSet(pv_GHOSTS_NPC_INTERSECT_DIST, 32)
+                }else{
+                    pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
+                }
             }else{
+                pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
+                pvSet(pv_GHOSTS_NPC_INTERSECT_DIST, 0);
             }
-            pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
+
         }
         when(pv_GHOSTS_NPC_INTERSECT == 0){
         } state MOVE
-        when(pv_GHOSTS_NPC_INTERSECT == 1){
+        when(pv_GHOSTS_NPC_INTERSECT == 1 ){
         } state CHECK_MOVEABLE_DIRECTION
     }
 
