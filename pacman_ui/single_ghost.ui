@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>280</width>
+    <height>220</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="caImage" name="caimage_7">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>10</y>
+     <width>51</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="filename" stdset="0">
+    <string notr="true">ghost_eyes.gif</string>
+   </property>
+   <property name="imageCalc">
+    <string notr="true">A</string>
+   </property>
+   <property name="delayMilliseconds" stdset="0">
+    <number>200</number>
+   </property>
+   <property name="visibility">
+    <enum>caImage::Calc</enum>
+   </property>
+   <property name="visibilityCalc">
+    <string notr="true">B == 4</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_DIR</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_MODE</string>
+   </property>
+  </widget>
+  <widget class="caImage" name="caimage_5">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>10</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="filename" stdset="0">
+    <string notr="true">$(GHOST).gif</string>
+   </property>
+   <property name="imageCalc">
+    <string notr="true">A</string>
+   </property>
+   <property name="delayMilliseconds" stdset="0">
+    <number>200</number>
+   </property>
+   <property name="visibility">
+    <enum>caImage::Calc</enum>
+   </property>
+   <property name="visibilityCalc">
+    <string notr="true">B &lt; 3</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_FRAME</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_MODE</string>
+   </property>
+  </widget>
+  <widget class="caImage" name="caimage_8">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>50</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="filename" stdset="0">
+    <string notr="true">ghost_edible.gif</string>
+   </property>
+   <property name="imageCalc">
+    <string notr="true">A % 2 == 0</string>
+   </property>
+   <property name="delayMilliseconds" stdset="0">
+    <number>200</number>
+   </property>
+   <property name="visibility">
+    <enum>caImage::Calc</enum>
+   </property>
+   <property name="visibilityCalc">
+    <string notr="true">B == 3</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_FRAME</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_MODE</string>
+   </property>
+  </widget>
+  <widget class="wmSignalPropagator" name="wmsignalpropagator">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>250</y>
+     <width>70</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc_20">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>140</y>
+     <width>101</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="variableType">
+    <enum>caCalc::scalar</enum>
+   </property>
+   <property name="channels" stdset="0">
+    <string/>
+   </property>
+   <property name="calc">
+    <string notr="true">%QRect</string>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">ZERO</string>
+   </property>
+   <property name="channelB">
+    <string notr="true">ZERO</string>
+   </property>
+   <property name="channelC">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_SIZE</string>
+   </property>
+   <property name="channelD">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_SIZE</string>
+   </property>
+   <property name="precision">
+    <number>0</number>
+   </property>
+   <property name="eventSignal">
+    <enum>caCalc::onAnyChange</enum>
+   </property>
+  </widget>
+  <widget class="caCalc" name="cacalc">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>160</y>
+     <width>70</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="variable">
+    <string notr="true">ZERO</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caImage</class>
+   <extends>QWidget</extends>
+   <header>caImage</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+  <customwidget>
+   <class>wmSignalPropagator</class>
+   <extends>QLabel</extends>
+   <header>wmSignalPropagator</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc_20</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>caimage_5</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>194</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_20</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>caimage_8</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>215</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_20</sender>
+   <signal>emitSignal(QRect)</signal>
+   <receiver>caimage_7</receiver>
+   <slot>animation(QRect)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

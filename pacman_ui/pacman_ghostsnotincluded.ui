@@ -5382,6 +5382,22 @@
      <string>Ghost Animation Delay</string>
     </property>
    </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>10</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),GHOST=BLINKY</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">single_ghost.ui</string>
+    </property>
+   </widget>
    <widget class="caLabel" name="calabel_13">
     <property name="geometry">
      <rect>
@@ -5508,6 +5524,54 @@
     </property>
     <property name="filename" stdset="0">
      <string notr="true">single_ghost_control.ui</string>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_8">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),GHOST=PINKY</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">single_ghost.ui</string>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_9">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>10</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),GHOST=INKY</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">single_ghost.ui</string>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_10">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>10</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),GHOST=CLYDE</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">single_ghost.ui</string>
     </property>
    </widget>
    <widget class="caCalc" name="cacalc_20">
@@ -5658,403 +5722,6 @@
      <enum>caCalc::onAnyChange</enum>
     </property>
    </widget>
-   <widget class="caImage" name="caimage_7">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>30</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_eyes.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 4</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_BLINKY_DIR</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_BLINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_5">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>30</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">BLINKY.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B &lt; 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_BLINKY_FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_BLINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_8">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>20</y>
-      <width>50</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_edible.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A % 2 == 0</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_BLINKY__FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_BLINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_9">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>80</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_eyes.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 4</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_PINKY_DIR</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_PINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_10">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>80</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">PINKY.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B &lt; 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_PINKY_FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_PINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_11">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>70</y>
-      <width>50</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_edible.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A % 2 == 0</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_PINKY__FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_PINKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_12">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>140</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_eyes.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 4</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_INKY_DIR</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_INKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_13">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>140</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">INKY.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B &lt; 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_INKY_FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_INKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_14">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>130</y>
-      <width>50</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_edible.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A % 2 == 0</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_INKY__FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_INKY_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_15">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>210</y>
-      <width>51</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_eyes.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 4</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_CLYDE_DIR</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_CLYDE_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_16">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>210</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">CLYDE.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B &lt; 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_CLYDE_FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_CLYDE_MODE</string>
-    </property>
-   </widget>
-   <widget class="caImage" name="caimage_17">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>200</y>
-      <width>50</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="filename" stdset="0">
-     <string notr="true">ghost_edible.gif</string>
-    </property>
-    <property name="imageCalc">
-     <string notr="true">A % 2 == 0</string>
-    </property>
-    <property name="delayMilliseconds" stdset="0">
-     <number>200</number>
-    </property>
-    <property name="visibility">
-     <enum>caImage::Calc</enum>
-    </property>
-    <property name="visibilityCalc">
-     <string notr="true">B == 3</string>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_CLYDE__FRAME</string>
-    </property>
-    <property name="channelB">
-     <string notr="true">$(NAME):GHOSTS_CLYDE_MODE</string>
-    </property>
-   </widget>
-   <zorder>caframe</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
    <zorder>cacalc_17</zorder>
@@ -6089,6 +5756,7 @@
    <zorder>canumeric_19</zorder>
    <zorder>canumeric_20</zorder>
    <zorder>calabel_21</zorder>
+   <zorder>cainclude</zorder>
    <zorder>calabel_13</zorder>
    <zorder>calabel_22</zorder>
    <zorder>calabel_23</zorder>
@@ -6097,22 +5765,14 @@
    <zorder>cainclude_5</zorder>
    <zorder>cainclude_6</zorder>
    <zorder>cainclude_7</zorder>
+   <zorder>cainclude_8</zorder>
+   <zorder>cainclude_9</zorder>
+   <zorder>cainclude_10</zorder>
    <zorder>cacalc_20</zorder>
    <zorder>cacalc_21</zorder>
    <zorder>cacalc_22</zorder>
    <zorder>cacalc_23</zorder>
-   <zorder>caimage_7</zorder>
-   <zorder>caimage_5</zorder>
-   <zorder>caimage_8</zorder>
-   <zorder>caimage_9</zorder>
-   <zorder>caimage_10</zorder>
-   <zorder>caimage_11</zorder>
-   <zorder>caimage_12</zorder>
-   <zorder>caimage_13</zorder>
-   <zorder>caimage_14</zorder>
-   <zorder>caimage_15</zorder>
-   <zorder>caimage_16</zorder>
-   <zorder>caimage_17</zorder>
+   <zorder>caframe</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
@@ -6200,192 +5860,64 @@
   <connection>
    <sender>cacalc_20</sender>
    <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_5</receiver>
+   <receiver>cainclude</receiver>
    <slot>animation(QRect)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1445</x>
-     <y>73</y>
+     <x>1447</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>155</x>
-     <y>42</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_20</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_7</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1409</x>
-     <y>77</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>187</x>
-     <y>55</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_20</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_8</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1461</x>
-     <y>63</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>98</x>
-     <y>54</y>
+     <x>100</x>
+     <y>41</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>cacalc_21</sender>
    <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_11</receiver>
+   <receiver>cainclude_8</receiver>
    <slot>animation(QRect)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1530</x>
-     <y>78</y>
+     <x>1560</x>
+     <y>61</y>
     </hint>
     <hint type="destinationlabel">
-     <x>84</x>
-     <y>96</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_21</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_10</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1551</x>
-     <y>71</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>154</x>
-     <y>106</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_21</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_9</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1562</x>
-     <y>71</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>203</x>
-     <y>103</y>
+     <x>252</x>
+     <y>50</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>cacalc_22</sender>
    <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_14</receiver>
+   <receiver>cainclude_9</receiver>
    <slot>animation(QRect)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1438</x>
-     <y>333</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>95</x>
-     <y>131</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_22</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_13</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1414</x>
-     <y>328</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>146</x>
-     <y>156</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_22</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_12</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1453</x>
-     <y>331</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>187</x>
-     <y>148</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_23</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_17</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1545</x>
+     <x>1435</x>
      <y>330</y>
     </hint>
     <hint type="destinationlabel">
-     <x>107</x>
-     <y>208</y>
+     <x>329</x>
+     <y>84</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>cacalc_23</sender>
    <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_16</receiver>
+   <receiver>cainclude_10</receiver>
    <slot>animation(QRect)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1535</x>
-     <y>337</y>
+     <x>1568</x>
+     <y>327</y>
     </hint>
     <hint type="destinationlabel">
-     <x>156</x>
-     <y>221</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacalc_23</sender>
-   <signal>emitSignal(QRect)</signal>
-   <receiver>caimage_15</receiver>
-   <slot>animation(QRect)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1541</x>
-     <y>328</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>188</x>
-     <y>223</y>
+     <x>436</x>
+     <y>71</y>
     </hint>
    </hints>
   </connection>
