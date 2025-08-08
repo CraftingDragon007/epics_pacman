@@ -204,12 +204,7 @@ ss gameloop {
             origin_tile_x = FIELD_WIDTH / 2;
             origin_tile_y = FIELD_HEIGHT / 2 - 1;
             origin_tile = get_tile_index_from_tile_coordinates(origin_tile_x, origin_tile_y);
-            target_tile_x = origin_tile_x;
-            target_tile_y = origin_tile_y - 4;
-            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
             ghost_size = pv_GHOST_SIZE;
-            target_pixel_x = target_tile_x * TILE_SIZE + TILE_SIZE / 2;
-            target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
             pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
             pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
         }
@@ -217,7 +212,10 @@ ss gameloop {
             current_mode = pv_CURRENT_MODE;
             previous_mode = current_mode;
             ghost_size = pv_GHOST_SIZE;
-            target_pixel_x = target_tile_x * TILE_SIZE + TILE_SIZE / 2;
+            target_tile_x = origin_tile_x;
+            target_tile_y = origin_tile_y - 3;
+            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
+            target_pixel_x = target_tile_x * TILE_SIZE;
             target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
             pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
             pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
@@ -270,8 +268,8 @@ ss gameloop {
             // Get possible directions, with theta to pacman and spawn
             int up_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y - 1);
             int down_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y + 1);
-            int left_tile = get_tile_index_from_tile_coordinates(target_tile_x - 1, target_tile_y);
-            int right_tile = get_tile_index_from_tile_coordinates(target_tile_x + 1, target_tile_y);
+            int left_tile = get_tile_index_from_tile_coordinates((target_tile_x - 1 + FIELD_WIDTH) % FIELD_WIDTH, target_tile_y);
+            int right_tile = get_tile_index_from_tile_coordinates((target_tile_x + 1) % FIELD_WIDTH, target_tile_y);
 
             double up_angle_pacman = ANGLE_INVALID;
             double down_angle_pacman = ANGLE_INVALID;
@@ -406,17 +404,22 @@ ss gameloop {
 
             pvSet(pv_GHOST_DIR, chosen_direction);
 
-            origin_tile = target_tile;
-            origin_tile_x = target_tile_x;
-            origin_tile_y = target_tile_y;
+            if (chosen_direction == DIRECTION_LEFT && left_tile > target_tile) {
+                // Wrap around left end to right end
+                pvSet(pv_GHOST_X, FIELD_WIDTH * TILE_SIZE - ghost_size);
+            } else if (chosen_direction == DIRECTION_RIGHT && right_tile < target_tile) {
+                // Wrap around right end to left end
+                pvSet(pv_GHOST_X, 0);
+            }
+
             if (chosen_direction == DIRECTION_UP) {
                 target_tile_y = target_tile_y - 1;
             } else if (chosen_direction == DIRECTION_DOWN) {
                 target_tile_y = target_tile_y + 1;
             } else if (chosen_direction == DIRECTION_LEFT) {
-                target_tile_x = target_tile_x - 1;
+                target_tile_x = (target_tile_x - 1 + FIELD_WIDTH) % FIELD_WIDTH;
             } else if (chosen_direction == DIRECTION_RIGHT) {
-                target_tile_x = target_tile_x + 1;
+                target_tile_x = (target_tile_x + 1) % FIELD_WIDTH;
             }
 
             target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
@@ -463,19 +466,19 @@ ss gameloop {
 #define GHOST_SKIN_DOWN_1 6
 #define GHOST_SKIN_DOWN_2 7
 
-ss ghost_animation{
+ss ghost_animation {
     int frame_1;
     int frame_2;
     int current_direction;
     double time_next_frame;
     int current_frame = 2;
 
-    state INIT{
+    state INIT {
         when () {
         } state CHECK_DIRECTION
     }
 
-    state CHECK_DIRECTION{
+    state CHECK_DIRECTION {
         entry {
             current_direction = pv_GHOST_DIR;
             if(current_direction == DIRECTION_RIGHT){
