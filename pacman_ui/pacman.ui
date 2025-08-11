@@ -59,7 +59,7 @@
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+     <enum>QFrame::Shape::NoFrame</enum>
     </property>
     <widget class="caImage" name="caimage_2">
      <property name="geometry">
@@ -133,7 +133,7 @@
       <bool>true</bool>
      </property>
      <property name="limitsMode">
-      <enum>caNumeric::Channel</enum>
+      <enum>caNumeric::SourceMode::Channel</enum>
      </property>
      <property name="maxValue">
       <double>50.000000000000000</double>
@@ -347,10 +347,10 @@
      </rect>
     </property>
     <property name="variable">
-     <string notr="true">$(NAME):PACMAN_USER_Y</string>
+     <string notr="true"/>
     </property>
     <property name="variableType">
-     <enum>caCalc::scalar</enum>
+     <enum>caCalc::varType::scalar</enum>
     </property>
     <property name="channels" stdset="0">
      <string/>
@@ -374,7 +374,7 @@
      <number>0</number>
     </property>
     <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
+     <enum>caCalc::eventsignal::onAnyChange</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_9">
@@ -432,19 +432,19 @@
      <double>1000.000000000000000</double>
     </property>
     <property name="YaxisScalingMax_1" stdset="0">
-     <enum>caStripPlot::Channel</enum>
+     <enum>caStripPlot::axisScaling::Channel</enum>
     </property>
     <property name="YaxisScalingMin_1" stdset="0">
-     <enum>caStripPlot::Channel</enum>
+     <enum>caStripPlot::axisScaling::Channel</enum>
     </property>
     <property name="YaxisLimitsMax_2">
      <double>1000.000000000000000</double>
     </property>
     <property name="YaxisScalingMax_2" stdset="0">
-     <enum>caStripPlot::Channel</enum>
+     <enum>caStripPlot::axisScaling::Channel</enum>
     </property>
     <property name="YaxisScalingMin_2" stdset="0">
-     <enum>caStripPlot::Channel</enum>
+     <enum>caStripPlot::axisScaling::Channel</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_11">
@@ -466,7 +466,7 @@
      <string notr="true">$(NAME):PACMAN_USER_X</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::Channel</enum>
+     <enum>caNumeric::SourceMode::Channel</enum>
     </property>
     <property name="fixedFormat">
      <bool>true</bool>
@@ -491,7 +491,7 @@
      <string notr="true">$(NAME):PACMAN_USER_Y</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::Channel</enum>
+     <enum>caNumeric::SourceMode::Channel</enum>
     </property>
     <property name="fixedFormat">
      <bool>true</bool>
@@ -652,10 +652,10 @@
      </color>
     </property>
     <property name="backgroundMode">
-     <enum>caFrame::Filled</enum>
+     <enum>caFrame::BackgroundMode::Filled</enum>
     </property>
     <property name="visibility">
-     <enum>caFrame::IfNotZero</enum>
+     <enum>caFrame::Visibility::IfNotZero</enum>
     </property>
     <property name="channel" stdset="0">
      <string notr="true">isOverlayVisible</string>
@@ -670,22 +670,22 @@
       </rect>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="alternatingRowColors">
       <bool>false</bool>
      </property>
      <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectItems</enum>
+      <enum>QAbstractItemView::SelectionBehavior::SelectItems</enum>
      </property>
      <property name="showGrid">
       <bool>true</bool>
      </property>
      <property name="gridStyle">
-      <enum>Qt::NoPen</enum>
+      <enum>Qt::PenStyle::NoPen</enum>
      </property>
      <property name="wordWrap">
       <bool>false</bool>
@@ -703,13 +703,13 @@
       <number>28</number>
      </property>
      <property name="alignment">
-      <enum>caWaveTable::Center</enum>
+      <enum>caWaveTable::Alignment::Center</enum>
      </property>
      <property name="colorMode">
-      <enum>caWaveTable::Static</enum>
+      <enum>caWaveTable::colMode::Static</enum>
      </property>
      <property name="formatType">
-      <enum>caWaveTable::decimal</enum>
+      <enum>caWaveTable::FormatType::decimal</enum>
      </property>
      <property name="styleSheet" stdset="0">
       <string notr="true">QHeaderView::section{border-right:1px solid #D8D8D8;border-bottom: 1px solid #D8D8D8;background-color:#f0f0f0;}QTableCornerButton::section{border-right:1px solid #D8D8D8;border-bottom: 1px solid #D8D8D8;background-color:#f0f0f0;}QScrollBar{border-right:1px solid #D8D8D8;border-bottom:1px solid #D8D8D8}</string>
@@ -5278,7 +5278,7 @@
      <string notr="true">$(NAME):GHOSTS_COMMON_SCATTER_DELAY</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::User</enum>
+     <enum>caNumeric::SourceMode::User</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_17">
@@ -5300,7 +5300,7 @@
      <string notr="true">$(NAME):GHOSTS_COMMON_CHASE_DELAY</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::User</enum>
+     <enum>caNumeric::SourceMode::User</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_18">
@@ -5322,7 +5322,7 @@
      <string notr="true">$(NAME):GHOSTS_COMMON_FRIGHT_DELAY</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::User</enum>
+     <enum>caNumeric::SourceMode::User</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_19">
@@ -5344,7 +5344,7 @@
      <string notr="true">$(NAME):GHOSTS_COMMON_SPAWN_DELAY</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::User</enum>
+     <enum>caNumeric::SourceMode::User</enum>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_20">
@@ -5366,7 +5366,7 @@
      <string notr="true">$(NAME):GHOSTS_COMMON_ANIMATION_DELAY</string>
     </property>
     <property name="precisionMode">
-     <enum>caNumeric::User</enum>
+     <enum>caNumeric::SourceMode::User</enum>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_21">
@@ -5395,7 +5395,7 @@
      <string>Pinky</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_22">
@@ -5411,7 +5411,7 @@
      <string>Inky</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_23">
@@ -5427,7 +5427,7 @@
      <string>Clyde</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_24">
@@ -5443,7 +5443,7 @@
      <string>Blinky</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
    <widget class="caInclude" name="cainclude_4">
@@ -5451,8 +5451,8 @@
      <rect>
       <x>1390</x>
       <y>90</y>
-      <width>100</width>
-      <height>191</height>
+      <width>132</width>
+      <height>168</height>
      </rect>
     </property>
     <property name="macro">
@@ -5467,8 +5467,8 @@
      <rect>
       <x>1500</x>
       <y>90</y>
-      <width>100</width>
-      <height>191</height>
+      <width>132</width>
+      <height>168</height>
      </rect>
     </property>
     <property name="macro">
@@ -5483,8 +5483,8 @@
      <rect>
       <x>1390</x>
       <y>350</y>
-      <width>100</width>
-      <height>191</height>
+      <width>132</width>
+      <height>168</height>
      </rect>
     </property>
     <property name="macro">
@@ -5499,8 +5499,8 @@
      <rect>
       <x>1500</x>
       <y>350</y>
-      <width>100</width>
-      <height>191</height>
+      <width>132</width>
+      <height>168</height>
      </rect>
     </property>
     <property name="macro">
@@ -5520,7 +5520,7 @@
      </rect>
     </property>
     <property name="variableType">
-     <enum>caCalc::scalar</enum>
+     <enum>caCalc::varType::scalar</enum>
     </property>
     <property name="channels" stdset="0">
      <string/>
@@ -5544,7 +5544,7 @@
      <number>0</number>
     </property>
     <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
+     <enum>caCalc::eventsignal::onAnyChange</enum>
     </property>
    </widget>
    <widget class="caCalc" name="cacalc_21">
@@ -5557,7 +5557,7 @@
      </rect>
     </property>
     <property name="variableType">
-     <enum>caCalc::scalar</enum>
+     <enum>caCalc::varType::scalar</enum>
     </property>
     <property name="channels" stdset="0">
      <string/>
@@ -5581,7 +5581,7 @@
      <number>0</number>
     </property>
     <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
+     <enum>caCalc::eventsignal::onAnyChange</enum>
     </property>
    </widget>
    <widget class="caCalc" name="cacalc_22">
@@ -5594,7 +5594,7 @@
      </rect>
     </property>
     <property name="variableType">
-     <enum>caCalc::scalar</enum>
+     <enum>caCalc::varType::scalar</enum>
     </property>
     <property name="channels" stdset="0">
      <string/>
@@ -5618,7 +5618,7 @@
      <number>0</number>
     </property>
     <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
+     <enum>caCalc::eventsignal::onAnyChange</enum>
     </property>
    </widget>
    <widget class="caCalc" name="cacalc_23">
@@ -5631,7 +5631,7 @@
      </rect>
     </property>
     <property name="variableType">
-     <enum>caCalc::scalar</enum>
+     <enum>caCalc::varType::scalar</enum>
     </property>
     <property name="channels" stdset="0">
      <string/>
@@ -5655,7 +5655,7 @@
      <number>0</number>
     </property>
     <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
+     <enum>caCalc::eventsignal::onAnyChange</enum>
     </property>
    </widget>
    <widget class="caImage" name="caimage_7">
@@ -5677,7 +5677,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 4</string>
@@ -5714,7 +5714,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B &lt; 3</string>
@@ -5745,7 +5745,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 3</string>
@@ -5776,7 +5776,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 4</string>
@@ -5813,7 +5813,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B &lt; 3</string>
@@ -5844,7 +5844,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 3</string>
@@ -5875,7 +5875,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 4</string>
@@ -5912,7 +5912,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B &lt; 3</string>
@@ -5943,7 +5943,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 3</string>
@@ -5974,7 +5974,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 4</string>
@@ -6011,7 +6011,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B &lt; 3</string>
@@ -6042,7 +6042,7 @@
      <number>200</number>
     </property>
     <property name="visibility">
-     <enum>caImage::Calc</enum>
+     <enum>caImage::Visibility::Calc</enum>
     </property>
     <property name="visibilityCalc">
      <string notr="true">B == 3</string>
@@ -6160,7 +6160,7 @@
   </customwidget>
   <customwidget>
    <class>caStripPlot</class>
-   <extends>QFrame</extends>
+   <extends>QwtPlot</extends>
    <header>caStripPlot</header>
   </customwidget>
   <customwidget>
@@ -6177,6 +6177,11 @@
    <class>caLineDraw</class>
    <extends>QWidget</extends>
    <header>caLineDraw</header>
+  </customwidget>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
