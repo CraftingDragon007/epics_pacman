@@ -96,7 +96,7 @@
       <string notr="true">pacrun</string>
      </property>
      <property name="calc">
-      <string notr="true">C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B))</string>
+      <string notr="true">B=-1 ? 8  : C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B))</string>
      </property>
      <property name="channel" stdset="0">
       <string notr="true">pacrun</string>
