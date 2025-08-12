@@ -3,10 +3,6 @@ dlload /usr/lib/epics/lib/linux-x86_64/librequire.so
 dbLoadDatabase /usr/lib/epics/dbd/requireSup.dbd
 require_registerRecordDeviceDriver pdbbase
 
-
-# require "stream"
-#require "SynApps"
-# require array
 require seq
 
 require misc
@@ -19,7 +15,6 @@ afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=BLINKY"
 afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=PINKY"
 afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=INKY"
 afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=CLYDE"
-
 
 dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
 dbLoadTemplate("ghosts_common.subs", "SYSTEM=PACMAN,GHOST=COMMON")
