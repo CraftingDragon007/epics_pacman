@@ -4,694 +4,534 @@ program ghosts_pacman
 %%#include "math.h"
 %%#include "stdlib.h"
 %%#include "stdio.h"
+%%#include "stdbool.h"
 %%#include "png.h"
 %%#include "errlog.h"
 %%#include "time.h"
+%%#include "stdint.h"
 %%#define PRINTF errlogPrintf
 
 /* options */
 option  +r;
 
-/* variables  ghosts */
-PV( string, pv_SS_GHOSTS, "{NAME}:SS_GHOSTS", PV_NONE );
-PV( int, pv_GHOSTS_NPC_DIR, "{NAME}:GHOSTS_NPC_DIR", PV_MON );  
-PV( int, pv_GHOSTS_NPC_X, "{NAME}:GHOSTS_NPC_X", PV_MON );  
-PV( int, pv_GHOSTS_NPC_Y, "{NAME}:GHOSTS_NPC_Y", PV_MON );
-PV( double, pv_GHOSTS_NPC_MOVE_DELAY, "{NAME}:GHOSTS_NPC_MOVE_DELAY", PV_MON );  
-PV( int, pv_GHOSTS_NPC_SIZE, "{NAME}:GHOSTS_NPC_SIZE", PV_MON );  
-PV( int, pv_GHOSTS_NPC_MOVDIST, "{NAME}:GHOSTS_NPC_MOVDIST", PV_MON );
+/* variables for ghost */
+PV( string, pv_LOGS, "{NAME}:SS_GHOSTS", PV_NONE );
+PV(double, pv_SCATTER_DELAY, "{NAME}:GHOSTS_COMMON_SCATTER_DELAY", PV_MON);
+PV(double, pv_CHASE_DELAY, "{NAME}:GHOSTS_COMMON_CHASE_DELAY", PV_MON);
+PV(double, pv_FRIGHT_DELAY, "{NAME}:GHOSTS_COMMON_FRIGHT_DELAY", PV_MON);
+PV(double, pv_SPAWN_DELAY, "{NAME}:GHOSTS_COMMON_SPAWN_DELAY", PV_MON);
+PV(int, pv_CURRENT_MODE, "{NAME}:GHOSTS_{GHOST}_MODE", PV_MON);
+PV( int, pv_GHOST_DIR, "{NAME}:GHOSTS_{GHOST}_DIR", PV_MON );  
+PV( int, pv_GHOST_X, "{NAME}:GHOSTS_{GHOST}_X", PV_MON );  
+PV( int, pv_GHOST_Y, "{NAME}:GHOSTS_{GHOST}_Y", PV_MON );
+PV( int, pv_GHOST_SIZE, "{NAME}:GHOSTS_{GHOST}_SIZE", PV_MON );  
 
-PV( int, pv_GHOSTS_TAB_X, "{NAME}:GHOSTS_NPC_TABX", PV_MON );  
-PV( int, pv_GHOSTS_TAB_Y, "{NAME}:GHOSTS_NPC_TABY", PV_MON );  
-PV( int, pv_GHOSTS_IDX, "{NAME}:GHOSTS_NPC_IDX", PV_MON );  
-PV( int, pv_GHOSTS_IDXVAL, "{NAME}:GHOSTS_NPC_IDXVAL", PV_MON );  
+/* variables for ghost animation */
+PV( double, pv_GHOST_ANIMATION_DELAY, "{NAME}:GHOSTS_COMMON_ANIMATION_DELAY", PV_MON);
+PV( int, pv_GHOST_CURRENT_FRAME, "{NAME}:GHOSTS_{GHOST}_FRAME", PV_MON );
 
-PV( int, pv_GHOSTS_NPC_X_CORRECT, "{NAME}:GHOSTS_NPC_X_CORRECT", PV_MON );
-PV( int, pv_GHOSTS_NPC_Y_CORRECT, "{NAME}:GHOSTS_NPC_Y_CORRECT", PV_MON );
-PV( int, pv_GHOSTS_NPC_INTERSECT, "{NAME}:GHOSTS_NPC_INTERSECT", PV_MON );
-PV( int, pv_GHOSTS_NPC_INTERSECT_DIST, "{NAME}:GHOSTS_NPC_INTERSECT_DIST", PV_MON );
-
-/* variables ghost run */
-PV( string, pv_SS_GHOSTS_RUN, "{NAME}:SS_GHOSTS_RUN", PV_NONE );
-PV( int, pv_GHOSTS_NPC_RUN, "{NAME}:GHOSTS_NPC_RUN", PV_MON );
-PV( int, pv_GHOSTS_NPC_RUNFRAME1, "{NAME}:GHOSTS_NPC_RUNFRAME1", PV_MON );
-PV( int, pv_GHOSTS_NPC_RUNFRAME2, "{NAME}:GHOSTS_NPC_RUNFRAME2", PV_MON );  
-PV( double, pv_GHOSTS_NPC_RUN_DELAY, "{NAME}:GHOSTS_NPC_RUN_DELAY", PV_MON );  
-
-/* variables from pcman */
+/* variables from pacman */
+PV( int, pv_PACMAN_X, "{NAME}:PACMAN_USER_X", PV_MON );
+PV( int, pv_PACMAN_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
+PV( int, pv_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
 PV( int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
 PV( int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
-PV( int, pv_PACMAN_USER_X, "{NAME}:PACMAN_USER_X", PV_MON );
-PV( int, pv_PACMAN_USER_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
 PVA( short, pv_PACMAN_PLAY_FIELD, 868, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
 PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
 PV( int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
 
-/* variables for png */
-PV( int, pv_GHOSTS_PNG_WIDTH, "{NAME}:GHOSTS_PNG_WIDTH"		, PV_MON );
-PV( int, pv_GHOSTS_PNG_HEIGHT, "{NAME}:GHOSTS_PNG_HEIGHT"	, PV_MON );
-PV( int, pv_GHOSTS_DATA_SIZE, "{NAME}:GHOSTS_PNG_DATA_SIZE"	, PV_MON );
-PVA( unsigned char, pv_GHOSTS_PNG_DATA, 200000, "{NAME}:GHOSTS_PNG_DATA" , PV_NONE );
+#define MODE_WAIT 0
+#define MODE_SCATTER 1
+#define MODE_CHASE 2
+#define MODE_FRIGHT 3
+#define MODE_SPAWN 4
 
-/* Functions */
+#define DIRECTION_RIGHT 0
+#define DIRECTION_LEFT 1
+#define DIRECTION_UP 2
+#define DIRECTION_DOWN 3
+
+#define bool int
+
+#define PICK_MAX 1
+#define PICK_MIN 0
+
+#define ANGLE_INVALID -1.0
+#define ANGLE_MIN 0.0
+#define ANGLE_MAX 3.15
+
+#define FIELD_WIDTH 28
+#define FIELD_HEIGHT 31
+#define TILE_SIZE 32
+
+#define TILE_PATH 0
+#define TILE_WALL 1
+#define TILE_PORTAL 2
+#define TILE_SPAWN_ENTRY 3
+
 %{
+    void swap_values(int* a, int* b) {
+         int temp = *a;
+         *a = *b;
+         *b = temp;
+    }
 
-        void gh_png_error_function(png_structp png_ptr, png_const_charp msg) {
-            fprintf(stderr, "libpng error: %s\n", msg);
-            if (png_ptr) {
-                png_destroy_read_struct(&png_ptr, NULL, NULL);
-            }
-            exit(EXIT_FAILURE);
-        }
-
-        // Function to handle libpng warnings (optional)
-        void gh_png_warning_function(png_structp png_ptr, png_const_charp msg) {
-            fprintf(stderr, "libpng warning: %s\n", msg);
-        }
-
-        /**
-        * Reads an 8-bit RGB image from a PNG file into a single 1D array.
-        * The caller is responsible for freeing the returned data array.
-        *
-        * @param filename The path to the PNG file.
-        * @param width Pointer to store the image width.
-        * @param height Pointer to store the image height.
-        * @return A pointer to the 1D unsigned char array containing RGB data,
-        *         or NULL on failure.
-        */
-        unsigned char* gh_read_png_to_1d_rgb(const char* filename, int* width, int* height) {
-            FILE* fp = NULL;
-            png_structp png_ptr = NULL;
-            png_infop info_ptr = NULL;
-            png_bytep* row_pointers = NULL;
-            unsigned char* image_data = NULL;
-
-            fp = fopen(filename, "rb");
-            if (!fp) {
-                fprintf(stderr, "Error: Could not open file %s for reading.\n", filename);
-                return NULL;
-            }
-
-            // 1. Create and initialize the png_structs
-            png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
-                                            gh_png_error_function, gh_png_warning_function);
-            if (!png_ptr) {
-                fprintf(stderr, "Error: Could not create PNG read struct.\n");
-                fclose(fp);
-                return NULL;
-            }
-
-            info_ptr = png_create_info_struct(png_ptr);
-            if (!info_ptr) {
-                fprintf(stderr, "Error: Could not create PNG info struct.\n");
-                png_destroy_read_struct(&png_ptr, NULL, NULL);
-                fclose(fp);
-                return NULL;
-            }
-
-            // 2. Set up error handling (longjmp for non-fatal errors)
-            if (setjmp(png_jmpbuf(png_ptr))) {
-                // This code is executed if an error occurs during PNG processing
-                fprintf(stderr, "Error during PNG image processing.\n");
-                if (fp) fclose(fp);
-                if (png_ptr) png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                if (row_pointers) free(row_pointers);
-                if (image_data) free(image_data);
-                return NULL;
-            }
-
-            // 3. Initialize PNG I/O
-            png_init_io(png_ptr, fp);
-
-            // 4. Read the PNG file header and info
-            png_read_info(png_ptr, info_ptr);
-
-            // Get image dimensions and properties
-            *width = png_get_image_width(png_ptr, info_ptr);
-            *height = png_get_image_height(png_ptr, info_ptr);
-            png_byte color_type = png_get_color_type(png_ptr, info_ptr);
-            png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-
-            printf("Image: %s, Width: %d, Height: %d, Color Type: %d, Bit Depth: %d\n",
-                filename, *width, *height, color_type, bit_depth);
-
-            // 5. Set up transformations for 8-bit RGB output
-            // Expand paletted colors to RGB
-            if (color_type == PNG_COLOR_TYPE_PALETTE) {
-                png_set_palette_to_rgb(png_ptr);
-            }
-
-            // Expand grayscale to 8-bit RGB
-            if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
-                png_set_expand_gray_1_2_4_to_8(png_ptr);
-            } else if (color_type == PNG_COLOR_TYPE_GRAY ||
-                    color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
-                // Convert grayscale to RGB by duplicating channels
-                png_set_gray_to_rgb(png_ptr);
-            }
-
-            // Strip 16-bit per channel images down to 8-bit per channel
-            if (bit_depth == 16) {
-                png_set_strip_16(png_ptr);
-            }
-
-            // Strip alpha channel if present (we only want RGB)
-            if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ||
-                color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-                color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
-                png_set_strip_alpha(png_ptr);
-            }
-
-            // After setting transformations, update the info structure
-            png_read_update_info(png_ptr, info_ptr);
-
-            // Re-check properties after transformations
-            color_type = png_get_color_type(png_ptr, info_ptr); // Should now be RGB
-            bit_depth = png_get_bit_depth(png_ptr, info_ptr);   // Should now be 8
-
-            if (color_type != PNG_COLOR_TYPE_RGB || bit_depth != 8) {
-                fprintf(stderr, "Error: Image could not be transformed to 8-bit RGB.\n");
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                fclose(fp);
-                return NULL;
-            }
-
-            // Calculate row_bytes and total image data size
-            png_size_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
-            size_t total_size = (size_t)*height * row_bytes; // row_bytes should be width * 3
-
-            if (row_bytes != (png_size_t)*width * 3) {
-                fprintf(stderr, "Warning: Expected %d bytes per row (Width * 3), got %zu. "
-                                "This might indicate an issue with transformation.\n",
-                        *width * 3, row_bytes);
-            }
-
-            // 6. Allocate memory for the 1D image data array
-            image_data = (unsigned char*)malloc(total_size);
-            if (!image_data) {
-                fprintf(stderr, "Error: Could not allocate memory for image data.\n");
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                fclose(fp);
-                return NULL;
-            }
-
-            // 7. Allocate memory for row pointers (for libpng's internal reading)
-            row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * (*height));
-            if (!row_pointers) {
-                fprintf(stderr, "Error: Could not allocate memory for row pointers.\n");
-                free(image_data);
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                fclose(fp);
-                return NULL;
-            }
-
-            // Point each row_pointer to the correct offset in the 1D array
-            for (int y = 0; y < *height; y++) {
-                row_pointers[y] = image_data + (size_t)y * row_bytes;
-            }
-
-            // 8. Read the entire image
-            png_read_image(png_ptr, row_pointers);
-
-            // 9. Cleanup
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            fclose(fp);
-            free(row_pointers); // Free the array of pointers, not the data they point to
-
-            return image_data;
-        }
-
-        void gh_write_rgb_into_pointer(unsigned char* original_data, unsigned char* target_data, int width, int height) {
-            if (!original_data || !target_data) {
-                fprintf(stderr, "Error: Null pointer passed to gh_write_rgb_into_pointer.\n");
-                return;
-            }
-            size_t total_size = width * height * 3; // 3 bytes per pixel (RGB)
-            memcpy(target_data, original_data, total_size);
-        }
-
-        /** Converts a position on the pv_PACMAN_FIELD_RESOLUTION * pv_PACMAN_FIELD_RESOLUTION field to an index in a png rgb (3-bit) image
-            * @param x The x-coordinate in the field.
-            * @param y The y-coordinate in the field.
-            * @param PACMAN_FIELD_RESOLUTION The resolution of the field (width and height).
-            * @param png_width The width of the PNG image.
-            * @param png_height The height of the PNG image.
-            * @return The index in the 1D RGB array for the PNG image.
-            */
+    double get_angle_for_coordinates(int current_x, int current_y, int next_x, int next_y, int target_x, int target_y) {
+        double nt = sqrt((next_x - target_x) * (next_x - target_x) + (next_y - target_y) * (next_y - target_y));
+        double cn = sqrt((next_x - current_x) * (next_x - current_x) + (next_y - current_y) * (next_y - current_y));
+        double ct = sqrt((target_x - current_x)*(target_x - current_x) + (target_y - current_y) * (target_y - current_y));
         
-        int gh_get_png_index_from_xy(int x, int y, int PACMAN_FIELD_RESOLUTION, int png_width, int png_height) {
-            if (x < 0 || x >= PACMAN_FIELD_RESOLUTION || y < 0 || y >= PACMAN_FIELD_RESOLUTION) {
-                return -1; // out of bounds
-            }
-
-            x = (x * png_width) / PACMAN_FIELD_RESOLUTION; // Scale x to PNG width
-            y = (y * png_height) / PACMAN_FIELD_RESOLUTION; // Scale y to PNG height
-            if (x < 0 || x >= png_width || y < 0 || y >= png_height) {
-                return -1; // out of bounds after scaling
-            }
-
-            return (y * png_width + x) * 3; // 3 bytes per pixel (RGB)
+        double dividend = nt * nt - ct * ct - cn * cn; 
+        double divisor = -2 * ct * cn;
+        if (divisor == 0) return 0;
+        
+        double cosResult = dividend / divisor;
+        if (fabs(cosResult + 1.0) < 1e-9) {
+            cosResult = -1; // Due to precision loss, it could be slightly less than -1, resulting in nan when doing acos (domain error)
         }
-}%
 
-%{
-    int NPC_SIZE;
-    int CELL_SIZE = 32;
-    int ARRAY_ROW_LENGTH = 32;
-
-    int gh_get_tab_coordinates(int cor, int offset){
-        double tabcor = (cor + (NPC_SIZE/2) + offset) / CELL_SIZE;
-        int tab = round(tabcor);
-        if(tabcor < 0) tabcor = 0;
-        if(tabcor > 32) tabcor = 32;
-        return tab;
+        return acos(cosResult);
     }
 
-    int gh_get_caqtdm_coordinates(int tab_cor){
-        int cor = tab_cor;
-        if(cor < 0) cor = 0;
-        if(cor > 31) cor = 31;
-        return (cor * CELL_SIZE) - (NPC_SIZE/2);
+    int get_tile_index_from_tile_coordinates(int tile_x, int tile_y){
+        return tile_y * FIELD_WIDTH + tile_x;
     }
 
-    int gh_tab_coordinates_to_index(int tab_x, int tab_y){
-        if(tab_x < 0) tab_x = 0;
-        if(tab_x > 27) tab_x = 27;
-        if(tab_y < 0) tab_y = 0;
-        if(tab_y > 30) tab_y = 30;
-        return tab_y * 28 + tab_x;
+    void get_tile_coordinates_from_tile_index(int tile_index, int *tile_x, int *tile_y) {
+        *tile_x = tile_index % FIELD_WIDTH;
+        *tile_y = tile_index / FIELD_WIDTH;
     }
 
-    
-    int gh_get_distance_from_pacman(int pac_x, int pac_y, int ghost_x, int ghost_y){
-        int diff_x = abs(ghost_x - pac_x);
-        int diff_y = abs(ghost_y - pac_y);
-        int difference = sqrt(diff_x*diff_x + diff_y*diff_y);
+    int random_int_between(int min, int max) {
+        if (min > max) {
+            int temp = min;
+            min = max;
+            max = temp;
+        }
 
-        return difference;
+        int range = max - min + 1;
+        int bucket_size = (RAND_MAX) / range;
+        int limit = bucket_size * range;
+
+        int r;
+        do {
+            r = rand();
+        } while (r >= limit);
+
+        return min + (r / bucket_size);
     }
 
-    void gh_get_shortest_direction_to_pacman(int ghost_x, int ghost_y, int pac_x, int pac_y, int* first, int* second, int* third, int* fourth) {
-            int distance[4];
-            int dir[4] = {0, 1, 2, 3}; // 0=right, 1=left, 2=up, 3=down
-            int x[4] = {
-                ghost_x + CELL_SIZE, // right
-                ghost_x - CELL_SIZE, // left
-                ghost_x, // up
-                ghost_x,  // down
-            };
-
-            int y[4] = {
-                ghost_y, // right
-                ghost_y, // left
-                ghost_y - CELL_SIZE, // up
-                ghost_y + CELL_SIZE  // down 
-            };
-
-            for(int i = 0; i < 4; i++) {
-                distance[i] = gh_get_distance_from_pacman(pac_x, pac_y, x[i], y[i]);
-            }
-
-            // Sort directions by distance (ascending)
-            for(int i = 0; i < 3; i++) {
-                for(int j = i + 1; j < 4; j++) {
-                    if(distance[dir[j]] < distance[dir[i]]) {
-                        int tmp = dir[i];
-                        dir[i] = dir[j];
-                        dir[j] = tmp;
-                    }
-                }
-            }
-
-          // printf("\nDIR: %d, %d, %d, %d", dir[0], dir[1], dir[2], dir[3]);
-            // Save sorted directions to pointers
-            if (first)  *first  = dir[0];
-            if (second) *second = dir[1];
-            if (third)  *third  = dir[2];
-            if (fourth) *fourth = dir[3];
+    double pick_angle(double a, double b, double c, double d, int pick_max) {
+        double result = pick_max == PICK_MAX ? ANGLE_MIN : ANGLE_MAX;
+        if (pick_max == PICK_MAX) {
+            if (a > result && a != ANGLE_INVALID) result = a;
+            if (b > result && b != ANGLE_INVALID) result = b;
+            if (c > result && c != ANGLE_INVALID) result = c;
+            if (d > result && d != ANGLE_INVALID) result = d;
+        } else {
+            if (a < result && a != ANGLE_INVALID) result = a;
+            if (b < result && b != ANGLE_INVALID) result = b;
+            if (c < result && c != ANGLE_INVALID) result = c;
+            if (d < result && d != ANGLE_INVALID) result = d;
+        }
+        return result;
     }
 
-    int gh_get_surrounding_y_from_direction(int tab_y, int direction){
-            switch(direction){
-                case 0: // right
-                    return tab_y;
-                    break;
-                case 1: // left
-                    return tab_y;
-                case 2: // up
-                    return (tab_y-1);
-                    break;
-                case 3: // down
-                    return (tab_y+1);
-                    break;
-                default:
-                    return tab_y;
-                    break;
-            }
+    double get_time_from_now(double offset_seconds) {
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+
+        double now_ms = (double)now.tv_sec * 1000.0 + (double)now.tv_nsec / 1e6;
+        double offset_ms = offset_seconds * 1000.0;
+
+        return now_ms + offset_ms;
     }
-    int gh_get_surrounding_x_from_direction(int tab_x, int direction){
-        switch(direction){
-            case 0: // right
-                return (tab_x+1);
-                break;
-            case 1: // left
-                return (tab_x-1);
-                break;
-            case 2: // up
-                return (tab_x);
-                break;
-            case 3: // down
-                return (tab_x);
-                break;
+
+    bool is_time_reached(double target_time) {
+        double current_time = get_time_from_now(0.0);
+        return current_time >= target_time;
+    }
+
+    // In spawn mode, the shortest path to spawn is needed. In some cases, using angles is horribly wrong, which is why some tiles are overriden to go upwards instead of using the angle.
+    bool is_spawn_upwards_override(int tile) {
+        switch (tile) {
+            case 401:
+            case 410:
+            case 485:
+            case 494:
+                return true;
             default:
-                return tab_x;
-                break;
+                return false;
         }
     }
-
 }%
 
-// movement of ghosts
-ss ghosts_pacman{
-    state INIT{
-        entry{
-            int width, height;
-            unsigned char* image_data = gh_read_png_to_1d_rgb("../pacman_ui/pacman_background.png", &width, &height);
-            
-            // GHOSTS
-            pvSetStr(pv_SS_GHOSTS, "INIT");
-            pvSet(pv_GHOSTS_NPC_SIZE, 40);
-            pvSet(pv_GHOSTS_NPC_MOVDIST, 5);
-            pvSet(pv_GHOSTS_NPC_X, 25);
-            pvSet(pv_GHOSTS_NPC_Y, 25);
-            pvSet(pv_GHOSTS_NPC_DIR,3);
+ss gameloop {
+    int previous_mode = MODE_WAIT;
+    int current_mode = MODE_WAIT;
+    double delay_time = 1;
 
-            // PNG
-            if (image_data) {
-                // Store the image data in the pv_PACMAN_PNG_DATA array
-                gh_write_rgb_into_pointer(image_data, pv_GHOSTS_PNG_DATA, width, height);
-                free(image_data); // Free the image data after copying it
-                pvPut(pv_GHOSTS_PNG_DATA);
-                // Set the width, height, and data size in the PVs
-                pvSet(pv_GHOSTS_PNG_WIDTH, width);
-                pvSet(pv_GHOSTS_PNG_HEIGHT, height);
-                pvSet(pv_GHOSTS_DATA_SIZE, width * height * 3);
-            }   
-        }
-        when(){
-            NPC_SIZE = pv_GHOSTS_NPC_SIZE;
-            CELL_SIZE = pv_PACMAN_ARRAY_CELL_WIDTH;
-            ARRAY_ROW_LENGTH = pv_PACMAN_ARRAY_ROW_LENGTH;
-        } state CHECK_MOVE
-    }
-    state CHECK_MOVE{
-        entry{
-            int dir = pv_GHOSTS_NPC_DIR % 4;
-            int offset = pv_GHOSTS_NPC_MOVDIST;
-            pvSetStr(pv_SS_GHOSTS, "CHECK_MOVE");
+    int current_direction = DIRECTION_RIGHT;
+    int chosen_direction = DIRECTION_RIGHT;
+    int inverse_direction = DIRECTION_RIGHT;
+    int num_directions_possible = 0;
 
-            // calculate wether a ghost is able to move
-            pvSet(pv_GHOSTS_TAB_X, gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0));
-            pvSet(pv_GHOSTS_TAB_Y, gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0));
-            
-            pvSet(pv_GHOSTS_IDX, gh_tab_coordinates_to_index(pv_GHOSTS_TAB_X, pv_GHOSTS_TAB_Y));
-            pvSet(pv_GHOSTS_IDXVAL, pv_PACMAN_PLAY_FIELD[pv_GHOSTS_IDX]);
+    bool current_direction_possible = false;
+
+    int origin_tile = -1;
+    int target_tile = -1;
+    int target_pixel_x = 0;
+    int target_pixel_y = 0;
+    int origin_tile_x = 0;
+    int origin_tile_y = 0;
+    int target_tile_x = 0;
+    int target_tile_y = 0;
+
+    int ghost_size = 40;
+
+    state INIT {
+        entry {
+            pvSetStr(pv_LOGS, "INIT");
+            %% srand((unsigned) time(NULL));
         }
-        when(delay(pv_GHOSTS_NPC_MOVE_DELAY) && pv_GHOSTS_IDXVAL == 0){
-        } state CHECK_CORRECTION
-        when(pv_GHOSTS_IDXVAL == 1){
-        } state CHECK_MOVEABLE_DIRECTION
+        when() {
+        } state READY
     }
 
-    state CHECK_CORRECTION{
-        entry{
-            int dir = pv_GHOSTS_NPC_DIR % 4;
-            int tab_x = gh_get_tab_coordinates(pv_GHOSTS_NPC_X, 0);
-            int tab_y = gh_get_tab_coordinates(pv_GHOSTS_NPC_Y, 0);
-            int y;
-            int yy;
-            int x;
-            int xx;
-            int size = 32;
-            pvSetStr(pv_SS_GHOSTS, "CHECK_CORRECTION");
+    state READY {
+        entry {
+            pvSetStr(pv_LOGS, "READY");
+            origin_tile_x = FIELD_WIDTH / 2;
+            origin_tile_y = FIELD_HEIGHT / 2 - 1;
+            origin_tile = get_tile_index_from_tile_coordinates(origin_tile_x, origin_tile_y);
+            ghost_size = pv_GHOST_SIZE;
+            pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
+            pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
+        }
+        when(pv_CURRENT_MODE != MODE_WAIT) {
+            current_mode = pv_CURRENT_MODE;
+            previous_mode = current_mode;
+            ghost_size = pv_GHOST_SIZE;
+            target_tile_x = origin_tile_x;
+            target_tile_y = origin_tile_y - 3;
+            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
+            target_pixel_x = target_tile_x * TILE_SIZE;
+            target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
+            pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
+            pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
+            current_direction = DIRECTION_UP;
+            chosen_direction = DIRECTION_UP;
+            pvSet(pv_GHOST_DIR, current_direction);
+            delay_time = pv_SCATTER_DELAY;
+        } state MOVE_DIRECTION
+    }
 
-            if(dir == 0 || dir == 1){
-                y = (tab_y * size) + (size/2);
-                yy = pv_GHOSTS_NPC_Y + (pv_GHOSTS_NPC_SIZE/2);
-                if(yy > y){
-                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, y - yy);
-                }else if(y > pv_GHOSTS_NPC_Y){
-                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, (yy - y));
-                }else{
-                    pvSet(pv_GHOSTS_NPC_Y_CORRECT, 0);
-                }
-            }else if(dir == 2 || dir == 3){
-                x = (tab_x * 28) + (size/2);
-                xx = pv_GHOSTS_NPC_X + (pv_GHOSTS_NPC_SIZE/2);
-                if(xx > x){
-                    pvSet(pv_GHOSTS_NPC_X_CORRECT, x - xx);
-                }else if(x > pv_GHOSTS_NPC_X){
-                    pvSet(pv_GHOSTS_NPC_X_CORRECT, (xx - x));
-                }else{
-                    pvSet(pv_GHOSTS_NPC_X_CORRECT, 0);
-                }
+    state CHECK_MODE {
+        entry {
+            pvSetStr(pv_LOGS, "CHECK_MODE");
+
+            ghost_size = pv_GHOST_SIZE;
+            if ((pv_GHOST_X + ghost_size / 2) % TILE_SIZE < TILE_SIZE / 2) {
+                pvSet(pv_GHOST_X, pv_GHOST_X + 1);
+            } else if ((pv_GHOST_X + ghost_size / 2) % TILE_SIZE > TILE_SIZE / 2) {
+                pvSet(pv_GHOST_X, pv_GHOST_X - 1);
+            }
+
+            if ((pv_GHOST_Y + ghost_size / 2) % TILE_SIZE < TILE_SIZE / 2) {
+                pvSet(pv_GHOST_Y, pv_GHOST_Y + 1);
+            } else if ((pv_GHOST_Y + ghost_size / 2) % TILE_SIZE > TILE_SIZE / 2) {
+                pvSet(pv_GHOST_Y, pv_GHOST_Y - 1);
+            }
+
+            current_mode = pv_CURRENT_MODE;
+            if (current_mode == MODE_SCATTER) {
+                delay_time = pv_SCATTER_DELAY;
+            } else if (current_mode == MODE_CHASE) {
+                delay_time = pv_CHASE_DELAY;
+            } else if (current_mode == MODE_FRIGHT) {
+                delay_time = pv_FRIGHT_DELAY;
+            } else if (current_mode == MODE_SPAWN) {
+                delay_time = pv_SPAWN_DELAY;
             }
         }
-        when(){
-        } state CHECK_INTERSECTION
+        when(current_mode == MODE_WAIT) {
+        } state READY
+        when () {
+        } state CHOOSE_DIRECTION
     }
 
-    state CHECK_MOVEABLE_DIRECTION{
-        entry{
-            int dir = pv_GHOSTS_NPC_DIR % 4;
-            int first, second, third, fourth;
-            int new_dir;
-            int tab_x = pv_GHOSTS_TAB_X;
-            int tab_y = pv_GHOSTS_TAB_Y;
+    state CHOOSE_DIRECTION {
+        entry {
+            pvSetStr(pv_LOGS, "CHOOSE_DIRECTION");
+        }
+        when () {
+            // Get possible directions, with theta to pacman and spawn
+            int up_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y - 1);
+            int down_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y + 1);
+            int left_tile = get_tile_index_from_tile_coordinates((target_tile_x - 1 + FIELD_WIDTH) % FIELD_WIDTH, target_tile_y);
+            int right_tile = get_tile_index_from_tile_coordinates((target_tile_x + 1) % FIELD_WIDTH, target_tile_y);
 
-                pvSetStr(pv_SS_GHOSTS, "CHECK_MOVEABLE_DIRECTION");
-                gh_get_shortest_direction_to_pacman(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_Y, pv_PACMAN_USER_X, pv_PACMAN_USER_Y, &first, &second, &third, &fourth);
-                
-                // Avoid reversing direction
-                if(dir == 0) new_dir = 1;
-                if(dir == 1) new_dir = 0;
-                if(dir == 2) new_dir = 3;
-                if(dir == 3) new_dir = 2;
-                
-                // CHECK IF POSSIBLE TO WALK NEAREST
-                tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, first);
-                tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, first);
-                if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && first != new_dir){
-                    pvSet(pv_GHOSTS_NPC_DIR, first);
-                }else{
-                    tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, second);
-                    tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, second);
-                    if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && second != new_dir){
-                        pvSet(pv_GHOSTS_NPC_DIR, second);
-                    }else{
-                        tab_y = gh_get_surrounding_y_from_direction(pv_GHOSTS_TAB_X, third);
-                        tab_x = gh_get_surrounding_x_from_direction(pv_GHOSTS_TAB_Y, third);
-                        if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y)] == 0 && third != new_dir){
-                            pvSet(pv_GHOSTS_NPC_DIR, third);
-                        }else{
-                            pvSet(pv_GHOSTS_NPC_DIR, fourth);
-                        }
+            double up_angle_pacman = ANGLE_INVALID;
+            double down_angle_pacman = ANGLE_INVALID;
+            double left_angle_pacman = ANGLE_INVALID;
+            double right_angle_pacman = ANGLE_INVALID;
+            double min_angle_pacman = ANGLE_MAX;
+            double max_angle_pacman = ANGLE_MIN;
+
+            double up_angle_spawn = ANGLE_INVALID;
+            double down_angle_spawn = ANGLE_INVALID;
+            double left_angle_spawn = ANGLE_INVALID;
+            double right_angle_spawn = ANGLE_INVALID;
+            double min_angle_spawn = ANGLE_MAX;
+
+            bool is_spawn = (current_mode == MODE_SPAWN);
+
+            num_directions_possible = 0;
+
+            chosen_direction = -1;
+
+            if (pv_PACMAN_PLAY_FIELD[up_tile] == TILE_PATH || (pv_PACMAN_PLAY_FIELD[up_tile] == TILE_SPAWN_ENTRY && is_spawn)) {
+                up_angle_pacman = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x, target_pixel_y - 1, pv_PACMAN_X + pv_PACMAN_SIZE / 2, pv_PACMAN_Y + pv_PACMAN_SIZE / 2);
+                up_angle_spawn = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x, target_pixel_y - 1, FIELD_WIDTH / 2 * TILE_SIZE, FIELD_HEIGHT / 2 * TILE_SIZE);
+                num_directions_possible += 1;
+            }
+
+            if (pv_PACMAN_PLAY_FIELD[down_tile] == TILE_PATH || (pv_PACMAN_PLAY_FIELD[down_tile] == TILE_SPAWN_ENTRY && is_spawn)) {
+                down_angle_pacman = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x, target_pixel_y + 1, pv_PACMAN_X + pv_PACMAN_SIZE / 2, pv_PACMAN_Y + pv_PACMAN_SIZE / 2);
+                down_angle_spawn = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x, target_pixel_y + 1, FIELD_WIDTH / 2 * TILE_SIZE, FIELD_HEIGHT / 2 * TILE_SIZE);
+                num_directions_possible += 1;
+            }
+
+            if (pv_PACMAN_PLAY_FIELD[left_tile] == TILE_PATH || (pv_PACMAN_PLAY_FIELD[left_tile] == TILE_SPAWN_ENTRY && is_spawn)) {
+                left_angle_pacman = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x - 1, target_pixel_y, pv_PACMAN_X + pv_PACMAN_SIZE / 2, pv_PACMAN_Y + pv_PACMAN_SIZE / 2);
+                left_angle_spawn = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x - 1, target_pixel_y, FIELD_WIDTH / 2 * TILE_SIZE, FIELD_HEIGHT / 2 * TILE_SIZE);
+                num_directions_possible += 1;
+            }
+
+            if (pv_PACMAN_PLAY_FIELD[right_tile] == TILE_PATH || (pv_PACMAN_PLAY_FIELD[right_tile] == TILE_SPAWN_ENTRY && is_spawn)) {
+                right_angle_pacman = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x + 1, target_pixel_y, pv_PACMAN_X + pv_PACMAN_SIZE / 2, pv_PACMAN_Y + pv_PACMAN_SIZE / 2);
+                right_angle_spawn = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x + 1, target_pixel_y, FIELD_WIDTH / 2 * TILE_SIZE, FIELD_HEIGHT / 2 * TILE_SIZE);
+                num_directions_possible += 1;
+            }
+
+            if (current_mode == previous_mode && num_directions_possible > 1) {
+                num_directions_possible -= 1;
+                if (current_direction == DIRECTION_DOWN) {
+                    up_angle_pacman = ANGLE_INVALID;
+                    up_angle_spawn = ANGLE_INVALID;
+                } else if (current_direction == DIRECTION_UP) {
+                    down_angle_pacman = ANGLE_INVALID;
+                    down_angle_spawn = ANGLE_INVALID;
+                } else if (current_direction == DIRECTION_RIGHT) {
+                    left_angle_pacman = ANGLE_INVALID;
+                    left_angle_spawn = ANGLE_INVALID;
+                } else if (current_direction == DIRECTION_LEFT) {
+                    right_angle_pacman = ANGLE_INVALID;
+                    right_angle_spawn = ANGLE_INVALID;
+                } else {
+                    num_directions_possible += 1;
+                }
+            }
+
+            min_angle_pacman = pick_angle(up_angle_pacman, down_angle_pacman, left_angle_pacman, right_angle_pacman, PICK_MIN);
+            max_angle_pacman = pick_angle(up_angle_pacman, down_angle_pacman, left_angle_pacman, right_angle_pacman, PICK_MAX);
+            min_angle_spawn = pick_angle(up_angle_spawn, down_angle_spawn, left_angle_spawn, right_angle_spawn, PICK_MIN);
+
+            if (current_mode == MODE_SCATTER) {
+                // pick random from possible direction
+                int rand_dir_counter = random_int_between(0, num_directions_possible - 1);
+                if (up_angle_pacman != ANGLE_INVALID) {
+                    if (rand_dir_counter == 0) {
+                        chosen_direction = DIRECTION_UP;
                     }
+                    rand_dir_counter -= 1;
                 }
 
-                
-        }
-        when(delay(pv_GHOSTS_NPC_MOVE_DELAY)){
-        } state MOVE
-    }
-
-    state CHECK_INTERSECTION{
-        entry{
-            int horizontal_count = 0;
-            int vertical_count = 0;
-            int tab_x = pv_GHOSTS_TAB_X;
-            int tab_y = pv_GHOSTS_TAB_Y;
-            pvSetStr(pv_SS_GHOSTS, "CHECK_INTERSECTION");
-        
-            // to the right
-            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x + 1, tab_y)] == 0){
-                horizontal_count++;
-            }
-
-            // to the left
-            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x-1, tab_y)] == 0){
-                horizontal_count++;
-            }
-
-            // upwards
-            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y-1)] == 0){
-                vertical_count++;
-            }
-
-            // downwards
-            if(pv_PACMAN_PLAY_FIELD[gh_tab_coordinates_to_index(tab_x, tab_y + 1)] == 0){
-                vertical_count++;
-            }
-
-            if(vertical_count > 0 && vertical_count > 0){
-                if(pv_GHOSTS_NPC_INTERSECT_DIST == 0){
-                    pvSet(pv_GHOSTS_NPC_INTERSECT, 1);
-                    pvSet(pv_GHOSTS_NPC_INTERSECT_DIST, 32)
-                }else{
-                    pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
+                if (down_angle_pacman != ANGLE_INVALID) {
+                    if (rand_dir_counter == 0) {
+                        chosen_direction = DIRECTION_DOWN;
+                    }
+                    rand_dir_counter -= 1;
                 }
-            }else{
-                pvSet(pv_GHOSTS_NPC_INTERSECT, 0);
-                pvSet(pv_GHOSTS_NPC_INTERSECT_DIST, 0);
+
+                if (left_angle_pacman != ANGLE_INVALID) {
+                    if (rand_dir_counter == 0) {
+                        chosen_direction = DIRECTION_LEFT;
+                    }
+                    rand_dir_counter -= 1;
+                }
+
+                if (right_angle_pacman != ANGLE_INVALID) {
+                    if (rand_dir_counter == 0) {
+                        chosen_direction = DIRECTION_RIGHT;
+                    }
+                    rand_dir_counter -= 1;
+                }
+            } else if (current_mode == MODE_CHASE) {
+                // lowest angle to pacman
+                if (up_angle_pacman != ANGLE_INVALID && up_angle_pacman == min_angle_pacman) {
+                    chosen_direction = DIRECTION_UP;
+                } else if (down_angle_pacman != ANGLE_INVALID && down_angle_pacman == min_angle_pacman) {
+                    chosen_direction = DIRECTION_DOWN;
+                } else if (left_angle_pacman != ANGLE_INVALID && left_angle_pacman == min_angle_pacman) {
+                    chosen_direction = DIRECTION_LEFT;
+                } else if (right_angle_pacman != ANGLE_INVALID && right_angle_pacman == min_angle_pacman) {
+                    chosen_direction = DIRECTION_RIGHT;
+                }
+            } else if (current_mode == MODE_FRIGHT) {
+                // highest angle to pacman
+                if (up_angle_pacman != ANGLE_INVALID && up_angle_pacman == max_angle_pacman) {
+                    chosen_direction = DIRECTION_UP;
+                } else if (down_angle_pacman != ANGLE_INVALID && down_angle_pacman == max_angle_pacman) {
+                    chosen_direction = DIRECTION_DOWN;
+                } else if (left_angle_pacman != ANGLE_INVALID && left_angle_pacman == max_angle_pacman) {
+                    chosen_direction = DIRECTION_LEFT;
+                } else if (right_angle_pacman != ANGLE_INVALID && right_angle_pacman == max_angle_pacman) {
+                    chosen_direction = DIRECTION_RIGHT;
+                }
+            } else if (current_mode == MODE_SPAWN) {
+                // lowest angle to spawn
+                if (up_angle_spawn != ANGLE_INVALID && (up_angle_spawn == min_angle_spawn || is_spawn_upwards_override(target_tile))) {
+                    chosen_direction = DIRECTION_UP;
+                } else if (down_angle_spawn != ANGLE_INVALID && down_angle_spawn == min_angle_spawn) {
+                    chosen_direction = DIRECTION_DOWN;
+                } else if (left_angle_spawn != ANGLE_INVALID && left_angle_spawn == min_angle_spawn) {
+                    chosen_direction = DIRECTION_LEFT;
+                } else if (right_angle_spawn != ANGLE_INVALID && right_angle_spawn == min_angle_spawn) {
+                    chosen_direction = DIRECTION_RIGHT;
+                }
             }
 
+            pvSet(pv_GHOST_DIR, chosen_direction);
+
+            if (chosen_direction == DIRECTION_LEFT && left_tile > target_tile) {
+                // Wrap around left end to right end
+                pvSet(pv_GHOST_X, FIELD_WIDTH * TILE_SIZE - ghost_size);
+            } else if (chosen_direction == DIRECTION_RIGHT && right_tile < target_tile) {
+                // Wrap around right end to left end
+                pvSet(pv_GHOST_X, 0);
+            }
+
+            if (chosen_direction == DIRECTION_UP) {
+                target_tile_y = target_tile_y - 1;
+            } else if (chosen_direction == DIRECTION_DOWN) {
+                target_tile_y = target_tile_y + 1;
+            } else if (chosen_direction == DIRECTION_LEFT) {
+                target_tile_x = (target_tile_x - 1 + FIELD_WIDTH) % FIELD_WIDTH;
+            } else if (chosen_direction == DIRECTION_RIGHT) {
+                target_tile_x = (target_tile_x + 1) % FIELD_WIDTH;
+            }
+
+            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
+            target_pixel_x = target_tile_x * TILE_SIZE + TILE_SIZE / 2;
+            target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
+        } state MOVE_DIRECTION
+    }
+
+    state MOVE_DIRECTION {
+        entry {
+            pvSetStr(pv_LOGS, "MOVE_DIRECTION");
         }
-        when(pv_GHOSTS_NPC_INTERSECT == 0){
-        } state MOVE
-        when(pv_GHOSTS_NPC_INTERSECT == 1 ){
-        } state CHECK_MOVEABLE_DIRECTION
-    }
-
-    state MOVE{
-        entry{
-            int png_index;
-            int correction_distance = pv_GHOSTS_NPC_MOVDIST/3;
-            pvSetStr(pv_SS_GHOSTS, "MOVE");
-        
-            png_index = gh_get_png_index_from_xy(pv_GHOSTS_NPC_X + (NPC_SIZE/2), pv_GHOSTS_NPC_Y + (NPC_SIZE/2), pv_PACMAN_FIELD_RESOLUTION, pv_GHOSTS_PNG_WIDTH, pv_GHOSTS_PNG_HEIGHT);
-            if (png_index >= 0 && png_index < pv_GHOSTS_DATA_SIZE) {
-                // Set the color of red for debugging purposes
-                pv_GHOSTS_PNG_DATA[png_index] = 0; // Red channel
-                pv_GHOSTS_PNG_DATA[png_index + 1] = 255; // Green channel
-                pv_GHOSTS_PNG_DATA[png_index + 2] = 0; // Blue channel
-                pvPut(pv_GHOSTS_PNG_DATA);
+        when (pv_CURRENT_MODE == MODE_WAIT) {
+        } state CHECK_MODE
+        when (pv_GHOST_X + ghost_size / 2 == target_pixel_x && pv_GHOST_Y + ghost_size / 2 == target_pixel_y) {
+            previous_mode = current_mode;
+        } state CHECK_MODE
+        when (delay(delay_time)) {
+            // Move step towards target_pixel_x and target_pixel_y
+            int current_x = pv_GHOST_X + ghost_size / 2;
+            int current_y = pv_GHOST_Y + ghost_size / 2;
+            if (current_x < target_pixel_x) {
+                pvSet(pv_GHOST_X, pv_GHOST_X + 1)
+            } else if (current_x > target_pixel_x) {
+                pvSet(pv_GHOST_X, pv_GHOST_X - 1)
             }
 
-            // Apply Correction
-            // Y - Correction
-            if(pv_GHOSTS_NPC_Y_CORRECT > 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y + correction_distance));
-                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT - 1));
-            }else if(pv_GHOSTS_NPC_Y_CORRECT < 0){
-                pvSet(pv_GHOSTS_NPC_Y, (pv_GHOSTS_NPC_Y - correction_distance));
-                pvSet(pv_GHOSTS_NPC_Y_CORRECT, (pv_GHOSTS_NPC_Y_CORRECT + 1));
+            if (current_y < target_pixel_y) {
+                pvSet(pv_GHOST_Y, pv_GHOST_Y + 1)
+            } else if (current_y > target_pixel_y) {
+                pvSet(pv_GHOST_Y, pv_GHOST_Y - 1)
             }
-
-            // X-Correction
-            if(pv_GHOSTS_NPC_X_CORRECT > 0){
-                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X + correction_distance));
-                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT - 1));
-            }else if(pv_GHOSTS_NPC_X_CORRECT < 0){
-                pvSet(pv_GHOSTS_NPC_X, (pv_GHOSTS_NPC_X - correction_distance));
-                pvSet(pv_GHOSTS_NPC_X_CORRECT, (pv_GHOSTS_NPC_X_CORRECT + 1));
-            }
-        }
-        when(pv_GHOSTS_NPC_DIR % 4 == 0 ){
-        } state MOVE_RIGHT
-        when(pv_GHOSTS_NPC_DIR % 4 == 1){
-        } state MOVE_LEFT
-        when(pv_GHOSTS_NPC_DIR % 4 == 2){
-        } state MOVE_UP
-        when(pv_GHOSTS_NPC_DIR % 4 == 3){
-        } state MOVE_DOWN
-        
-    }
-
-    state MOVE_RIGHT{
-        when(){
-            pvSetStr(pv_SS_GHOSTS, "MOVE_RIGHT");
-            pvSet(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_X + pv_GHOSTS_NPC_MOVDIST);
-        } state CHECK_MOVE
-    }
-
-    state MOVE_LEFT{
-        when(){
-            pvSetStr(pv_SS_GHOSTS, "MOVE_LEFT");
-            pvSet(pv_GHOSTS_NPC_X, pv_GHOSTS_NPC_X - pv_GHOSTS_NPC_MOVDIST);
-        } state CHECK_MOVE
-    }
-
-    state MOVE_UP{
-        when(){
-            pvSetStr(pv_SS_GHOSTS, "MOVE_UP");
-            pvSet(pv_GHOSTS_NPC_Y, pv_GHOSTS_NPC_Y - pv_GHOSTS_NPC_MOVDIST);
-        } state CHECK_MOVE
-    }
-
-    state MOVE_DOWN{
-        when(){
-            pvSetStr(pv_SS_GHOSTS, "MOVE_UP");
-            pvSet(pv_GHOSTS_NPC_Y, pv_GHOSTS_NPC_Y + pv_GHOSTS_NPC_MOVDIST);
-        } state CHECK_MOVE
-    }
-
-    
-    state TELEPORT_CENTER{
-        when(delay(0.1)){
-            int respawn = 370;
-            pvSetStr(pv_SS_GHOSTS, "TELEPORT_CENTER");
-            pvSet(pv_GHOSTS_NPC_X, respawn);
-            pvSet(pv_GHOSTS_NPC_Y, respawn);
-        } state CHECK_MOVE
+            current_direction = chosen_direction;
+        } state MOVE_DIRECTION
     }
 }
 
-// animation of ghosts
-ss run_ghost{
-    state INIT{
-        entry{
-            pvSetStr(pv_SS_GHOSTS_RUN, "INIT");
-        }when(delay(1)){
+#define GHOST_SKIN_RIGHT_1 0
+#define GHOST_SKIN_RIGHT_2 1
+#define GHOST_SKIN_LEFT_1 2
+#define GHOST_SKIN_LEFT_2 3
+#define GHOST_SKIN_UP_1 4
+#define GHOST_SKIN_UP_2 5
+#define GHOST_SKIN_DOWN_1 6
+#define GHOST_SKIN_DOWN_2 7
 
-        }state CHECK_DIRECTION
+ss ghost_animation {
+    int frame_1;
+    int frame_2;
+    int current_direction;
+    double time_next_frame;
+    int current_frame = 2;
+
+    state INIT {
+        when () {
+        } state CHECK_DIRECTION
     }
 
-    state CHECK_DIRECTION{
-        entry{
-            int direction = pv_GHOSTS_NPC_DIR % 4;
-            int FRAME_1;
-            int FRAME_2;
-            pvSetStr(pv_SS_GHOSTS_RUN, "CHECK_DIRECTION");
-            // right
-            if(direction == 0){
-                FRAME_1 = 0;
-                FRAME_2 = 1;
+    state CHECK_DIRECTION {
+        entry {
+            current_direction = pv_GHOST_DIR;
+            if(current_direction == DIRECTION_RIGHT){
+                frame_1 = GHOST_SKIN_RIGHT_1;
+                frame_2 = GHOST_SKIN_RIGHT_2;
             }
-            //left
-            if(direction == 1){
-                FRAME_1 = 2;
-                FRAME_2 = 3;
+            if(current_direction == DIRECTION_LEFT){
+                frame_1 = GHOST_SKIN_LEFT_1;
+                frame_2 = GHOST_SKIN_LEFT_2;
             }
-            // up
-            if(direction == 2){
-                FRAME_1 = 4;
-                FRAME_2 = 5;
+            if(current_direction == DIRECTION_UP){
+                frame_1 = GHOST_SKIN_UP_1;
+                frame_2 = GHOST_SKIN_UP_2;
             }
-            // down
-            if(direction == 3){
-                FRAME_1 = 6;
-                FRAME_2 = 7;
+            if(current_direction == DIRECTION_DOWN){
+                frame_1 = GHOST_SKIN_DOWN_1;
+                frame_2 = GHOST_SKIN_DOWN_2;
             }
-            pvSet(pv_GHOSTS_NPC_RUNFRAME1, FRAME_1);
-            pvSet(pv_GHOSTS_NPC_RUNFRAME2, FRAME_2);
         }
-        when(){
+        when () {
+            pvSet(pv_GHOST_CURRENT_FRAME, frame_2);
         } state FRAME_1
     }
 
-    state FRAME_1{
-        entry{
-            pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_1");
-        }when (delay(pv_GHOSTS_NPC_RUN_DELAY)){
-            pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME1);
-        }state FRAME_2
+    state FRAME_1 {
+        entry {
+            if (current_frame == 2) {
+                time_next_frame = get_time_from_now(pv_GHOST_ANIMATION_DELAY);
+                current_frame = 1;
+            }
+        }
+        when (is_time_reached(time_next_frame)) {
+            pvSet(pv_GHOST_CURRENT_FRAME, frame_1);
+        } state FRAME_2
+        when (current_direction != pv_GHOST_DIR) {
+        } state CHECK_DIRECTION
+        when () {
+        } state FRAME_1
     }
 
-      state FRAME_2{
-        entry{
-            pvSetStr(pv_SS_GHOSTS_RUN, "FRAME_2");
-        }when (delay(pv_GHOSTS_NPC_RUN_DELAY)){
-            pvSet(pv_GHOSTS_NPC_RUN, pv_GHOSTS_NPC_RUNFRAME2);
-        }state CHECK_DIRECTION
+    state FRAME_2 {
+        entry {
+            if (current_frame == 1) {
+                time_next_frame = get_time_from_now(pv_GHOST_ANIMATION_DELAY);
+                current_frame = 2;
+            }
+        }
+        when (is_time_reached(time_next_frame)) {
+            pvSet(pv_GHOST_CURRENT_FRAME, frame_2);
+        } state FRAME_1
+        when (current_direction != pv_GHOST_DIR) {
+        } state CHECK_DIRECTION
+        when () {
+        } state FRAME_2
     }
 }

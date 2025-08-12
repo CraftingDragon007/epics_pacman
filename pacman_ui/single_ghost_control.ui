@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>132</width>
+    <height>168</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="caLabel" name="calabel_15">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>80</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ghost Mode</string>
+   </property>
+  </widget>
+  <widget class="caLabel" name="calabel_14">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>101</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ghost Size</string>
+   </property>
+  </widget>
+  <widget class="caNumeric" name="canumeric">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="decimalDigits" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_SIZE</string>
+   </property>
+   <property name="precisionMode">
+    <enum>caNumeric::User</enum>
+   </property>
+   <property name="fixedFormat">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="caNumeric" name="canumeric_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="integerDigits" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="decimalDigits" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(NAME):GHOSTS_$(GHOST)_MODE</string>
+   </property>
+   <property name="precisionMode">
+    <enum>caNumeric::User</enum>
+   </property>
+   <property name="fixedFormat">
+    <bool>true</bool>
+   </property>
+   <property name="limitsMode">
+    <enum>caNumeric::Channel</enum>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

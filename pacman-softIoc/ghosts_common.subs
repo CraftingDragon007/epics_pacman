@@ -1,0 +1,9 @@
+file pacman_ghost_parameter.template
+{ pattern
+  { NAME,   GHOST,  P,                  DRVH,	DRVL,   VAL   }
+  { GHOSTS, COMMON, ANIMATION_DELAY,    10,     0,      0.1   }
+  { GHOSTS, COMMON, SCATTER_DELAY,      1,      0,      0.02  }
+  { GHOSTS, COMMON, CHASE_DELAY,        1,      0,      0.02  }
+  { GHOSTS, COMMON, FRIGHT_DELAY,       1,      0,      0.03  }
+  { GHOSTS, COMMON, SPAWN_DELAY,        1,      0,      0.005 }
+}

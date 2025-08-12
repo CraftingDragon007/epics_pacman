@@ -12,8 +12,22 @@ require seq
 require misc
 
 require "pacman"
+require "ghosts_pacman"
 
 afterInit seq &pacman, "NAME=PACMAN"
+afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=BLINKY"
+afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=PINKY"
+afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=INKY"
+afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=CLYDE"
+
 
 dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
+dbLoadTemplate("ghosts_common.subs", "SYSTEM=PACMAN,GHOST=COMMON")
+
+dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=BLINKY");
+dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=PINKY");
+dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=INKY");
+dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=CLYDE");
+
 dbLoadRecords("pacman.db", "NAME=PACMAN,SS=PACMAN");
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GHOSTS");
