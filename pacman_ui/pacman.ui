@@ -165,13 +165,16 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION_UP</string>
      </property>
      <property name="label">
       <string notr="true">Up</string>
      </property>
      <property name="releaseMessage">
-      <string notr="true">2</string>
+      <string notr="true"/>
+     </property>
+     <property name="pressMessage">
+      <string notr="true">1</string>
      </property>
     </widget>
     <widget class="caMessageButton" name="camessagebutton_3">
@@ -184,13 +187,16 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION_DOWN</string>
      </property>
      <property name="label">
       <string notr="true">Down</string>
      </property>
      <property name="releaseMessage">
-      <string notr="true">3</string>
+      <string notr="true"/>
+     </property>
+     <property name="pressMessage">
+      <string notr="true">1</string>
      </property>
     </widget>
     <widget class="caMessageButton" name="camessagebutton_4">
@@ -203,13 +209,16 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION_RIGHT</string>
      </property>
      <property name="label">
       <string notr="true">Right</string>
      </property>
      <property name="releaseMessage">
-      <string notr="true">0</string>
+      <string notr="true"/>
+     </property>
+     <property name="pressMessage">
+      <string notr="true">1</string>
      </property>
     </widget>
     <widget class="caMessageButton" name="camessagebutton_5">
@@ -225,12 +234,15 @@
       <string>Left</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION</string>
+      <string notr="true">$(NAME):PACMAN_TRY_DIRECTION_LEFT</string>
      </property>
      <property name="label">
       <string notr="true">Left</string>
      </property>
      <property name="releaseMessage">
+      <string notr="true"/>
+     </property>
+     <property name="pressMessage">
       <string notr="true">1</string>
      </property>
     </widget>

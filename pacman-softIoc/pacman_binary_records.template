@@ -1,0 +1,6 @@
+record(bo, "$(SYSTEM):$(NAME)_$(DEVICE)_$(P)") {	
+  field(VAL, "$(VAL=0)")
+  field(HIGH, "$(HIGH=5)")
+  field(ZNAM, "$(ZNAM=ZERO)")
+  field(ONAM, "$(ONAM=ONE)")
+}

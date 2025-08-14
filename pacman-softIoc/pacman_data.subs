@@ -1,8 +1,8 @@
 file pacman_game_parameter.template
 { pattern
   { NAME,	DEVICE,	P,	DRVH,	DRVL,	VAL	}
-  { PACMAN, USER, X, 1000, 0, 100}
-  { PACMAN, USER, Y, 1000, 0, 90}
+  { PACMAN, USER, X, 1000, 0, 100 }
+  { PACMAN, USER, Y, 1000, 0, 90 }
   { PACMAN, USER, DIRECTION, 3, -1, 0 }
   { PACMAN, TRY, DIRECTION, 3, -1, 0 }
   { PACMAN, STOP, DIRECTION, 3, -1, 0 }
@@ -21,6 +21,15 @@ file pacman_game_parameter.template
   { PACMAN, PNG, DATA_SIZE, 200000, 0, 200000 }
   { PACMAN, DEBUG, MODE, 1, 0, 0 }
   { PACMAN, TARGET, VALID, 1, 0, 0 }
+}
+
+file pacman_binary_records.template
+{ pattern
+  { NAME,	DEVICE,	P, ZNAM, ONAM,	VAL,	HIGH }
+  { PACMAN, TRY, DIRECTION_LEFT, NOT_PRESSED, PRESSED, 0, 1}
+  { PACMAN, TRY, DIRECTION_RIGHT, NOT_PRESSED, PRESSED, 0, 1 }
+  { PACMAN, TRY, DIRECTION_UP, NOT_PRESSED, PRESSED, 0, 1 }
+  { PACMAN, TRY, DIRECTION_DOWN, NOT_PRESSED, PRESSED, 0, 1 }  
 }
 
 file pacman_waveform.template

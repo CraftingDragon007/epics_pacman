@@ -17,6 +17,10 @@ PV( int     , pv_PACMAN_USER_X			, "{NAME}:PACMAN_USER_X"		, PV_MON );
 PV( int     , pv_PACMAN_USER_Y			, "{NAME}:PACMAN_USER_Y"		, PV_MON );
 PV( int     , pv_PACMAN_USER_DIRECTION	, "{NAME}:PACMAN_USER_DIRECTION", PV_MON );
 PV( int     , pv_PACMAN_TRY_DIRECTION	, "{NAME}:PACMAN_TRY_DIRECTION"	, PV_MON );
+PV( int     , pv_PACMAN_TRY_DIRECTION_LEFT, "{NAME}:PACMAN_TRY_DIRECTION_LEFT", PV_MON );
+PV( int     , pv_PACMAN_TRY_DIRECTION_RIGHT, "{NAME}:PACMAN_TRY_DIRECTION_RIGHT", PV_MON );
+PV( int     , pv_PACMAN_TRY_DIRECTION_UP, "{NAME}:PACMAN_TRY_DIRECTION_UP", PV_MON );
+PV( int     , pv_PACMAN_TRY_DIRECTION_DOWN, "{NAME}:PACMAN_TRY_DIRECTION_DOWN", PV_MON );
 PV( int     , pv_PACMAN_STOP_DIRECTION	, "{NAME}:PACMAN_STOP_DIRECTION", PV_MON );
 PV( int     , pv_PACMAN_FIELD_SIZE    	, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
 PV( int     , pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
@@ -269,6 +273,27 @@ PVA( unsigned char, pv_PACMAN_PNG_DATA, 200000, "{NAME}:PACMAN_PNG_DATA" , PV_NO
         return (y * png_width + x) * 3; // 3 bytes per pixel (RGB)
     }
 
+    static void field_to_png_xy(int fx, int fy, int png_w, int png_h, int* outx, int* outy) {
+        const int field_w_px = FIELD_WIDTH * TILE_SIZE;
+        const int field_h_px = FIELD_HEIGHT * TILE_SIZE;
+
+        double sx = (double)png_w / (double)field_w_px;
+        double sy = (double)png_h / (double)field_h_px;
+        double s = (sx < sy) ? sx : sy; // uniform scale to preserve aspect
+
+        int off_x = (int)((png_w - (int)(field_w_px * s)) * 0.5 + 0.5);
+        int off_y = (int)((png_h - (int)(field_h_px * s)) * 0.5 + 0.5);
+
+        int x = (int)(fx * s + 0.5) + off_x;
+        int y = (int)(fy * s + 0.5) + off_y;
+
+        if (x < 0) x = 0; if (x >= png_w) x = png_w - 1;
+        if (y < 0) y = 0; if (y >= png_h) y = png_h - 1;
+
+        *outx = x;
+        *outy = y;
+    }
+
     static void draw_pixel(int x, int y, unsigned char* png_data, int png_width, int png_height, unsigned char r, unsigned char g, unsigned char b) {
         if (x < 0 || x >= png_width || y < 0 || y >= png_height) {
             printf("Error: Pixel coordinates out of bounds: (%d, %d)\n", x, y);
@@ -307,6 +332,12 @@ PVA( unsigned char, pv_PACMAN_PNG_DATA, 200000, "{NAME}:PACMAN_PNG_DATA" , PV_NO
         if (tile >= field_size) tile = field_size - 1;
         return tile;
     }
+
+    // allow "almost centered" checks with small tolerance
+    static int is_near(int a, int b, int tolerance) {
+        int d = (a > b) ? (a - b) : (b - a);
+        return d <= tolerance;
+    }
 }%
 
 ss pacman_game {
@@ -325,7 +356,14 @@ ss pacman_game {
 			pvSet(pv_PACMAN_USER_X, 25); // Initial X position
 			pvSet(pv_PACMAN_USER_Y, 25); // Initial Y position
 			pvSet(pv_PACMAN_USER_DIRECTION, -1); // Initial direction (0=right, 1=left, 2=up, 3=down)
-            pvSet(pv_PACMAN_TRY_DIRECTION, -1); // No direction tried yet
+            
+            // No direction tried yet
+            pvSet(pv_PACMAN_TRY_DIRECTION, -1); 
+            pvSet(pv_PACMAN_TRY_DIRECTION_LEFT, 0);
+            pvSet(pv_PACMAN_TRY_DIRECTION_RIGHT, 0);
+            pvSet(pv_PACMAN_TRY_DIRECTION_UP, 0);
+            pvSet(pv_PACMAN_TRY_DIRECTION_DOWN, 0);
+
             pvSet(pv_PACMAN_PACMAN_STATE, STATE_READY); // Initial state is ready
             current_tile_x = 1; // Start at tile (1, 1)
             current_tile_y = 1; // Start at tile (1, 1)
@@ -379,6 +417,16 @@ ss pacman_game {
             pvSet(pv_PACMAN_USER_X, pos_x);
             pvSet(pv_PACMAN_USER_Y, pos_y);
         }
+
+        when (pv_PACMAN_TRY_DIRECTION_LEFT == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_LEFT);
+            pvSet(pv_PACMAN_TRY_DIRECTION_LEFT, 0);
+        } state MOVE_CHECK
+
+        when (pv_PACMAN_TRY_DIRECTION_RIGHT == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_RIGHT);
+            pvSet(pv_PACMAN_TRY_DIRECTION_RIGHT, 0);
+        } state MOVE_CHECK
 
         when (pv_PACMAN_TRY_DIRECTION != pv_PACMAN_USER_DIRECTION) {            
         } state MOVE_CHECK
@@ -454,17 +502,16 @@ ss pacman_game {
             pvSetStr(pv_SS_PACMAN, "SET_TARGET");
         }
         when (pv_PACMAN_TARGET_VALID == 1 && target_tile_x != -1 && target_tile_y != -1) {
-            pvSetStr(pv_SS_PACMAN, "SET_TARGET_VALID");
+
         } state MOVE
         when () {
-            pvSetStr(pv_SS_PACMAN, "SET_TARGET_SEARCHING");
             if (target_tile_x == -1 || target_tile_y == -1) {
                 // If target tile coordinates are not set, initialize them to current tile coordinates
                 target_tile_x = current_tile_x;
                 target_tile_y = current_tile_y;
             }
             target_tile_index = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
-            printf("Current tile: (%d, %d), Target tile: (%d, %d)\n", current_tile_x, current_tile_y, target_tile_x, target_tile_y);
+            //printf("Current tile: (%d, %d), Target tile: (%d, %d)\n", current_tile_x, current_tile_y, target_tile_x, target_tile_y);
             pvSet(pv_PACMAN_TARGET_VALID, 0); // Reset valid target flag
             if (pv_PACMAN_USER_DIRECTION == DIRECTION_UP) {
                 if (pv_PACMAN_PLAY_FIELD[target_tile_index - FIELD_WIDTH] != TILE_PATH) {
@@ -504,6 +551,27 @@ ss pacman_game {
             pvSet(pv_PACMAN_TRY_DIRECTION, pv_PACMAN_USER_DIRECTION);
             pvSet(pv_PACMAN_PACMAN_STATE, STATE_BLOCKED);
         }
+
+        when (pv_PACMAN_TRY_DIRECTION_LEFT == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_LEFT);
+            pvSet(pv_PACMAN_TRY_DIRECTION_LEFT, 0); // Reset left
+        } state MOVE_CHECK
+
+        when (pv_PACMAN_TRY_DIRECTION_RIGHT == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_RIGHT);
+            pvSet(pv_PACMAN_TRY_DIRECTION_RIGHT, 0); // Reset right
+        } state MOVE_CHECK
+
+        when (pv_PACMAN_TRY_DIRECTION_UP == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_UP);
+            pvSet(pv_PACMAN_TRY_DIRECTION_UP, 0); // Reset up
+        } state MOVE_CHECK
+
+        when (pv_PACMAN_TRY_DIRECTION_DOWN == true){
+            pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_DOWN);
+            pvSet(pv_PACMAN_TRY_DIRECTION_DOWN, 0); // Reset down
+        } state MOVE_CHECK
+
         when (pv_PACMAN_TRY_DIRECTION != pv_PACMAN_USER_DIRECTION){
             
         } state MOVE_CHECK
@@ -541,7 +609,7 @@ ss pacman_game {
             printf("Pacman reached a portal at (%d, %d).\n", current_tile_x, current_tile_y);
         } state TELEPORT_RIGHT        
 
-        when (current_tile_x == target_tile_x && current_tile_y == target_tile_y) {
+        when (pv_PACMAN_USER_X + (pv_PACMAN_PACMAN_SIZE / 2) == (target_tile_x * TILE_SIZE + TILE_SIZE / 2) && pv_PACMAN_USER_Y + (pv_PACMAN_PACMAN_SIZE / 2) == (target_tile_y * TILE_SIZE + TILE_SIZE / 2)) {
             printf("Pacman reached the target tile (%d, %d).\n", target_tile_x, target_tile_y);            
             target_tile_x = -1; // Reset target tile coordinates
             target_tile_y = -1; // Reset target tile coordinates
@@ -556,21 +624,24 @@ ss pacman_game {
             int direction = pv_PACMAN_USER_DIRECTION;
             int field_size = pv_PACMAN_FIELD_SIZE * TILE_SIZE; // Convert field size to pixels
             int step_size = 1; // Step size in pixels
+            int tolerance = step_size + 1; // small leeway to detect alignment
             int new_x = current_x;
             int new_y = current_y;
-            printf("Starting movement: current_x=%d, current_y=%d, direction=%d\n", current_x, current_y, direction);
+            int png_x = 0;
+            int png_y = 0;
+            //printf("Starting movement: current_x=%d, current_y=%d, direction=%d\n", current_x, current_y, direction);
             if (direction == DIRECTION_UP) {
                 new_y -= step_size;
-                printf("Moving up to (%d, %d)\n", new_x, new_y);
+                //printf("Moving up to (%d, %d)\n", new_x, new_y);
             } else if (direction == DIRECTION_DOWN) {
                 new_y += step_size;
-                printf("Moving down to (%d, %d)\n", new_x, new_y);
+                //printf("Moving down to (%d, %d)\n", new_x, new_y);
             } else if (direction == DIRECTION_LEFT) {
                 new_x -= step_size;
-                printf("Moving left to (%d, %d)\n", new_x, new_y);
+                //printf("Moving left to (%d, %d)\n", new_x, new_y);
             } else if (direction == DIRECTION_RIGHT) {
                 new_x += step_size;
-                printf("Moving right to (%d, %d)\n", new_x, new_y);
+                //printf("Moving right to (%d, %d)\n", new_x, new_y);
             }
             // Check if the new position is within bounds
             if (new_x >= 0 && new_x < field_size && new_y >= 0 && new_y < field_size) {
@@ -578,20 +649,87 @@ ss pacman_game {
                 pvSet(pv_PACMAN_USER_X, new_x);
                 pvSet(pv_PACMAN_USER_Y, new_y);
                 // Update the current tile coordinates
-                printf("Before conversion: new_x=%d, new_y=%d, current_tile_y=%d\n", new_x, new_y, current_tile_y);
-                printf("Debug: new_y=%d, FIELD_HEIGHT=%d, TILE_SIZE=%d\n", new_y, FIELD_HEIGHT, TILE_SIZE);
-                printf("Debug: new_y/TILE_SIZE = %d/%d = %d\n", new_y, TILE_SIZE, new_y / TILE_SIZE);
+                //printf("Before conversion: new_x=%d, new_y=%d, current_tile_y=%d\n", new_x, new_y, current_tile_y);
+                //printf("Debug: new_y=%d, FIELD_HEIGHT=%d, TILE_SIZE=%d\n", new_y, FIELD_HEIGHT, TILE_SIZE);
+                //printf("Debug: new_y/TILE_SIZE = %d/%d = %d\n", new_y, TILE_SIZE, new_y / TILE_SIZE);
 
                 // Store old values for comparison
                 old_tile_y = current_tile_y;
                 
-                current_tile_x = convert_graphical_coordinate_to_tile_coordinate(new_x, FIELD_WIDTH, TILE_SIZE);
+                current_tile_x = convert_graphical_coordinate_to_tile_coordinate(new_x + pv_PACMAN_PACMAN_SIZE / 2, FIELD_WIDTH, TILE_SIZE);
                 current_tile_y = convert_graphical_coordinate_to_tile_coordinate(new_y + pv_PACMAN_PACMAN_SIZE / 2, FIELD_HEIGHT, TILE_SIZE);
                 
-                printf("After conversion: current_tile_x=%d, current_tile_y=%d (was %d)\n", 
+                /*printf("After conversion: current_tile_x=%d, current_tile_y=%d (was %d)\n", 
                        current_tile_x, current_tile_y, old_tile_y);
                 printf("Pacman moved to tile (%d, %d) at position (%d, %d) targeting tile (%d, %d)\n",
-                       current_tile_x, current_tile_y, new_x, new_y, target_tile_x, target_tile_y);
+                       current_tile_x, current_tile_y, new_x, new_y, target_tile_x, target_tile_y);*/
+
+                field_to_png_xy(new_x, new_y, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT, &png_x, &png_y);
+
+                //printf("Drawing Pacman at PNG coordinates (%d, %d)\n", png_x, png_y);
+
+                draw_pixel(png_x, png_y, pv_PACMAN_PNG_DATA, pv_PACMAN_PNG_WIDTH, pv_PACMAN_PNG_HEIGHT, 255, 255, 0);
+                pvPut(pv_PACMAN_PNG_DATA);
+            }
+
+            // Turning logic with tolerance and snapping to center line
+            if (pv_PACMAN_TRY_DIRECTION_LEFT == true) {
+                // check if the left tile to the current position is valid and pacman is near the center on the Y axis
+                int center_y = current_tile_y * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
+                if (current_tile_x > 0 &&
+                    pv_PACMAN_PLAY_FIELD[get_tile_index_from_tile_coordinates(current_tile_x - 1, current_tile_y)] == TILE_PATH &&
+                    is_near(new_y, center_y, tolerance)) {
+                    // snap to center line to stabilize movement
+                    if (new_y != center_y) {
+                        new_y = center_y;
+                        pvSet(pv_PACMAN_USER_Y, new_y);
+                    }
+                    printf("User changed direction to LEFT\n");
+                    pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_LEFT);
+                    pvSet(pv_PACMAN_TRY_DIRECTION_LEFT, 0); // Reset left
+                }
+            } else if (pv_PACMAN_TRY_DIRECTION_RIGHT == true) {
+                // check if the right tile to the current position is valid and pacman is near the center on the Y axis
+                int center_y = current_tile_y * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
+                if (current_tile_x < FIELD_WIDTH - 1 &&
+                    pv_PACMAN_PLAY_FIELD[get_tile_index_from_tile_coordinates(current_tile_x + 1, current_tile_y)] == TILE_PATH &&
+                    is_near(new_y, center_y, tolerance)) {
+                    if (new_y != center_y) {
+                        new_y = center_y;
+                        pvSet(pv_PACMAN_USER_Y, new_y);
+                    }
+                    printf("User changed direction to RIGHT\n");
+                    pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_RIGHT);
+                    pvSet(pv_PACMAN_TRY_DIRECTION_RIGHT, 0); // Reset right
+                }
+            } else if (pv_PACMAN_TRY_DIRECTION_UP == true) {
+                // check if the upper tile to the current position is valid and pacman is near the center on the X axis
+                int center_x = current_tile_x * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
+                if (current_tile_y > 0 &&
+                    pv_PACMAN_PLAY_FIELD[get_tile_index_from_tile_coordinates(current_tile_x, current_tile_y - 1)] == TILE_PATH &&
+                    is_near(new_x, center_x, tolerance)) {
+                    if (new_x != center_x) {
+                        new_x = center_x;
+                        pvSet(pv_PACMAN_USER_X, new_x);
+                    }
+                    printf("User changed direction to UP\n");
+                    pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_UP);
+                    pvSet(pv_PACMAN_TRY_DIRECTION_UP, 0); // Reset up
+                }
+            } else if (pv_PACMAN_TRY_DIRECTION_DOWN == true) {
+                // check if the lower tile to the current position is valid and pacman is near the center on the X axis
+                int center_x = current_tile_x * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
+                if (current_tile_y < FIELD_HEIGHT - 1 &&
+                    pv_PACMAN_PLAY_FIELD[get_tile_index_from_tile_coordinates(current_tile_x, current_tile_y + 1)] == TILE_PATH &&
+                    is_near(new_x, center_x, tolerance)) {
+                    if (new_x != center_x) {
+                        new_x = center_x;
+                        pvSet(pv_PACMAN_USER_X, new_x);
+                    }
+                    printf("User changed direction to DOWN\n");
+                    pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_DOWN);
+                    pvSet(pv_PACMAN_TRY_DIRECTION_DOWN, 0); // Reset down
+                }
             }
 
         } state MOVE
