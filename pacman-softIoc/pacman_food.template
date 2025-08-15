@@ -1,6 +1,35 @@
-record(bi, "$(SYSTEM):VIS_$(X)_$(Y)") {	
-  field(VAL, "$(VAL=0)")
+record(ao, "$(NAME):VIS_$(X)_$(Y)") {	
+  field(VAL, "$(FOODSTATE=1)")
 }
-record(bi, "$(SYSTEM):DOT_$(X)_$(Y)") {	
-  field(VAL, "$(VAL=0)")
+record(ao, "$(NAME):DOTX_$(X)_$(Y)") {	
+  field(VAL, "$(VALX=0)")
+}
+record(ao, "$(NAME):DOTY_$(X)_$(Y)") {	
+  field(VAL, "$(VALY=0)")
+}
+
+record(calcout, "$(NAME):CALC_$(X)_$(Y)") {	
+  field(INPA, "$(NAME):PACMAN_USER_X CPP")
+  field(INPB, "$(NAME):PACMAN_USER_Y CPP")
+  field(INPC, "$(NAME):DOTX_$(X)_$(Y)")
+  field(INPD, "$(NAME):DOTY_$(X)_$(Y)")
+  field(INPE, "$(NAME):VIS_$(X)_$(Y)")
+  field(CALC, "(A-3<C)&&(A+30>C)&&(B<D+3)&&(B>D-30)&&(E==$(FOODSTATE=1))?0:1")
+  field(OUT, "$(NAME):VIS_$(X)_$(Y) PP")
+  field(OOPT, "Transition To Zero")
+}
+
+record(calcout, "$(NAME):CALC_RESET_$(X)_$(Y)") {
+  field(INPA, "$(NAME):PACMAN_RESET_FOOD CPP")
+  field(CALC, "A==1?$(FOODSTATE=1):0")
+  field(OUT, "$(NAME):VIS_$(X)_$(Y) PP")
+  field(OOPT, "Transition To Non-zero")
+}
+
+record(calcout, "$(NAME):CALC_SCORE_$(X)_$(Y)") {
+  field(INPA, "$(NAME):VIS_$(X)_$(Y) CPP")
+  field(INPB, "$(NAME):PACMAN_USER_SCORE")
+  field(CALC, "A==0?(($(FOODSTATE=1)==2)?B+50:B+10):0")
+  field(OUT, "$(NAME):PACMAN_USER_SCORE PP")
+  field(OOPT, "Transition To Non-zero")
 }

@@ -6286,6 +6286,57 @@
      <string>Ready Display</string>
     </property>
    </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>896</width>
+      <height>992</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),X=1,Y=1, [$(NAME):DOTX_1_1,$(NAME):DOTY_1_1];NAME=$(NAME),X=2,Y=1, [$(NAME):DOTX_2_1,$(NAME):DOTY_2_1];NAME=$(NAME),X=3,Y=1, [$(NAME):DOTX_3_1,$(NAME):DOTY_3_1];NAME=$(NAME),X=4,Y=1, [$(NAME):DOTX_4_1,$(NAME):DOTY_4_1];NAME=$(NAME),X=5,Y=1, [$(NAME):DOTX_5_1,$(NAME):DOTY_5_1];NAME=$(NAME),X=6,Y=1, [$(NAME):DOTX_6_1,$(NAME):DOTY_6_1];NAME=$(NAME),X=7,Y=1, [$(NAME):DOTX_7_1,$(NAME):DOTY_7_1];NAME=$(NAME),X=8,Y=1, [$(NAME):DOTX_8_1,$(NAME):DOTY_8_1];NAME=$(NAME),X=9,Y=1, [$(NAME):DOTX_9_1,$(NAME):DOTY_9_1];NAME=$(NAME),X=10,Y=1, [$(NAME):DOTX_10_1,$(NAME):DOTY_10_1];NAME=$(NAME),X=11,Y=1, [$(NAME):DOTX_11_1,$(NAME):DOTY_11_1];NAME=$(NAME),X=12,Y=1, [$(NAME):DOTX_12_1,$(NAME):DOTY_12_1];NAME=$(NAME),X=13,Y=1, [$(NAME):DOTX_13_1,$(NAME):DOTY_13_1];NAME=$(NAME),X=14,Y=1, [$(NAME):DOTX_14_1,$(NAME):DOTY_14_1];NAME=$(NAME),X=15,Y=1, [$(NAME):DOTX_15_1,$(NAME):DOTY_15_1];NAME=$(NAME),X=16,Y=1, [$(NAME):DOTX_16_1,$(NAME):DOTY_16_1];NAME=$(NAME),X=17,Y=1, [$(NAME):DOTX_17_1,$(NAME):DOTY_17_1];NAME=$(NAME),X=18,Y=1, [$(NAME):DOTX_18_1,$(NAME):DOTY_18_1];NAME=$(NAME),X=19,Y=1, [$(NAME):DOTX_19_1,$(NAME):DOTY_19_1];NAME=$(NAME),X=20,Y=1, [$(NAME):DOTX_20_1,$(NAME):DOTY_20_1];NAME=$(NAME),X=21,Y=1, [$(NAME):DOTX_21_1,$(NAME):DOTY_21_1];NAME=$(NAME),X=22,Y=1, [$(NAME):DOTX_22_1,$(NAME):DOTY_22_1];NAME=$(NAME),X=23,Y=1, [$(NAME):DOTX_23_1,$(NAME):DOTY_23_1];NAME=$(NAME),X=24,Y=1, [$(NAME):DOTX_24_1,$(NAME):DOTY_24_1];NAME=$(NAME),X=25,Y=1, [$(NAME):DOTX_25_1,$(NAME):DOTY_25_1];NAME=$(NAME),X=26,Y=1, [$(NAME):DOTX_26_1,$(NAME):DOTY_26_1];NAME=$(NAME),X=27,Y=1, [$(NAME):DOTX_27_1,$(NAME):DOTY_27_1];NAME=$(NAME),X=28,Y=1, [$(NAME):DOTX_28_1,$(NAME):DOTY_28_1];NAME=$(NAME),X=1,Y=2, [$(NAME):DOTX_1_2,$(NAME):DOTY_1_2];NAME=$(NAME),X=2,Y=2, [$(NAME):DOTX_2_2,$(NAME):DOTY_2_2];NAME=$(NAME),X=3,Y=2, [$(NAME):DOTX_3_2,$(NAME):DOTY_3_2];NAME=$(NAME),X=4,Y=2, [$(NAME):DOTX_4_2,$(NAME):DOTY_4_2];NAME=$(NAME),X=5,Y=2, [$(NAME):DOTX_5_2,$(NAME):DOTY_5_2];NAME=$(NAME),X=6,Y=2, [$(NAME):DOTX_6_2,$(NAME):DOTY_6_2];NAME=$(NAME),X=7,Y=2, [$(NAME):DOTX_7_2,$(NAME):DOTY_7_2];NAME=$(NAME),X=8,Y=2, [$(NAME):DOTX_8_2,$(NAME):DOTY_8_2];NAME=$(NAME),X=9,Y=2, [$(NAME):DOTX_9_2,$(NAME):DOTY_9_2];NAME=$(NAME),X=10,Y=2, [$(NAME):DOTX_10_2,$(NAME):DOTY_10_2];NAME=$(NAME),X=11,Y=2, [$(NAME):DOTX_11_2,$(NAME):DOTY_11_2];NAME=$(NAME),X=12,Y=2, [$(NAME):DOTX_12_2,$(NAME):DOTY_12_2];NAME=$(NAME),X=13,Y=2, [$(NAME):DOTX_13_2,$(NAME):DOTY_13_2];NAME=$(NAME),X=14,Y=2, [$(NAME):DOTX_14_2,$(NAME):DOTY_14_2];NAME=$(NAME),X=15,Y=2, [$(NAME):DOTX_15_2,$(NAME):DOTY_15_2];NAME=$(NAME),X=16,Y=2, [$(NAME):DOTX_16_2,$(NAME):DOTY_16_2];NAME=$(NAME),X=17,Y=2, [$(NAME):DOTX_17_2,$(NAME):DOTY_17_2];NAME=$(NAME),X=18,Y=2, [$(NAME):DOTX_18_2,$(NAME):DOTY_18_2];NAME=$(NAME),X=19,Y=2, [$(NAME):DOTX_19_2,$(NAME):DOTY_19_2];NAME=$(NAME),X=20,Y=2, [$(NAME):DOTX_20_2,$(NAME):DOTY_20_2];NAME=$(NAME),X=21,Y=2, [$(NAME):DOTX_21_2,$(NAME):DOTY_21_2];NAME=$(NAME),X=22,Y=2, [$(NAME):DOTX_22_2,$(NAME):DOTY_22_2];NAME=$(NAME),X=23,Y=2, [$(NAME):DOTX_23_2,$(NAME):DOTY_23_2];NAME=$(NAME),X=24,Y=2, [$(NAME):DOTX_24_2,$(NAME):DOTY_24_2];NAME=$(NAME),X=25,Y=2, [$(NAME):DOTX_25_2,$(NAME):DOTY_25_2];NAME=$(NAME),X=26,Y=2, [$(NAME):DOTX_26_2,$(NAME):DOTY_26_2];NAME=$(NAME),X=27,Y=2, [$(NAME):DOTX_27_2,$(NAME):DOTY_27_2];NAME=$(NAME),X=28,Y=2, [$(NAME):DOTX_28_2,$(NAME):DOTY_28_2];NAME=$(NAME),X=1,Y=3, [$(NAME):DOTX_1_3,$(NAME):DOTY_1_3];NAME=$(NAME),X=2,Y=3, [$(NAME):DOTX_2_3,$(NAME):DOTY_2_3];NAME=$(NAME),X=3,Y=3, [$(NAME):DOTX_3_3,$(NAME):DOTY_3_3];NAME=$(NAME),X=4,Y=3, [$(NAME):DOTX_4_3,$(NAME):DOTY_4_3];NAME=$(NAME),X=5,Y=3, [$(NAME):DOTX_5_3,$(NAME):DOTY_5_3];NAME=$(NAME),X=6,Y=3, [$(NAME):DOTX_6_3,$(NAME):DOTY_6_3];NAME=$(NAME),X=7,Y=3, [$(NAME):DOTX_7_3,$(NAME):DOTY_7_3];NAME=$(NAME),X=8,Y=3, [$(NAME):DOTX_8_3,$(NAME):DOTY_8_3];NAME=$(NAME),X=9,Y=3, [$(NAME):DOTX_9_3,$(NAME):DOTY_9_3];NAME=$(NAME),X=10,Y=3, [$(NAME):DOTX_10_3,$(NAME):DOTY_10_3];NAME=$(NAME),X=11,Y=3, [$(NAME):DOTX_11_3,$(NAME):DOTY_11_3];NAME=$(NAME),X=12,Y=3, [$(NAME):DOTX_12_3,$(NAME):DOTY_12_3];NAME=$(NAME),X=13,Y=3, [$(NAME):DOTX_13_3,$(NAME):DOTY_13_3];NAME=$(NAME),X=14,Y=3, [$(NAME):DOTX_14_3,$(NAME):DOTY_14_3];NAME=$(NAME),X=15,Y=3, [$(NAME):DOTX_15_3,$(NAME):DOTY_15_3];NAME=$(NAME),X=16,Y=3, [$(NAME):DOTX_16_3,$(NAME):DOTY_16_3];NAME=$(NAME),X=17,Y=3, [$(NAME):DOTX_17_3,$(NAME):DOTY_17_3];NAME=$(NAME),X=18,Y=3, [$(NAME):DOTX_18_3,$(NAME):DOTY_18_3];NAME=$(NAME),X=19,Y=3, [$(NAME):DOTX_19_3,$(NAME):DOTY_19_3];NAME=$(NAME),X=20,Y=3, [$(NAME):DOTX_20_3,$(NAME):DOTY_20_3];NAME=$(NAME),X=21,Y=3, [$(NAME):DOTX_21_3,$(NAME):DOTY_21_3];NAME=$(NAME),X=22,Y=3, [$(NAME):DOTX_22_3,$(NAME):DOTY_22_3];NAME=$(NAME),X=23,Y=3, [$(NAME):DOTX_23_3,$(NAME):DOTY_23_3];NAME=$(NAME),X=24,Y=3, [$(NAME):DOTX_24_3,$(NAME):DOTY_24_3];NAME=$(NAME),X=25,Y=3, [$(NAME):DOTX_25_3,$(NAME):DOTY_25_3];NAME=$(NAME),X=26,Y=3, [$(NAME):DOTX_26_3,$(NAME):DOTY_26_3];NAME=$(NAME),X=27,Y=3, [$(NAME):DOTX_27_3,$(NAME):DOTY_27_3];NAME=$(NAME),X=28,Y=3, [$(NAME):DOTX_28_3,$(NAME):DOTY_28_3];NAME=$(NAME),X=1,Y=4, [$(NAME):DOTX_1_4,$(NAME):DOTY_1_4];NAME=$(NAME),X=2,Y=4, [$(NAME):DOTX_2_4,$(NAME):DOTY_2_4];NAME=$(NAME),X=3,Y=4, [$(NAME):DOTX_3_4,$(NAME):DOTY_3_4];NAME=$(NAME),X=4,Y=4, [$(NAME):DOTX_4_4,$(NAME):DOTY_4_4];NAME=$(NAME),X=5,Y=4, [$(NAME):DOTX_5_4,$(NAME):DOTY_5_4];NAME=$(NAME),X=6,Y=4, [$(NAME):DOTX_6_4,$(NAME):DOTY_6_4];NAME=$(NAME),X=7,Y=4, [$(NAME):DOTX_7_4,$(NAME):DOTY_7_4];NAME=$(NAME),X=8,Y=4, [$(NAME):DOTX_8_4,$(NAME):DOTY_8_4];NAME=$(NAME),X=9,Y=4, [$(NAME):DOTX_9_4,$(NAME):DOTY_9_4];NAME=$(NAME),X=10,Y=4, [$(NAME):DOTX_10_4,$(NAME):DOTY_10_4];NAME=$(NAME),X=11,Y=4, [$(NAME):DOTX_11_4,$(NAME):DOTY_11_4];NAME=$(NAME),X=12,Y=4, [$(NAME):DOTX_12_4,$(NAME):DOTY_12_4];NAME=$(NAME),X=13,Y=4, [$(NAME):DOTX_13_4,$(NAME):DOTY_13_4];NAME=$(NAME),X=14,Y=4, [$(NAME):DOTX_14_4,$(NAME):DOTY_14_4];NAME=$(NAME),X=15,Y=4, [$(NAME):DOTX_15_4,$(NAME):DOTY_15_4];NAME=$(NAME),X=16,Y=4, [$(NAME):DOTX_16_4,$(NAME):DOTY_16_4];NAME=$(NAME),X=17,Y=4, [$(NAME):DOTX_17_4,$(NAME):DOTY_17_4];NAME=$(NAME),X=18,Y=4, [$(NAME):DOTX_18_4,$(NAME):DOTY_18_4];NAME=$(NAME),X=19,Y=4, [$(NAME):DOTX_19_4,$(NAME):DOTY_19_4];NAME=$(NAME),X=20,Y=4, [$(NAME):DOTX_20_4,$(NAME):DOTY_20_4];NAME=$(NAME),X=21,Y=4, [$(NAME):DOTX_21_4,$(NAME):DOTY_21_4];NAME=$(NAME),X=22,Y=4, [$(NAME):DOTX_22_4,$(NAME):DOTY_22_4];NAME=$(NAME),X=23,Y=4, [$(NAME):DOTX_23_4,$(NAME):DOTY_23_4];NAME=$(NAME),X=24,Y=4, [$(NAME):DOTX_24_4,$(NAME):DOTY_24_4];NAME=$(NAME),X=25,Y=4, [$(NAME):DOTX_25_4,$(NAME):DOTY_25_4];NAME=$(NAME),X=26,Y=4, [$(NAME):DOTX_26_4,$(NAME):DOTY_26_4];NAME=$(NAME),X=27,Y=4, [$(NAME):DOTX_27_4,$(NAME):DOTY_27_4];NAME=$(NAME),X=28,Y=4, [$(NAME):DOTX_28_4,$(NAME):DOTY_28_4];NAME=$(NAME),X=1,Y=5, [$(NAME):DOTX_1_5,$(NAME):DOTY_1_5];NAME=$(NAME),X=2,Y=5, [$(NAME):DOTX_2_5,$(NAME):DOTY_2_5];NAME=$(NAME),X=3,Y=5, [$(NAME):DOTX_3_5,$(NAME):DOTY_3_5];NAME=$(NAME),X=4,Y=5, [$(NAME):DOTX_4_5,$(NAME):DOTY_4_5];NAME=$(NAME),X=5,Y=5, [$(NAME):DOTX_5_5,$(NAME):DOTY_5_5];NAME=$(NAME),X=6,Y=5, [$(NAME):DOTX_6_5,$(NAME):DOTY_6_5];NAME=$(NAME),X=7,Y=5, [$(NAME):DOTX_7_5,$(NAME):DOTY_7_5];NAME=$(NAME),X=8,Y=5, [$(NAME):DOTX_8_5,$(NAME):DOTY_8_5];NAME=$(NAME),X=9,Y=5, [$(NAME):DOTX_9_5,$(NAME):DOTY_9_5];NAME=$(NAME),X=10,Y=5, [$(NAME):DOTX_10_5,$(NAME):DOTY_10_5];NAME=$(NAME),X=11,Y=5, [$(NAME):DOTX_11_5,$(NAME):DOTY_11_5];NAME=$(NAME),X=12,Y=5, [$(NAME):DOTX_12_5,$(NAME):DOTY_12_5];NAME=$(NAME),X=13,Y=5, [$(NAME):DOTX_13_5,$(NAME):DOTY_13_5];NAME=$(NAME),X=14,Y=5, [$(NAME):DOTX_14_5,$(NAME):DOTY_14_5];NAME=$(NAME),X=15,Y=5, [$(NAME):DOTX_15_5,$(NAME):DOTY_15_5];NAME=$(NAME),X=16,Y=5, [$(NAME):DOTX_16_5,$(NAME):DOTY_16_5];NAME=$(NAME),X=17,Y=5, [$(NAME):DOTX_17_5,$(NAME):DOTY_17_5];NAME=$(NAME),X=18,Y=5, [$(NAME):DOTX_18_5,$(NAME):DOTY_18_5];NAME=$(NAME),X=19,Y=5, [$(NAME):DOTX_19_5,$(NAME):DOTY_19_5];NAME=$(NAME),X=20,Y=5, [$(NAME):DOTX_20_5,$(NAME):DOTY_20_5];NAME=$(NAME),X=21,Y=5, [$(NAME):DOTX_21_5,$(NAME):DOTY_21_5];NAME=$(NAME),X=22,Y=5, [$(NAME):DOTX_22_5,$(NAME):DOTY_22_5];NAME=$(NAME),X=23,Y=5, [$(NAME):DOTX_23_5,$(NAME):DOTY_23_5];NAME=$(NAME),X=24,Y=5, [$(NAME):DOTX_24_5,$(NAME):DOTY_24_5];NAME=$(NAME),X=25,Y=5, [$(NAME):DOTX_25_5,$(NAME):DOTY_25_5];NAME=$(NAME),X=26,Y=5, [$(NAME):DOTX_26_5,$(NAME):DOTY_26_5];NAME=$(NAME),X=27,Y=5, [$(NAME):DOTX_27_5,$(NAME):DOTY_27_5];NAME=$(NAME),X=28,Y=5, [$(NAME):DOTX_28_5,$(NAME):DOTY_28_5];NAME=$(NAME),X=1,Y=6, [$(NAME):DOTX_1_6,$(NAME):DOTY_1_6];NAME=$(NAME),X=2,Y=6, [$(NAME):DOTX_2_6,$(NAME):DOTY_2_6];NAME=$(NAME),X=3,Y=6, [$(NAME):DOTX_3_6,$(NAME):DOTY_3_6];NAME=$(NAME),X=4,Y=6, [$(NAME):DOTX_4_6,$(NAME):DOTY_4_6];NAME=$(NAME),X=5,Y=6, [$(NAME):DOTX_5_6,$(NAME):DOTY_5_6];NAME=$(NAME),X=6,Y=6, [$(NAME):DOTX_6_6,$(NAME):DOTY_6_6];NAME=$(NAME),X=7,Y=6, [$(NAME):DOTX_7_6,$(NAME):DOTY_7_6];NAME=$(NAME),X=8,Y=6, [$(NAME):DOTX_8_6,$(NAME):DOTY_8_6];NAME=$(NAME),X=9,Y=6, [$(NAME):DOTX_9_6,$(NAME):DOTY_9_6];NAME=$(NAME),X=10,Y=6, [$(NAME):DOTX_10_6,$(NAME):DOTY_10_6];NAME=$(NAME),X=11,Y=6, [$(NAME):DOTX_11_6,$(NAME):DOTY_11_6];NAME=$(NAME),X=12,Y=6, [$(NAME):DOTX_12_6,$(NAME):DOTY_12_6];NAME=$(NAME),X=13,Y=6, [$(NAME):DOTX_13_6,$(NAME):DOTY_13_6];NAME=$(NAME),X=14,Y=6, [$(NAME):DOTX_14_6,$(NAME):DOTY_14_6];NAME=$(NAME),X=15,Y=6, [$(NAME):DOTX_15_6,$(NAME):DOTY_15_6];NAME=$(NAME),X=16,Y=6, [$(NAME):DOTX_16_6,$(NAME):DOTY_16_6];NAME=$(NAME),X=17,Y=6, [$(NAME):DOTX_17_6,$(NAME):DOTY_17_6];NAME=$(NAME),X=18,Y=6, [$(NAME):DOTX_18_6,$(NAME):DOTY_18_6];NAME=$(NAME),X=19,Y=6, [$(NAME):DOTX_19_6,$(NAME):DOTY_19_6];NAME=$(NAME),X=20,Y=6, [$(NAME):DOTX_20_6,$(NAME):DOTY_20_6];NAME=$(NAME),X=21,Y=6, [$(NAME):DOTX_21_6,$(NAME):DOTY_21_6];NAME=$(NAME),X=22,Y=6, [$(NAME):DOTX_22_6,$(NAME):DOTY_22_6];NAME=$(NAME),X=23,Y=6, [$(NAME):DOTX_23_6,$(NAME):DOTY_23_6];NAME=$(NAME),X=24,Y=6, [$(NAME):DOTX_24_6,$(NAME):DOTY_24_6];NAME=$(NAME),X=25,Y=6, [$(NAME):DOTX_25_6,$(NAME):DOTY_25_6];NAME=$(NAME),X=26,Y=6, [$(NAME):DOTX_26_6,$(NAME):DOTY_26_6];NAME=$(NAME),X=27,Y=6, [$(NAME):DOTX_27_6,$(NAME):DOTY_27_6];NAME=$(NAME),X=28,Y=6, [$(NAME):DOTX_28_6,$(NAME):DOTY_28_6];NAME=$(NAME),X=1,Y=7, [$(NAME):DOTX_1_7,$(NAME):DOTY_1_7];NAME=$(NAME),X=2,Y=7, [$(NAME):DOTX_2_7,$(NAME):DOTY_2_7];NAME=$(NAME),X=3,Y=7, [$(NAME):DOTX_3_7,$(NAME):DOTY_3_7];NAME=$(NAME),X=4,Y=7, [$(NAME):DOTX_4_7,$(NAME):DOTY_4_7];NAME=$(NAME),X=5,Y=7, [$(NAME):DOTX_5_7,$(NAME):DOTY_5_7];NAME=$(NAME),X=6,Y=7, [$(NAME):DOTX_6_7,$(NAME):DOTY_6_7];NAME=$(NAME),X=7,Y=7, [$(NAME):DOTX_7_7,$(NAME):DOTY_7_7];NAME=$(NAME),X=8,Y=7, [$(NAME):DOTX_8_7,$(NAME):DOTY_8_7];NAME=$(NAME),X=9,Y=7, [$(NAME):DOTX_9_7,$(NAME):DOTY_9_7];NAME=$(NAME),X=10,Y=7, [$(NAME):DOTX_10_7,$(NAME):DOTY_10_7];NAME=$(NAME),X=11,Y=7, [$(NAME):DOTX_11_7,$(NAME):DOTY_11_7];NAME=$(NAME),X=12,Y=7, [$(NAME):DOTX_12_7,$(NAME):DOTY_12_7];NAME=$(NAME),X=13,Y=7, [$(NAME):DOTX_13_7,$(NAME):DOTY_13_7];NAME=$(NAME),X=14,Y=7, [$(NAME):DOTX_14_7,$(NAME):DOTY_14_7];NAME=$(NAME),X=15,Y=7, [$(NAME):DOTX_15_7,$(NAME):DOTY_15_7];NAME=$(NAME),X=16,Y=7, [$(NAME):DOTX_16_7,$(NAME):DOTY_16_7];NAME=$(NAME),X=17,Y=7, [$(NAME):DOTX_17_7,$(NAME):DOTY_17_7];NAME=$(NAME),X=18,Y=7, [$(NAME):DOTX_18_7,$(NAME):DOTY_18_7];NAME=$(NAME),X=19,Y=7, [$(NAME):DOTX_19_7,$(NAME):DOTY_19_7];NAME=$(NAME),X=20,Y=7, [$(NAME):DOTX_20_7,$(NAME):DOTY_20_7];NAME=$(NAME),X=21,Y=7, [$(NAME):DOTX_21_7,$(NAME):DOTY_21_7];NAME=$(NAME),X=22,Y=7, [$(NAME):DOTX_22_7,$(NAME):DOTY_22_7];NAME=$(NAME),X=23,Y=7, [$(NAME):DOTX_23_7,$(NAME):DOTY_23_7];NAME=$(NAME),X=24,Y=7, [$(NAME):DOTX_24_7,$(NAME):DOTY_24_7];NAME=$(NAME),X=25,Y=7, [$(NAME):DOTX_25_7,$(NAME):DOTY_25_7];NAME=$(NAME),X=26,Y=7, [$(NAME):DOTX_26_7,$(NAME):DOTY_26_7];NAME=$(NAME),X=27,Y=7, [$(NAME):DOTX_27_7,$(NAME):DOTY_27_7];NAME=$(NAME),X=28,Y=7, [$(NAME):DOTX_28_7,$(NAME):DOTY_28_7];NAME=$(NAME),X=1,Y=8, [$(NAME):DOTX_1_8,$(NAME):DOTY_1_8];NAME=$(NAME),X=2,Y=8, [$(NAME):DOTX_2_8,$(NAME):DOTY_2_8];NAME=$(NAME),X=3,Y=8, [$(NAME):DOTX_3_8,$(NAME):DOTY_3_8];NAME=$(NAME),X=4,Y=8, [$(NAME):DOTX_4_8,$(NAME):DOTY_4_8];NAME=$(NAME),X=5,Y=8, [$(NAME):DOTX_5_8,$(NAME):DOTY_5_8];NAME=$(NAME),X=6,Y=8, [$(NAME):DOTX_6_8,$(NAME):DOTY_6_8];NAME=$(NAME),X=7,Y=8, [$(NAME):DOTX_7_8,$(NAME):DOTY_7_8];NAME=$(NAME),X=8,Y=8, [$(NAME):DOTX_8_8,$(NAME):DOTY_8_8];NAME=$(NAME),X=9,Y=8, [$(NAME):DOTX_9_8,$(NAME):DOTY_9_8];NAME=$(NAME),X=10,Y=8, [$(NAME):DOTX_10_8,$(NAME):DOTY_10_8];NAME=$(NAME),X=11,Y=8, [$(NAME):DOTX_11_8,$(NAME):DOTY_11_8];NAME=$(NAME),X=12,Y=8, [$(NAME):DOTX_12_8,$(NAME):DOTY_12_8];NAME=$(NAME),X=13,Y=8, [$(NAME):DOTX_13_8,$(NAME):DOTY_13_8];NAME=$(NAME),X=14,Y=8, [$(NAME):DOTX_14_8,$(NAME):DOTY_14_8];NAME=$(NAME),X=15,Y=8, [$(NAME):DOTX_15_8,$(NAME):DOTY_15_8];NAME=$(NAME),X=16,Y=8, [$(NAME):DOTX_16_8,$(NAME):DOTY_16_8];NAME=$(NAME),X=17,Y=8, [$(NAME):DOTX_17_8,$(NAME):DOTY_17_8];NAME=$(NAME),X=18,Y=8, [$(NAME):DOTX_18_8,$(NAME):DOTY_18_8];NAME=$(NAME),X=19,Y=8, [$(NAME):DOTX_19_8,$(NAME):DOTY_19_8];NAME=$(NAME),X=20,Y=8, [$(NAME):DOTX_20_8,$(NAME):DOTY_20_8];NAME=$(NAME),X=21,Y=8, [$(NAME):DOTX_21_8,$(NAME):DOTY_21_8];NAME=$(NAME),X=22,Y=8, [$(NAME):DOTX_22_8,$(NAME):DOTY_22_8];NAME=$(NAME),X=23,Y=8, [$(NAME):DOTX_23_8,$(NAME):DOTY_23_8];NAME=$(NAME),X=24,Y=8, [$(NAME):DOTX_24_8,$(NAME):DOTY_24_8];NAME=$(NAME),X=25,Y=8, [$(NAME):DOTX_25_8,$(NAME):DOTY_25_8];NAME=$(NAME),X=26,Y=8, [$(NAME):DOTX_26_8,$(NAME):DOTY_26_8];NAME=$(NAME),X=27,Y=8, [$(NAME):DOTX_27_8,$(NAME):DOTY_27_8];NAME=$(NAME),X=28,Y=8, [$(NAME):DOTX_28_8,$(NAME):DOTY_28_8];NAME=$(NAME),X=1,Y=9, [$(NAME):DOTX_1_9,$(NAME):DOTY_1_9];NAME=$(NAME),X=2,Y=9, [$(NAME):DOTX_2_9,$(NAME):DOTY_2_9];NAME=$(NAME),X=3,Y=9, [$(NAME):DOTX_3_9,$(NAME):DOTY_3_9];NAME=$(NAME),X=4,Y=9, [$(NAME):DOTX_4_9,$(NAME):DOTY_4_9];NAME=$(NAME),X=5,Y=9, [$(NAME):DOTX_5_9,$(NAME):DOTY_5_9];NAME=$(NAME),X=6,Y=9, [$(NAME):DOTX_6_9,$(NAME):DOTY_6_9];NAME=$(NAME),X=7,Y=9, [$(NAME):DOTX_7_9,$(NAME):DOTY_7_9];NAME=$(NAME),X=8,Y=9, [$(NAME):DOTX_8_9,$(NAME):DOTY_8_9];NAME=$(NAME),X=9,Y=9, [$(NAME):DOTX_9_9,$(NAME):DOTY_9_9];NAME=$(NAME),X=10,Y=9, [$(NAME):DOTX_10_9,$(NAME):DOTY_10_9];NAME=$(NAME),X=11,Y=9, [$(NAME):DOTX_11_9,$(NAME):DOTY_11_9];NAME=$(NAME),X=12,Y=9, [$(NAME):DOTX_12_9,$(NAME):DOTY_12_9];NAME=$(NAME),X=13,Y=9, [$(NAME):DOTX_13_9,$(NAME):DOTY_13_9];NAME=$(NAME),X=14,Y=9, [$(NAME):DOTX_14_9,$(NAME):DOTY_14_9];NAME=$(NAME),X=15,Y=9, [$(NAME):DOTX_15_9,$(NAME):DOTY_15_9];NAME=$(NAME),X=16,Y=9, [$(NAME):DOTX_16_9,$(NAME):DOTY_16_9];NAME=$(NAME),X=17,Y=9, [$(NAME):DOTX_17_9,$(NAME):DOTY_17_9];NAME=$(NAME),X=18,Y=9, [$(NAME):DOTX_18_9,$(NAME):DOTY_18_9];NAME=$(NAME),X=19,Y=9, [$(NAME):DOTX_19_9,$(NAME):DOTY_19_9];NAME=$(NAME),X=20,Y=9, [$(NAME):DOTX_20_9,$(NAME):DOTY_20_9]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">food.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Stacking::Positions</enum>
+    </property>
+    <property name="numberOfItems" stdset="0">
+     <number>244</number>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_7">
+    <property name="geometry">
+     <rect>
+      <x>1510</x>
+      <y>540</y>
+      <width>61</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Score</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit">
+    <property name="geometry">
+     <rect>
+      <x>1470</x>
+      <y>580</y>
+      <width>211</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_SCORE</string>
+    </property>
+   </widget>
    <zorder>caframe</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
@@ -6305,7 +6356,6 @@
    <zorder>cainclude_3</zorder>
    <zorder>calabel</zorder>
    <zorder>calabel_2</zorder>
-   <zorder>caimage_4</zorder>
    <zorder>cacalc_3</zorder>
    <zorder>catogglebutton</zorder>
    <zorder>calabel_3</zorder>
@@ -6333,18 +6383,6 @@
    <zorder>cacalc_21</zorder>
    <zorder>cacalc_22</zorder>
    <zorder>cacalc_23</zorder>
-   <zorder>caimage_7</zorder>
-   <zorder>caimage_5</zorder>
-   <zorder>caimage_8</zorder>
-   <zorder>caimage_9</zorder>
-   <zorder>caimage_10</zorder>
-   <zorder>caimage_11</zorder>
-   <zorder>caimage_12</zorder>
-   <zorder>caimage_13</zorder>
-   <zorder>caimage_14</zorder>
-   <zorder>caimage_15</zorder>
-   <zorder>caimage_16</zorder>
-   <zorder>caimage_17</zorder>
    <zorder>calabel_25</zorder>
    <zorder>canumeric_21</zorder>
    <zorder>caimage_18</zorder>
@@ -6355,6 +6393,22 @@
    <zorder>caimage_23</zorder>
    <zorder>cacalc_2</zorder>
    <zorder>calabel_26</zorder>
+   <zorder>cainclude</zorder>
+   <zorder>caimage_4</zorder>
+   <zorder>caimage_15</zorder>
+   <zorder>caimage_12</zorder>
+   <zorder>caimage_9</zorder>
+   <zorder>caimage_7</zorder>
+   <zorder>caimage_5</zorder>
+   <zorder>caimage_10</zorder>
+   <zorder>caimage_13</zorder>
+   <zorder>caimage_16</zorder>
+   <zorder>caimage_17</zorder>
+   <zorder>caimage_14</zorder>
+   <zorder>caimage_11</zorder>
+   <zorder>caimage_8</zorder>
+   <zorder>calabel_7</zorder>
+   <zorder>calineedit</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
@@ -6399,6 +6453,11 @@
    <class>caLed</class>
    <extends>QWidget</extends>
    <header>caLed</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
   </customwidget>
   <customwidget>
    <class>caStripPlot</class>

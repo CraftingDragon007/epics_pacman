@@ -17,7 +17,8 @@ afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=INKY"
 afterInit seq &ghosts_pacman, "NAME=PACMAN,GHOST=CLYDE"
 
 dbLoadTemplate("pacman_data.subs", "SYSTEM=PACMAN");
-dbLoadTemplate("ghosts_common.subs", "SYSTEM=PACMAN,GHOST=COMMON")
+dbLoadTemplate("pacman_food.subs", "SYSTEM=PACMAN");
+dbLoadTemplate("ghosts_common.subs", "SYSTEM=PACMAN,GHOST=COMMON");
 
 dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=BLINKY");
 dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=PINKY");

@@ -6,21 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>215</height>
+    <width>41</width>
+    <height>41</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="caImage" name="caimage_12">
+   <widget class="caImage" name="caimage">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>60</y>
-      <width>70</width>
-      <height>70</height>
+      <x>0</x>
+      <y>0</y>
+      <width>41</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="filename" stdset="0">
@@ -29,8 +29,36 @@
     <property name="imageCalc">
      <string notr="true">A</string>
     </property>
+    <property name="visibility">
+     <enum>caImage::Visibility::Calc</enum>
+    </property>
+    <property name="visibilityCalc">
+     <string notr="true">(A==2)&amp;&amp;(B==1)||(A==1)</string>
+    </property>
     <property name="channel" stdset="0">
-     <string notr="true">small_food_frame</string>
+     <string notr="true">$(NAME):VIS_$(X)_$(Y)</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">timer_$(X)_$(Y)</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">timer_$(X)_$(Y)</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A&gt;0?0:1</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">timer_$(X)_$(Y)</string>
     </property>
    </widget>
   </widget>
@@ -40,6 +68,11 @@
    <class>caImage</class>
    <extends>QWidget</extends>
    <header>caImage</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
   </customwidget>
  </customwidgets>
  <resources/>

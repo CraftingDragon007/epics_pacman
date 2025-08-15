@@ -354,8 +354,8 @@ ss pacman_game {
     state INIT {
 		entry {
 			pvSetStr( pv_SS_PACMAN, "INIT" );
-			pvSet(pv_PACMAN_USER_X, 25); // Initial X position
-			pvSet(pv_PACMAN_USER_Y, 25); // Initial Y position
+			pvSet(pv_PACMAN_USER_X, 426); // Initial X position
+			pvSet(pv_PACMAN_USER_Y, 727); // Initial Y position
 			pvSet(pv_PACMAN_USER_DIRECTION, -1); // Initial direction (0=right, 1=left, 2=up, 3=down)
             
             // No direction tried yet
