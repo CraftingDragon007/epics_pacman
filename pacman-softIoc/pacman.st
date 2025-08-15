@@ -11,7 +11,7 @@ program pacman
 /* options */
 option  +r;
 
-/* variables pacman game --> some Values are double even though they behave like ints, because they need to be for conversion. */
+/* variables pacman game */
 
 PV( int     , pv_PACMAN_USER_X			, "{NAME}:PACMAN_USER_X"		, PV_MON );   
 PV( int     , pv_PACMAN_USER_Y			, "{NAME}:PACMAN_USER_Y"		, PV_MON );

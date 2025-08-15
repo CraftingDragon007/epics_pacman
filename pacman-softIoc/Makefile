@@ -29,6 +29,17 @@ ghosts_pacman_DBD += base.dbd
 ghosts_pacman_LIBS += seq pv png z
 ghosts_pacman_LIBS += $(EPICS_BASE_IOC_LIBS)
 
+
+LIBRARY_IOC += game_engine_pacman
+DBD += game_engine_pacman.dbd
+
+game_engine_pacman_SRCS += game_engine_pacman_registerRecordDeviceDriver.cpp
+game_engine_pacman_SRCS += game_engine_pacman.st
+game_engine_pacman_DBD += base.dbd
+game_engine_pacman_LIBS += seq pv png z
+game_engine_pacman_LIBS += $(EPICS_BASE_IOC_LIBS)
+
+
 png_DIR = /usr/lib
 z_DIR = /usr/lib
 
