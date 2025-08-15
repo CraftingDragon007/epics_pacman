@@ -5292,6 +5292,9 @@
     <property name="precisionMode">
      <enum>caNumeric::SourceMode::User</enum>
     </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="caNumeric" name="canumeric_17">
     <property name="geometry">
@@ -5313,6 +5316,9 @@
     </property>
     <property name="precisionMode">
      <enum>caNumeric::SourceMode::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="caNumeric" name="canumeric_18">
@@ -5336,6 +5342,9 @@
     <property name="precisionMode">
      <enum>caNumeric::SourceMode::User</enum>
     </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="caNumeric" name="canumeric_19">
     <property name="geometry">
@@ -5358,6 +5367,9 @@
     <property name="precisionMode">
      <enum>caNumeric::SourceMode::User</enum>
     </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="caNumeric" name="canumeric_20">
     <property name="geometry">
@@ -5379,6 +5391,9 @@
     </property>
     <property name="precisionMode">
      <enum>caNumeric::SourceMode::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_21">
@@ -6066,6 +6081,211 @@
      <string notr="true">$(NAME):GHOSTS_CLYDE_MODE</string>
     </property>
    </widget>
+   <widget class="caLabel" name="calabel_25">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>600</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pacman Movement Delay</string>
+    </property>
+   </widget>
+   <widget class="caNumeric" name="canumeric_21">
+    <property name="geometry">
+     <rect>
+      <x>1310</x>
+      <y>630</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="integerDigits" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="decimalDigits" stdset="0">
+     <number>3</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_MOVE_DELAY</string>
+    </property>
+    <property name="precisionMode">
+     <enum>caNumeric::SourceMode::User</enum>
+    </property>
+    <property name="fixedFormat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_18">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_r.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_19">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_e.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_20">
+    <property name="geometry">
+     <rect>
+      <x>414</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_a.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_21">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_d.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_22">
+    <property name="geometry">
+     <rect>
+      <x>481</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_y.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caImage" name="caimage_23">
+    <property name="geometry">
+     <rect>
+      <x>515</x>
+      <y>544</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">letter_exclamation_mark.gif</string>
+    </property>
+    <property name="imageCalc">
+     <string notr="true">A</string>
+    </property>
+    <property name="delayMilliseconds" stdset="0">
+     <number>200</number>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">pacready</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>560</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">pacready</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A=-1?0:1</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+    </property>
+    <property name="precision">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_26">
+    <property name="geometry">
+     <rect>
+      <x>1280</x>
+      <y>540</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ready Display</string>
+    </property>
+   </widget>
    <zorder>caframe</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
@@ -6125,6 +6345,16 @@
    <zorder>caimage_15</zorder>
    <zorder>caimage_16</zorder>
    <zorder>caimage_17</zorder>
+   <zorder>calabel_25</zorder>
+   <zorder>canumeric_21</zorder>
+   <zorder>caimage_18</zorder>
+   <zorder>caimage_19</zorder>
+   <zorder>caimage_20</zorder>
+   <zorder>caimage_21</zorder>
+   <zorder>caimage_22</zorder>
+   <zorder>caimage_23</zorder>
+   <zorder>cacalc_2</zorder>
+   <zorder>calabel_26</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

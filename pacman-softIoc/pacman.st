@@ -32,6 +32,7 @@ PV( int     , pv_PACMAN_ARRAY_COL       , "{NAME}:PACMAN_ARRAY_COL"	    , PV_MON
 PV( int     , pv_PACMAN_PACMAN_STATE	, "{NAME}:PACMAN_PACMAN_STATE"	, PV_MON );
 PV( int     , pv_PACMAN_PACMAN_ABORT	, "{NAME}:PACMAN_PACMAN_ABORT"	, PV_MON );
 PV( int     , pv_PACMAN_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
+PV( double  , pv_PACMAN_MOVE_DELAY      , "{NAME}:PACMAN_MOVE_DELAY"	, PV_MON );
 PV( int     , pv_PACMAN_PNG_WIDTH		, "{NAME}:PACMAN_PNG_WIDTH"		, PV_MON );
 PV( int     , pv_PACMAN_PNG_HEIGHT      , "{NAME}:PACMAN_PNG_HEIGHT"	, PV_MON );
 PV( int     , pv_PACMAN_DATA_SIZE       , "{NAME}:PACMAN_PNG_DATA_SIZE"	, PV_MON );
@@ -405,13 +406,13 @@ ss pacman_game {
             printf("Initial: origin_tile_x=%d, origin_tile_y=%d\n", origin_tile_x, origin_tile_y);
             origin_tile = get_tile_index_from_tile_coordinates(origin_tile_x, origin_tile_y);
             printf("origin_tile index=%d\n", origin_tile);
-            origin_tile = origin_tile + 3 * FIELD_WIDTH;
+            origin_tile = origin_tile + 9 * FIELD_WIDTH;
             printf("After adding 3 rows: origin_tile=%d\n", origin_tile);
             get_tile_coordinates_from_tile_index(origin_tile, &origin_tile_x, &origin_tile_y);
             printf("Final: origin_tile_x=%d, origin_tile_y=%d\n", origin_tile_x, origin_tile_y);
             current_tile_x = origin_tile_x;
             current_tile_y = origin_tile_y;
-            pos_x = origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
+            pos_x = origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2 - 13;
             pos_y = origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - pv_PACMAN_PACMAN_SIZE / 2;
             printf("Setting position to: (%d, %d) with pacman_size=%d\n", pos_x, pos_y, pv_PACMAN_PACMAN_SIZE);
             pvSet(pv_PACMAN_USER_X, pos_x);
@@ -595,7 +596,7 @@ ss pacman_game {
 
         when (pv_PACMAN_TRY_DIRECTION != pv_PACMAN_USER_DIRECTION && pv_PACMAN_TRY_DIRECTION != INVALID_DIRECTION) {
             // If the user tries to change direction, go back to MOVE_CHECK
-            printf("User tried to change direction while moving.\n");
+            printf("User tries to change direction while moving.\n");
             trying_new_direction = true; // Set flag to indicate a new direction is being tried
         } state MOVE_CHECK
 
@@ -615,7 +616,7 @@ ss pacman_game {
             target_tile_y = -1; // Reset target tile coordinates
         } state BLOCKED
 
-        when (delay(0.02)){
+        when (delay(pv_PACMAN_MOVE_DELAY)){
             // Move pacman towards the target tile
             int current_x = pv_PACMAN_USER_X;
             int current_y = pv_PACMAN_USER_Y;
@@ -739,7 +740,7 @@ ss pacman_game {
         entry {
             pvSetStr(pv_SS_PACMAN, "TELEPORT_LEFT");
         }
-        when (delay(0.02)){
+        when (){
             pvSet(pv_PACMAN_USER_X, FIELD_WIDTH * TILE_SIZE - pv_PACMAN_PACMAN_SIZE);
             current_tile_x = FIELD_WIDTH - 1; // Update current tile X coordinate
         } state MOVE_CHECK
@@ -749,8 +750,8 @@ ss pacman_game {
         entry {
             pvSetStr(pv_SS_PACMAN, "TELEPORT_RIGHT");
         }
-        when (delay(0.02)){
-            pvSet(pv_PACMAN_USER_X, pv_PACMAN_PACMAN_SIZE - TILE_SIZE / 2);
+        when (){
+            pvSet(pv_PACMAN_USER_X, 1);
             current_tile_x = 0; // Update current tile X coordinate
         } state MOVE_CHECK
     }

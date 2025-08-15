@@ -16,6 +16,7 @@ file pacman_game_parameter.template
   { PACMAN, PACMAN, STATE, 10, 0, 0 }
   { PACMAN, PACMAN, ABORT, 10, 0, 0 }
   { PACMAN, PACMAN, SIZE, 100, 0, 50 }
+  { PACMAN, MOVE, DELAY, 1, 0, 0.02 }
   { PACMAN, PNG, WIDTH, 800, 0, 800 }
   { PACMAN, PNG, HEIGHT, 600, 0, 600 }
   { PACMAN, PNG, DATA_SIZE, 200000, 0, 200000 }
