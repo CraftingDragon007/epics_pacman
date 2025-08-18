@@ -33,3 +33,18 @@ record(calcout, "$(NAME):CALC_SCORE_$(X)_$(Y)") {
   field(OUT, "$(NAME):PACMAN_USER_SCORE PP")
   field(OOPT, "Transition To Non-zero")
 }
+
+record(calcout, "$(NAME):CALC_FRIGHTENED_$(X)_$(Y)") {
+  field(INPA, "$(NAME):VIS_$(X)_$(Y) CPP")
+  field(CALC, "A==0?(($(FOODSTATE=1)==2)?1:0):0")
+  field(OUT, "$(NAME):GAME_FRIGHT_MODE PP")
+  field(OOPT, "Transition To Non-zero")
+}
+
+record(calcout, "$(NAME):CALC_WIN_CONDITION_$(X)_$(Y)"){
+  field(INPA, "$(NAME):VIS_$(X)_$(Y) CPP")
+  field(INPB, "$(NAME):GAME_WIN_CONDITION")
+  field(CALC, "A==0?(B-1):B")
+  field(OUT, "$(NAME):GAME_WIN_CONDITION PP")
+  field(OOPT, "On Change")
+}

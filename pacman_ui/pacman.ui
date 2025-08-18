@@ -46,7 +46,7 @@
      <number>200</number>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">pacrun</string>
+     <string notr="true">pacrun.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
     </property>
    </widget>
    <widget class="caFrame" name="caframe_6">
@@ -93,10 +93,10 @@
       </rect>
      </property>
      <property name="variable">
-      <string notr="true">pacrun</string>
+      <string notr="true">pacrun.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:20}}</string>
      </property>
      <property name="calc">
-      <string notr="true">B=-1 ? 8  : (C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B)))</string>
+      <string notr="true">B=-1 ? 8 : (D&gt;0 ? D : (C=1 ? B : (A=8 ? 0+B : ( A=4+B ? 8 : 4+B))))</string>
      </property>
      <property name="channel" stdset="0">
       <string notr="true">pacrun</string>
@@ -106,6 +106,9 @@
      </property>
      <property name="channelC">
       <string notr="true">$(NAME):PACMAN_PACMAN_STATE</string>
+     </property>
+     <property name="channelD">
+      <string notr="true">$(NAME):PACMAN_PACMAN_DEATH</string>
      </property>
      <property name="precision">
       <number>0</number>
@@ -512,9 +515,9 @@
    <widget class="caInclude" name="cainclude_2">
     <property name="geometry">
      <rect>
-      <x>940</x>
+      <x>930</x>
       <y>730</y>
-      <width>291</width>
+      <width>211</width>
       <height>491</height>
      </rect>
     </property>
@@ -608,7 +611,7 @@
    <widget class="caInclude" name="cainclude_3">
     <property name="geometry">
      <rect>
-      <x>1240</x>
+      <x>1170</x>
       <y>730</y>
       <width>291</width>
       <height>491</height>
@@ -624,7 +627,7 @@
    <widget class="caLabel" name="calabel">
     <property name="geometry">
      <rect>
-      <x>1050</x>
+      <x>960</x>
       <y>700</y>
       <width>141</width>
       <height>28</height>
@@ -637,7 +640,7 @@
    <widget class="caLabel" name="calabel_2">
     <property name="geometry">
      <rect>
-      <x>1310</x>
+      <x>1220</x>
       <y>700</y>
       <width>141</width>
       <height>28</height>
@@ -6337,6 +6340,87 @@
      <string notr="true">$(NAME):PACMAN_USER_SCORE</string>
     </property>
    </widget>
+   <widget class="caInclude" name="cainclude_8">
+    <property name="geometry">
+     <rect>
+      <x>1420</x>
+      <y>730</y>
+      <width>211</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>NAME=$(NAME),SS=GAME_ENGINE</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">ss_info</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_4">
+    <property name="geometry">
+     <rect>
+      <x>1470</x>
+      <y>700</y>
+      <width>161</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Game Engine Logs</string>
+    </property>
+   </widget>
+   <widget class="caLed" name="caled_3">
+    <property name="geometry">
+     <rect>
+      <x>1640</x>
+      <y>40</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):GAME_FRIGHT_MODE</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_5">
+    <property name="geometry">
+     <rect>
+      <x>1609</x>
+      <y>20</y>
+      <width>91</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frightened</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_2">
+    <property name="geometry">
+     <rect>
+      <x>1490</x>
+      <y>670</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):GAME_WIN_CONDITION</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_11">
+    <property name="geometry">
+     <rect>
+      <x>1490</x>
+      <y>640</y>
+      <width>121</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Win Condition</string>
+    </property>
+   </widget>
    <zorder>caframe</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
@@ -6409,6 +6493,12 @@
    <zorder>caimage_8</zorder>
    <zorder>calabel_7</zorder>
    <zorder>calineedit</zorder>
+   <zorder>cainclude_8</zorder>
+   <zorder>calabel_4</zorder>
+   <zorder>caled_3</zorder>
+   <zorder>calabel_5</zorder>
+   <zorder>calineedit_2</zorder>
+   <zorder>calabel_11</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

@@ -1,5 +1,6 @@
 program pacman
 #include "seqPVmacros.h"
+#include "pacman_common.h"
 
 %%#include "math.h"
 %%#include "stdlib.h"
@@ -32,6 +33,7 @@ PV( int     , pv_PACMAN_ARRAY_COL       , "{NAME}:PACMAN_ARRAY_COL"	    , PV_MON
 PV( int     , pv_PACMAN_PACMAN_STATE	, "{NAME}:PACMAN_PACMAN_STATE"	, PV_MON );
 PV( int     , pv_PACMAN_PACMAN_ABORT	, "{NAME}:PACMAN_PACMAN_ABORT"	, PV_MON );
 PV( int     , pv_PACMAN_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
+PV( int     , pv_PACMAN_PACMAN_DEATH    , "{NAME}:PACMAN_PACMAN_DEATH"	, PV_MON );
 PV( double  , pv_PACMAN_MOVE_DELAY      , "{NAME}:PACMAN_MOVE_DELAY"	, PV_MON );
 PV( int     , pv_PACMAN_PNG_WIDTH		, "{NAME}:PACMAN_PNG_WIDTH"		, PV_MON );
 PV( int     , pv_PACMAN_PNG_HEIGHT      , "{NAME}:PACMAN_PNG_HEIGHT"	, PV_MON );
@@ -41,35 +43,6 @@ PV( int     , pv_PACMAN_TARGET_VALID	, "{NAME}:PACMAN_TARGET_VALID"	, PV_MON );
 PV( string  , pv_SS_PACMAN				, "{NAME}:SS_PACMAN"			, PV_NONE );
 PVA( short	, pv_PACMAN_PLAY_FIELD, 1024, "{NAME}:PACMAN_PLAY_FIELD"	, PV_MON);
 PVA( unsigned char, pv_PACMAN_PNG_DATA, 200000, "{NAME}:PACMAN_PNG_DATA" , PV_NONE );
-
-#define DIRECTION_RIGHT 0
-#define DIRECTION_LEFT 1
-#define DIRECTION_UP 2
-#define DIRECTION_DOWN 3
-
-#define bool int
-#define true 1
-#define false 0
-
-#define PICK_MAX 1
-#define PICK_MIN 0
-
-#define FIELD_WIDTH 28
-#define FIELD_HEIGHT 31
-#define TILE_SIZE 32
-
-#define TILE_PATH 0
-#define TILE_WALL 1
-#define TILE_PORTAL 2
-#define TILE_SPAWN_ENTRY 3
-
-#define INVALID_DIRECTION -1
-#define READY_DIRECTION -1
-
-#define STATE_NORMAL 0
-#define STATE_BLOCKED 1
-#define STATE_TELEPORT 2
-#define STATE_READY 3
 
 // PNG logic
 %{
@@ -552,6 +525,10 @@ ss pacman_game {
             pvSet(pv_PACMAN_TRY_DIRECTION, pv_PACMAN_USER_DIRECTION);
             pvSet(pv_PACMAN_PACMAN_STATE, STATE_BLOCKED);
         }
+
+        when (pv_PACMAN_USER_DIRECTION == -1){
+
+        } state READY
 
         when (pv_PACMAN_TRY_DIRECTION_LEFT == true){
             pvSet(pv_PACMAN_TRY_DIRECTION, DIRECTION_LEFT);
