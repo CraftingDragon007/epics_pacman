@@ -36,3 +36,5 @@
 #define STATE_BLOCKED 1
 #define STATE_TELEPORT 2
 #define STATE_READY 3
+
+#define WIN_CONDITION 244

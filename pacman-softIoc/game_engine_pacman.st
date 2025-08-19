@@ -89,7 +89,11 @@ ss game_logic {
             pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
             pvSet(pv_GAME_GHOSTS_INKY_RELEASE, 1);
             pvSet(pv_GAME_STATE_INDICATOR, 1);
-            pvSet(pv_GAME_PACMAN_LIVES, pv_GAME_PACMAN_LIVES - 1);            
+            if (pv_GAME_WIN_CONDITION <= 0){ 
+                pvSet(pv_GAME_WIN_CONDITION, WIN_CONDITION);
+            } else {
+                pvSet(pv_GAME_PACMAN_LIVES, pv_GAME_PACMAN_LIVES - 1);
+            }            
         }
 
         when (){
@@ -307,7 +311,7 @@ ss game_logic {
         }
     
         when (pv_GAME_PACMAN_LIVES == 0){
-            pvSet(pv_GAME_WIN_CONDITION, 244);
+            pvSet(pv_GAME_WIN_CONDITION, WIN_CONDITION);
             pvSet(pv_PACMAN_RESET_FOOD, 1);
             pvSet(pv_GAME_PACMAN_LIVES, -1);
         } state INIT
