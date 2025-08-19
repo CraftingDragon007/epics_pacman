@@ -16,6 +16,7 @@ PV( int, pv_GAME_STATE_INDICATOR, "{NAME}:GAME_STATE_INDICATOR", PV_MON );
 PV( int, pv_GAME_FRIGHT_MODE, "{NAME}:GAME_FRIGHT_MODE", PV_MON );
 PV( int, pv_GAME_KILLED_GHOSTS_MULTIPLIER, "{NAME}:GAME_KILLED_GHOSTS_MULTIPLIER", PV_MON );
 PV( int, pv_GAME_WIN_CONDITION, "{NAME}:GAME_WIN_CONDITION", PV_MON );
+PV( int, pv_GAME_PACMAN_LIVES, "{NAME}:GAME_PACMAN_LIVES", PV_MON );
 
 PV( int, pv_GAME_GHOSTS_INKY_RELEASE, "{NAME}:GAME_GHOSTS_INKY_RELEASE", PV_MON );
 PV( int, pv_GAME_GHOSTS_CLYDE_RELEASE, "{NAME}:GAME_GHOSTS_CLYDE_RELEASE", PV_MON );
@@ -68,7 +69,10 @@ ss game_logic {
         }
 
         when (pv_PACMAN_USER_DIRECTION != INVALID_DIRECTION && pv_PACMAN_TRY_DIRECTION != INVALID_DIRECTION){
-            pvSet(pv_PACMAN_USER_SCORE, 0);
+            if (pv_GAME_PACMAN_LIVES <= 0){
+                pvSet(pv_PACMAN_USER_SCORE, 0);
+                pvSet(pv_GAME_PACMAN_LIVES, 3);
+            }
         } state START
 
         when () {
@@ -84,7 +88,8 @@ ss game_logic {
             pvSet(pv_GHOSTS_INKY_MODE, MODE_WAIT);
             pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
             pvSet(pv_GAME_GHOSTS_INKY_RELEASE, 1);
-            pvSet(pv_GAME_STATE_INDICATOR, 1);        
+            pvSet(pv_GAME_STATE_INDICATOR, 1);
+            pvSet(pv_GAME_PACMAN_LIVES, pv_GAME_PACMAN_LIVES - 1);            
         }
 
         when (){
@@ -100,6 +105,10 @@ ss game_logic {
         when (pv_PACMAN_PACMAN_DEATH != -1){
 
         } state PACMAN_DEATH
+
+        when (pv_GAME_WIN_CONDITION <= 0){
+
+        } state RESET
 
         // release inky
         when (pv_GAME_GHOSTS_INKY_RELEASE == 0 && pv_GAME_STATE_INDICATOR == 1 && pv_GAME_FRIGHT_MODE == 0){
@@ -296,10 +305,21 @@ ss game_logic {
         entry {
             pvSetStr(pv_LOGS, "RESET");
         }
-
-        when (){
+    
+        when (pv_GAME_PACMAN_LIVES == 0){
             pvSet(pv_GAME_WIN_CONDITION, 244);
             pvSet(pv_PACMAN_RESET_FOOD, 1);
+            pvSet(pv_GAME_PACMAN_LIVES, -1);
+        } state INIT
+
+        when (){
+            if(pv_GAME_WIN_CONDITION <= 0){
+                pvSet(pv_GHOSTS_BLINKY_MODE, MODE_WAIT);
+                pvSet(pv_GHOSTS_PINKY_MODE, MODE_WAIT);
+                pvSet(pv_GHOSTS_INKY_MODE, MODE_WAIT);
+                pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
+                pvSet(pv_PACMAN_RESET_FOOD, 1);
+            }
         } state INIT
     }
 }

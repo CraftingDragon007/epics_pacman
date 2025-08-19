@@ -6267,10 +6267,13 @@
      <string notr="true">pacready</string>
     </property>
     <property name="calc">
-     <string notr="true">A=-1?0:1</string>
+     <string notr="true">(A=-1)&amp;&amp;(B!=-1)?0:1</string>
     </property>
     <property name="channel" stdset="0">
      <string notr="true">$(NAME):PACMAN_USER_DIRECTION</string>
+    </property>
+    <property name="channelB">
+     <string notr="true">$(NAME):GAME_PACMAN_LIVES</string>
     </property>
     <property name="precision">
      <number>0</number>
@@ -6421,6 +6424,227 @@
      <string>Win Condition</string>
     </property>
    </widget>
+   <widget class="caLineEdit" name="calineedit_3">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>110</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):GAME_PACMAN_LIVES</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_12">
+    <property name="geometry">
+     <rect>
+      <x>1140</x>
+      <y>80</y>
+      <width>51</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lives</string>
+    </property>
+   </widget>
+   <widget class="caFrame" name="caframe_2">
+    <property name="geometry">
+     <rect>
+      <x>285</x>
+      <y>530</y>
+      <width>341</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="visibility">
+     <enum>caFrame::Visibility::Calc</enum>
+    </property>
+    <property name="visibilityCalc">
+     <string notr="true">A==-1</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">$(NAME):GAME_PACMAN_LIVES</string>
+    </property>
+    <widget class="caImage" name="caimage_29">
+     <property name="geometry">
+      <rect>
+       <x>105</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_e.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_27">
+     <property name="geometry">
+      <rect>
+       <x>76</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_m.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_26">
+     <property name="geometry">
+      <rect>
+       <x>43</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_a.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_25">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_g.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_28">
+     <property name="geometry">
+      <rect>
+       <x>256</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_e.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_30">
+     <property name="geometry">
+      <rect>
+       <x>288</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_r.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_31">
+     <property name="geometry">
+      <rect>
+       <x>228</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_v.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+    <widget class="caImage" name="caimage_32">
+     <property name="geometry">
+      <rect>
+       <x>196</x>
+       <y>14</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">letter_red_o.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">A</string>
+     </property>
+     <property name="delayMilliseconds" stdset="0">
+      <number>200</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </widget>
    <zorder>caframe</zorder>
    <zorder>caimage</zorder>
    <zorder>caframe_6</zorder>
@@ -6469,12 +6693,6 @@
    <zorder>cacalc_23</zorder>
    <zorder>calabel_25</zorder>
    <zorder>canumeric_21</zorder>
-   <zorder>caimage_18</zorder>
-   <zorder>caimage_19</zorder>
-   <zorder>caimage_20</zorder>
-   <zorder>caimage_21</zorder>
-   <zorder>caimage_22</zorder>
-   <zorder>caimage_23</zorder>
    <zorder>cacalc_2</zorder>
    <zorder>calabel_26</zorder>
    <zorder>cainclude</zorder>
@@ -6499,6 +6717,15 @@
    <zorder>calabel_5</zorder>
    <zorder>calineedit_2</zorder>
    <zorder>calabel_11</zorder>
+   <zorder>calineedit_3</zorder>
+   <zorder>calabel_12</zorder>
+   <zorder>caimage_23</zorder>
+   <zorder>caimage_22</zorder>
+   <zorder>caimage_21</zorder>
+   <zorder>caimage_20</zorder>
+   <zorder>caimage_19</zorder>
+   <zorder>caimage_18</zorder>
+   <zorder>caframe_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

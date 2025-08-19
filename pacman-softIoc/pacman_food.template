@@ -46,5 +46,5 @@ record(calcout, "$(NAME):CALC_WIN_CONDITION_$(X)_$(Y)"){
   field(INPB, "$(NAME):GAME_WIN_CONDITION")
   field(CALC, "A==0?(B-1):B")
   field(OUT, "$(NAME):GAME_WIN_CONDITION PP")
-  field(OOPT, "On Change")
+  field(OOPT, "Every Time")
 }
