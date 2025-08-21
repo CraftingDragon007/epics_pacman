@@ -283,16 +283,6 @@ PVA( unsigned char, pv_PACMAN_PNG_DATA, 200000, "{NAME}:PACMAN_PNG_DATA" , PV_NO
 }%
 
 %{
-
-    int get_tile_index_from_tile_coordinates(int tile_x, int tile_y){
-        return tile_y * FIELD_WIDTH + tile_x;
-    }
-
-    void get_tile_coordinates_from_tile_index(int tile_index, int *tile_x, int *tile_y) {
-        *tile_x = tile_index % FIELD_WIDTH;
-        *tile_y = tile_index / FIELD_WIDTH;
-    }
-
     static char* toString(int value) {
         static char buffer[20];
         snprintf(buffer, sizeof(buffer), "%d", value);

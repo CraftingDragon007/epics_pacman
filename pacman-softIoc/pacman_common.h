@@ -38,3 +38,12 @@
 #define STATE_READY 3
 
 #define WIN_CONDITION 244
+
+int get_tile_index_from_tile_coordinates(int tile_x, int tile_y){
+    return tile_y * FIELD_WIDTH + tile_x;
+}
+
+void get_tile_coordinates_from_tile_index(int tile_index, int *tile_x, int *tile_y) {
+    *tile_x = tile_index % FIELD_WIDTH;
+    *tile_y = tile_index / FIELD_WIDTH;
+}

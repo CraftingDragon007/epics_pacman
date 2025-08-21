@@ -65,15 +65,6 @@ PV( int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
         return acos(cosResult);
     }
 
-    int get_tile_index_from_tile_coordinates(int tile_x, int tile_y){
-        return tile_y * FIELD_WIDTH + tile_x;
-    }
-
-    void get_tile_coordinates_from_tile_index(int tile_index, int *tile_x, int *tile_y) {
-        *tile_x = tile_index % FIELD_WIDTH;
-        *tile_y = tile_index / FIELD_WIDTH;
-    }
-
     int random_int_between(int min, int max) {
         if (min > max) {
             int temp = min;
