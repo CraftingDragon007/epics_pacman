@@ -1,10 +1,9 @@
-# Normalize text files to LF on checkout (consistent across platforms)
+# Normalize text files to LF on checkout
 * text=auto eol=lf
 
 # EPICS State Notation Language (.st)
 *.st text linguist-language=C
 
-# Common EPICS text/config files
 *.db text
 *.dbd text
 *.template text
@@ -13,11 +12,9 @@
 *.req text
 *.proto text
 
-# Scripts and build files
 *.sh text eol=lf
 Makefile text
 
-# Images and other binaries
 *.png binary -diff -merge
 *.jpg binary -diff -merge
 *.jpeg binary -diff -merge
@@ -25,7 +22,6 @@ Makefile text
 *.bmp binary -diff -merge
 *.ico binary -diff -merge
 
-# Optional: treat archives as binary too
 *.zip binary -diff -merge
 *.tar binary -diff -merge
 *.gz  binary -diff -merge
