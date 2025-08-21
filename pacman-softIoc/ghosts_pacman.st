@@ -16,30 +16,34 @@ program ghosts_pacman
 option  +r;
 
 /* variables for ghost */
-PV( string, pv_LOGS, "{NAME}:SS_GHOSTS", PV_NONE );
+PV(string, pv_LOGS, "{NAME}:SS_GHOSTS", PV_NONE );
 PV(double, pv_SCATTER_DELAY, "{NAME}:GHOSTS_COMMON_SCATTER_DELAY", PV_MON);
 PV(double, pv_CHASE_DELAY, "{NAME}:GHOSTS_COMMON_CHASE_DELAY", PV_MON);
 PV(double, pv_FRIGHT_DELAY, "{NAME}:GHOSTS_COMMON_FRIGHT_DELAY", PV_MON);
 PV(double, pv_SPAWN_DELAY, "{NAME}:GHOSTS_COMMON_SPAWN_DELAY", PV_MON);
 PV(int, pv_CURRENT_MODE, "{NAME}:GHOSTS_{GHOST}_MODE", PV_MON);
-PV( int, pv_GHOST_DIR, "{NAME}:GHOSTS_{GHOST}_DIR", PV_MON );  
-PV( int, pv_GHOST_X, "{NAME}:GHOSTS_{GHOST}_X", PV_MON );  
-PV( int, pv_GHOST_Y, "{NAME}:GHOSTS_{GHOST}_Y", PV_MON );
-PV( int, pv_GHOST_SIZE, "{NAME}:GHOSTS_{GHOST}_SIZE", PV_MON );  
+PV(int, pv_GHOST_DIR, "{NAME}:GHOSTS_{GHOST}_DIR", PV_MON );  
+PV(int, pv_GHOST_X, "{NAME}:GHOSTS_{GHOST}_X", PV_MON );  
+PV(int, pv_GHOST_Y, "{NAME}:GHOSTS_{GHOST}_Y", PV_MON );
+PV(int, pv_GHOST_SIZE, "{NAME}:GHOSTS_{GHOST}_SIZE", PV_MON );
+PV(int, pv_SPAWN_X0, "{NAME}:GHOSTS_{GHOST}_SPAWN_X0", PV_MON);
+PV(int, pv_SPAWN_Y0, "{NAME}:GHOSTS_{GHOST}_SPAWN_Y0", PV_MON);
+PV(int, pv_SPAWN_X1, "{NAME}:GHOSTS_{GHOST}_SPAWN_X1", PV_MON);
+PV(int, pv_SPAWN_Y1, "{NAME}:GHOSTS_{GHOST}_SPAWN_Y1", PV_MON);
 
 /* variables for ghost animation */
-PV( double, pv_GHOST_ANIMATION_DELAY, "{NAME}:GHOSTS_COMMON_ANIMATION_DELAY", PV_MON);
-PV( int, pv_GHOST_CURRENT_FRAME, "{NAME}:GHOSTS_{GHOST}_FRAME", PV_MON );
+PV(double, pv_GHOST_ANIMATION_DELAY, "{NAME}:GHOSTS_COMMON_ANIMATION_DELAY", PV_MON);
+PV(int, pv_GHOST_CURRENT_FRAME, "{NAME}:GHOSTS_{GHOST}_FRAME", PV_MON );
 
 /* variables from pacman */
-PV( int, pv_PACMAN_X, "{NAME}:PACMAN_USER_X", PV_MON );
-PV( int, pv_PACMAN_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
-PV( int, pv_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
-PV( int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
-PV( int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
-PVA( short, pv_PACMAN_PLAY_FIELD, 868, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
-PV( int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
-PV( int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
+PV(int, pv_PACMAN_X, "{NAME}:PACMAN_USER_X", PV_MON );
+PV(int, pv_PACMAN_Y, "{NAME}:PACMAN_USER_Y", PV_MON );
+PV(int, pv_PACMAN_SIZE     , "{NAME}:PACMAN_PACMAN_SIZE"	, PV_MON );
+PV(int, pv_PACMAN_ARRAY_ROW_LENGTH	, "{NAME}:PACMAN_ARRAY_X_SIZE"	, PV_MON );
+PV(int, pv_PACMAN_ARRAY_CELL_WIDTH	, "{NAME}:PACMAN_ARRAY_X_FACTOR", PV_MON );
+PVA(short, pv_PACMAN_PLAY_FIELD, 868, "{NAME}:PACMAN_PLAY_FIELD", PV_MON);
+PV(int, pv_PACMAN_FIELD_SIZE, "{NAME}:PACMAN_FIELD_SIZE"	, PV_MON );
+PV(int, pv_PACMAN_FIELD_RESOLUTION, "{NAME}:PACMAN_FIELD_RESOLUTION", PV_MON );
 
 %{
     void swap_values(int* a, int* b) {
@@ -134,6 +138,8 @@ ss gameloop {
     int current_mode = MODE_WAIT;
     double delay_time = 1;
 
+    int target_spawn_point = 0;
+
     int current_direction = DIRECTION_RIGHT;
     int chosen_direction = DIRECTION_RIGHT;
     int inverse_direction = DIRECTION_RIGHT;
@@ -141,12 +147,9 @@ ss gameloop {
 
     bool current_direction_possible = false;
 
-    int origin_tile = -1;
     int target_tile = -1;
     int target_pixel_x = 0;
     int target_pixel_y = 0;
-    int origin_tile_x = 0;
-    int origin_tile_y = 0;
     int target_tile_x = 0;
     int target_tile_y = 0;
 
@@ -155,38 +158,104 @@ ss gameloop {
     state INIT {
         entry {
             pvSetStr(pv_LOGS, "INIT");
-            %% srand((unsigned) time(NULL));
         }
-        when() {
+        // Wait until spawn positions are set to begin
+        when(pv_SPAWN_X0 != 0 && pv_SPAWN_Y0 != 0) {
         } state READY
     }
 
     state READY {
         entry {
             pvSetStr(pv_LOGS, "READY");
-            origin_tile_x = FIELD_WIDTH / 2;
-            origin_tile_y = FIELD_HEIGHT / 2 - 1;
-            origin_tile = get_tile_index_from_tile_coordinates(origin_tile_x, origin_tile_y);
             ghost_size = pv_GHOST_SIZE;
-            pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
-            pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
-        }
-        when(pv_CURRENT_MODE != MODE_WAIT) {
             current_mode = pv_CURRENT_MODE;
             previous_mode = current_mode;
-            ghost_size = pv_GHOST_SIZE;
-            target_tile_x = origin_tile_x;
-            target_tile_y = origin_tile_y - 3;
-            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
-            target_pixel_x = target_tile_x * TILE_SIZE;
-            target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
-            pvSet(pv_GHOST_X, origin_tile_x * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
-            pvSet(pv_GHOST_Y, origin_tile_y * TILE_SIZE + TILE_SIZE / 2 - ghost_size / 2);
             current_direction = DIRECTION_UP;
             chosen_direction = DIRECTION_UP;
-            pvSet(pv_GHOST_DIR, current_direction);
+
+            target_tile_x = FIELD_WIDTH / 2;
+            target_tile_y = FIELD_HEIGHT / 2 - 4;
+            target_tile = get_tile_index_from_tile_coordinates(target_tile_x, target_tile_y);
+            // To begin, they have target pixels that dont align with tiles, so they go out centered
+            target_pixel_x = FIELD_WIDTH * TILE_SIZE / 2;
+            target_pixel_y = target_tile_y * TILE_SIZE + TILE_SIZE / 2;
+            
+            // If the ghost is still somewhere random, put it into the first spawn position and set the second as it's target 
+            if (!((pv_GHOST_X == pv_SPAWN_X0 || pv_GHOST_X == pv_SPAWN_X0) && (pv_GHOST_Y == pv_SPAWN_Y0 || pv_GHOST_Y == pv_SPAWN_Y1))) {
+                pvSet(pv_GHOST_X, pv_SPAWN_X0);
+                pvSet(pv_GHOST_Y, pv_SPAWN_Y0);
+                target_spawn_point = 1;
+            }
+        }
+        when(pv_CURRENT_MODE != MODE_WAIT && pv_SPAWN_X0 == pv_SPAWN_X1 && pv_SPAWN_Y0 == pv_SPAWN_Y1) {
+            // Spawn positions are the same: Ghost is already out of spawn point
+            delay_time = pv_SCATTER_DELAY;
+        } state CHOOSE_DIRECTION
+        when(pv_CURRENT_MODE != MODE_WAIT) {
+            // Ghost is still in spawn point, needs to get to middle first
+        } state MOVE_X_MIDDLE
+        when () {
+        } state MOVE_IN_SPAWN
+    }
+
+    state MOVE_X_MIDDLE {
+        entry {
+            pvSetStr(pv_LOGS, "MOVE_X_MIDDLE");
+        }
+        when (pv_GHOST_X == FIELD_WIDTH * TILE_SIZE / 2 - pv_GHOST_SIZE / 2) {
+            pvSet(pv_GHOST_DIR, DIRECTION_UP);
             delay_time = pv_SCATTER_DELAY;
         } state MOVE_DIRECTION
+        when (delay(pv_SCATTER_DELAY)) {
+            if (pv_GHOST_X < FIELD_WIDTH * TILE_SIZE / 2 - pv_GHOST_SIZE / 2) {
+                pvSet(pv_GHOST_DIR, DIRECTION_RIGHT);
+                pvSet(pv_GHOST_X, pv_GHOST_X + 1);
+            } else if (pv_GHOST_X > FIELD_WIDTH * TILE_SIZE / 2 - pv_GHOST_SIZE / 2) {
+                pvSet(pv_GHOST_DIR, DIRECTION_LEFT);
+                pvSet(pv_GHOST_X, pv_GHOST_X - 1);
+            }
+        } state MOVE_X_MIDDLE
+    }
+
+    state MOVE_IN_SPAWN {
+        entry {
+            pvSetStr(pv_LOGS, "MOVE_IN_SPAWN");
+        }
+        when (target_spawn_point == 0 && pv_GHOST_X == pv_SPAWN_X0 && pv_GHOST_Y == pv_SPAWN_Y0) {
+            target_spawn_point = 1;
+        } state READY
+        when (target_spawn_point == 1 && pv_GHOST_X == pv_SPAWN_X1 && pv_GHOST_Y == pv_SPAWN_Y1) {
+            target_spawn_point = 0;
+        } state READY
+        when (delay(pv_SCATTER_DELAY)) {
+            if (target_spawn_point == 0) {
+                pvSet(pv_GHOST_DIR, DIRECTION_DOWN);
+                if (pv_GHOST_X < pv_SPAWN_X0) {
+                    pvSet(pv_GHOST_X, pv_GHOST_X + 1);
+                } else if (pv_GHOST_X > pv_SPAWN_X0) {
+                    pvSet(pv_GHOST_X, pv_GHOST_X - 1);
+                }
+
+                if (pv_GHOST_Y < pv_SPAWN_Y0) {
+                    pvSet(pv_GHOST_Y, pv_GHOST_Y + 1);
+                } else if (pv_GHOST_Y > pv_SPAWN_Y0) {
+                    pvSet(pv_GHOST_Y, pv_GHOST_Y - 1);
+                }
+            } else if (target_spawn_point == 1) {
+                pvSet(pv_GHOST_DIR, DIRECTION_UP);
+                if (pv_GHOST_X < pv_SPAWN_X1) {
+                    pvSet(pv_GHOST_X, pv_GHOST_X + 1);
+                } else if (pv_GHOST_X > pv_SPAWN_X1) {
+                    pvSet(pv_GHOST_X, pv_GHOST_X - 1);
+                }
+
+                if (pv_GHOST_Y < pv_SPAWN_Y1) {
+                    pvSet(pv_GHOST_Y, pv_GHOST_Y + 1);
+                } else if (pv_GHOST_Y > pv_SPAWN_Y1) {
+                    pvSet(pv_GHOST_Y, pv_GHOST_Y - 1);
+                }
+            }
+        } state MOVE_IN_SPAWN
     }
 
     state CHECK_MODE {
@@ -275,20 +344,23 @@ ss gameloop {
                 right_angle_pacman = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x + 1, target_pixel_y, pv_PACMAN_X + pv_PACMAN_SIZE / 2, pv_PACMAN_Y + pv_PACMAN_SIZE / 2);
                 right_angle_spawn = get_angle_for_coordinates(target_pixel_x, target_pixel_y, target_pixel_x + 1, target_pixel_y, FIELD_WIDTH / 2 * TILE_SIZE, FIELD_HEIGHT / 2 * TILE_SIZE);
                 num_directions_possible += 1;
+            } else {
+                printf("RIGHT NOT VALID\n");
             }
 
             if (current_mode == previous_mode && num_directions_possible > 1) {
                 num_directions_possible -= 1;
-                if (current_direction == DIRECTION_DOWN) {
+                if (current_direction == DIRECTION_DOWN && up_angle_pacman != ANGLE_INVALID) {
                     up_angle_pacman = ANGLE_INVALID;
                     up_angle_spawn = ANGLE_INVALID;
-                } else if (current_direction == DIRECTION_UP) {
+                } else if (current_direction == DIRECTION_UP && down_angle_pacman != ANGLE_INVALID) {
                     down_angle_pacman = ANGLE_INVALID;
                     down_angle_spawn = ANGLE_INVALID;
-                } else if (current_direction == DIRECTION_RIGHT) {
+                } else if (current_direction == DIRECTION_RIGHT && left_angle_pacman != ANGLE_INVALID) {
                     left_angle_pacman = ANGLE_INVALID;
                     left_angle_spawn = ANGLE_INVALID;
-                } else if (current_direction == DIRECTION_LEFT) {
+                } else if (current_direction == DIRECTION_LEFT && right_angle_pacman != ANGLE_INVALID) {
+                    printf("REMOVING RIGHT AS POSSIBLE\n");
                     right_angle_pacman = ANGLE_INVALID;
                     right_angle_spawn = ANGLE_INVALID;
                 } else {
@@ -303,6 +375,7 @@ ss gameloop {
             if (current_mode == MODE_SCATTER) {
                 // pick random from possible direction
                 int rand_dir_counter = random_int_between(0, num_directions_possible - 1);
+                printf("RAND INT: %d MAX: %d\n", rand_dir_counter, num_directions_possible - 1);
                 if (up_angle_pacman != ANGLE_INVALID) {
                     if (rand_dir_counter == 0) {
                         chosen_direction = DIRECTION_UP;
@@ -405,15 +478,15 @@ ss gameloop {
             int current_x = pv_GHOST_X + ghost_size / 2;
             int current_y = pv_GHOST_Y + ghost_size / 2;
             if (current_x < target_pixel_x) {
-                pvSet(pv_GHOST_X, pv_GHOST_X + 1)
+                pvSet(pv_GHOST_X, pv_GHOST_X + 1);
             } else if (current_x > target_pixel_x) {
-                pvSet(pv_GHOST_X, pv_GHOST_X - 1)
+                pvSet(pv_GHOST_X, pv_GHOST_X - 1);
             }
 
             if (current_y < target_pixel_y) {
-                pvSet(pv_GHOST_Y, pv_GHOST_Y + 1)
+                pvSet(pv_GHOST_Y, pv_GHOST_Y + 1);
             } else if (current_y > target_pixel_y) {
-                pvSet(pv_GHOST_Y, pv_GHOST_Y - 1)
+                pvSet(pv_GHOST_Y, pv_GHOST_Y - 1);
             }
             current_direction = chosen_direction;
         } state MOVE_DIRECTION

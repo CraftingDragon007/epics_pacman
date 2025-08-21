@@ -1,10 +1,14 @@
 file pacman_ghost_parameter.template
 { pattern
-  { NAME,	  P,	    DRVH,	DRVL,	VAL	}
-  { GHOSTS, DIR,    3,    0,    0   }
-  { GHOSTS, X,      1000, 0,    0   }
-  { GHOSTS, Y,      1000, 0,    0   }
-  { GHOSTS, SIZE,   1000, 1,    50  }
-  { GHOSTS, FRAME,  10,   0,    0   }
-  { GHOSTS, MODE,   4,    0,    0   }
+  { NAME,	  P,	      DRVH,	DRVL,	VAL	}
+  { GHOSTS, DIR,      3,    0,    0   }
+  { GHOSTS, X,        1000, 0,    0   }
+  { GHOSTS, Y,        1000, 0,    0   }
+  { GHOSTS, SIZE,     1000, 1,    50  }
+  { GHOSTS, FRAME,    10,   0,    0   }
+  { GHOSTS, MODE,     4,    0,    0   }
+  { GHOSTS, SPAWN_X0, 1000, 0,    0,  }
+  { GHOSTS, SPAWN_Y0, 1000, 0,    0,  }
+  { GHOSTS, SPAWN_X1, 1000, 0,    0,  }
+  { GHOSTS, SPAWN_Y1, 1000, 0,    0,  }
 }
