@@ -5781,7 +5781,7 @@
      <string notr="true">B == 3</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_BLINKY__FRAME</string>
+     <string notr="true">$(NAME):GHOSTS_BLINKY_FRAME</string>
     </property>
     <property name="channelB">
      <string notr="true">$(NAME):GHOSTS_BLINKY_MODE</string>
@@ -5880,7 +5880,7 @@
      <string notr="true">B == 3</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_PINKY__FRAME</string>
+     <string notr="true">$(NAME):GHOSTS_PINKY_FRAME</string>
     </property>
     <property name="channelB">
      <string notr="true">$(NAME):GHOSTS_PINKY_MODE</string>
@@ -5979,7 +5979,7 @@
      <string notr="true">B == 3</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_INKY__FRAME</string>
+     <string notr="true">$(NAME):GHOSTS_INKY_FRAME</string>
     </property>
     <property name="channelB">
      <string notr="true">$(NAME):GHOSTS_INKY_MODE</string>
@@ -6078,7 +6078,7 @@
      <string notr="true">B == 3</string>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">$(NAME):GHOSTS_CLYDE__FRAME</string>
+     <string notr="true">$(NAME):GHOSTS_CLYDE_FRAME</string>
     </property>
     <property name="channelB">
      <string notr="true">$(NAME):GHOSTS_CLYDE_MODE</string>
