@@ -14,6 +14,8 @@ option  +r;
 
 PV( int, pv_GAME_STATE_INDICATOR, "{NAME}:GAME_STATE_INDICATOR", PV_MON );
 PV( int, pv_GAME_FRIGHT_MODE, "{NAME}:GAME_FRIGHT_MODE", PV_MON );
+PV( int, pv_GAME_FRIGHT_EXPIRATION_TIMER, "{NAME}:GAME_FRIGHT_EXPIRATION_TIMER", PV_MON );
+PV( int, pv_GAME_FRIGHT_FLASH, "{NAME}:GAME_FRIGHT_FLASH", PV_MON );
 PV( int, pv_GAME_KILLED_GHOSTS_MULTIPLIER, "{NAME}:GAME_KILLED_GHOSTS_MULTIPLIER", PV_MON );
 PV( int, pv_GAME_WIN_CONDITION, "{NAME}:GAME_WIN_CONDITION", PV_MON );
 PV( int, pv_GAME_PACMAN_LIVES, "{NAME}:GAME_PACMAN_LIVES", PV_MON );
@@ -211,6 +213,10 @@ ss game_logic {
             initial_fright = true;
         } state RUN
 
+        when (pv_GAME_FRIGHT_EXPIRATION_TIMER == 0 && pv_GAME_FRIGHT_MODE == 1 && pv_GAME_FRIGHT_FLASH == 0){
+            pvSet(pv_GAME_FRIGHT_FLASH, 1);
+        } state RUN
+
         // check if colliding with blinky
         when (pv_PACMAN_USER_X >= pv_GHOSTS_BLINKY_X - tolerance &&
               pv_PACMAN_USER_X <= pv_GHOSTS_BLINKY_X + tolerance &&
@@ -326,6 +332,7 @@ ss game_logic {
             pvSet(pv_GHOSTS_PINKY_MODE, MODE_FRIGHT);
             pvSet(pv_GHOSTS_INKY_MODE, MODE_FRIGHT);
             pvSet(pv_GHOSTS_CLYDE_MODE, MODE_FRIGHT);
+            pvSet(pv_GAME_FRIGHT_EXPIRATION_TIMER, 1);
         } state RUN
 
         when (){
