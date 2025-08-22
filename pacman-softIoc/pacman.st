@@ -468,6 +468,9 @@ ss pacman_game {
         when (pv_PACMAN_TARGET_VALID == 1 && target_tile_x != -1 && target_tile_y != -1) {
 
         } state MOVE
+        when (pv_PACMAN_USER_DIRECTION == -1){
+            // go to ready state (pacman either died or won the game)
+        } state READY
         when () {
             if (target_tile_x == -1 || target_tile_y == -1) {
                 // If target tile coordinates are not set, initialize them to current tile coordinates
