@@ -64,7 +64,7 @@ for cy, cx, stat in pellet_list:
 
     # Increment virtual coordinates
     virtual_x += 1
-    if virtual_x > 28:  # Example: Pac-Man grid width
+    if virtual_x > 28:
         virtual_x = 1
         virtual_y += 1
 

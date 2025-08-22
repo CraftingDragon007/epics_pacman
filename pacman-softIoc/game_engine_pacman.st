@@ -75,7 +75,7 @@ PV( int, pv_GHOSTS_CLYDE_SPAWN_Y1, "{NAME}:GHOSTS_CLYDE_SPAWN_Y1", PV_MON);
 PV( string, pv_LOGS, "{NAME}:SS_GAME_ENGINE", PV_NONE );
 
 #define PACMAN_GHOST_KILL_REWARD 200
-#define PACMAN_DEATH_ANIMATION_DELAY 0.5
+#define PACMAN_DEATH_ANIMATION_DELAY 0.25
 
 ss game_logic {
     bool initial_fright = true;
