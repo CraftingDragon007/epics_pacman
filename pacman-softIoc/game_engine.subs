@@ -5,6 +5,9 @@ file pacman_game_parameter.template
   { GAME, KILLED, GHOSTS_MULTIPLIER, 100, 0, 1 }
   { GAME, WIN, CONDITION, 244, 0, 244 }
   { GAME, PACMAN, LIVES, 3, -1, 3 }
+  { GAME, PACMAN, LEVEL, 1000, 1, 1 }
+  { GAME, GHOSTS, RUNNING, 1, 0, 0 }
+  { GAME, GHOSTS, SCATTER_COUNT, 10, 0, 0 }
 }
 
 file pacman_binary_records.template

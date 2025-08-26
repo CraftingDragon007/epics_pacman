@@ -1,0 +1,5 @@
+file pacman_fruit.template
+{ pattern
+  { NAME,   VALX, VALY }
+  { PACMAN,  426,  540 }
+}

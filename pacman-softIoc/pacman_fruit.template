@@ -1,0 +1,69 @@
+record(bo, "$(NAME):VIS_FRUIT") {	
+  field(VAL, 0)
+  field(HIGH, 15)
+  field(ZNAM, "HIDDEN")
+  field(ONAM, "VISIBLE")
+}
+
+record(bo, "$(NAME):EAT_FRUIT") {
+  field(VAL, 0)
+  field(HIGH, 2)
+  field(ZNAM, "NORMAL")
+  field(ONAM, "EATEN")
+}
+
+record(ao, "$(NAME):FRUIT_TYPE") {
+  field(VAL, 0)
+  field(DRVH, 1)
+  field(DRVL, 0)
+  field(HOPR, 1)
+  field(LOPR, 0)
+}
+
+record(ao, "$(NAME):FRUIT_X") {	
+  field(VAL, "$(VALX=0)")
+}
+record(ao, "$(NAME):FRUIT_Y") {	
+  field(VAL, "$(VALY=0)")
+}
+
+record(calcout, "$(NAME):CALC_FRUIT_TYPE") {
+  field(INPA, "$(NAME):GAME_PACMAN_LEVEL CPP")
+  field(CALC, "A%2==0?1:0")
+  field(OUT, "$(NAME):FRUIT_TYPE PP")
+  field(OOPT, "Every Time")
+}
+
+record(calcout, "$(NAME):CALC_EAT_FRUIT") {	
+  field(INPA, "$(NAME):PACMAN_USER_X CPP")
+  field(INPB, "$(NAME):PACMAN_USER_Y CPP")
+  field(INPC, "$(NAME):FRUIT_X")
+  field(INPD, "$(NAME):FRUIT_Y")
+  field(INPE, "$(NAME):VIS_FRUIT")
+  field(CALC, "(A-3<C)&&(A+30>C)&&(B<D+3)&&(B>D-30)&&(E==1)?0:1")
+  field(OUT, "$(NAME):EAT_FRUIT PP")
+  field(OOPT, "Transition To Non-zero")
+}
+
+record(calcout, "$(NAME):CALC_FRUIT_VISIBILITY") {
+  field(INPA, "$(NAME):GAME_WIN_CONDITION CPP")
+  field(CALC, "((A==174)||(A==74))?1:0")
+  field(OUT, "$(NAME):VIS_FRUIT PP")
+  field(OOPT, "Transition To Non-zero")
+}
+
+record(calcout, "$(NAME):CALC_HIDE_EATEN"){
+  field(INPA, "$(NAME):EAT_FRUIT CPP")
+  field(CALC, "A==1?0:1")
+  field(OUT, "$(NAME):VIS_FRUIT PP")
+  field(OOPT, "Transition To Zero")
+}
+
+record(calcout, "$(NAME):CALC_SCORE_FRUIT") {
+  field(INPA, "$(NAME):EAT_FRUIT CPP")
+  field(INPB, "$(NAME):PACMAN_USER_SCORE")
+  field(INPC, "$(NAME):GAME_PACMAN_LEVEL")
+  field(CALC, "A==1?((C==1)?(B+100):(B+200*C)):0")
+  field(OUT, "$(NAME):PACMAN_USER_SCORE PP")
+  field(OOPT, "Transition To Non-zero")
+}

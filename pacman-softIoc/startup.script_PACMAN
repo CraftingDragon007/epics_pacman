@@ -23,6 +23,8 @@ dbLoadTemplate("pacman_food.subs", "SYSTEM=PACMAN");
 
 dbLoadTemplate("game_engine.subs", "SYSTEM=PACMAN");
 
+dbLoadTemplate("pacman_fruit.subs", "SYSTEM=PACMAN");
+
 dbLoadTemplate("ghosts_common.subs", "SYSTEM=PACMAN,GHOST=COMMON");
 
 dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=BLINKY");
@@ -33,3 +35,4 @@ dbLoadTemplate("ghosts_individual.subs", "SYSTEM=PACMAN,GHOST=CLYDE");
 dbLoadRecords("pacman.db", "NAME=PACMAN,SS=PACMAN");
 dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GHOSTS");
 dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GAME_ENGINE")
+dbLoadRecords("pacman.db", "NAME=PACMAN,SS=GHOST_MODES")

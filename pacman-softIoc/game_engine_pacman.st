@@ -19,6 +19,10 @@ PV( int, pv_GAME_FRIGHT_FLASH, "{NAME}:GAME_FRIGHT_FLASH", PV_MON );
 PV( int, pv_GAME_KILLED_GHOSTS_MULTIPLIER, "{NAME}:GAME_KILLED_GHOSTS_MULTIPLIER", PV_MON );
 PV( int, pv_GAME_WIN_CONDITION, "{NAME}:GAME_WIN_CONDITION", PV_MON );
 PV( int, pv_GAME_PACMAN_LIVES, "{NAME}:GAME_PACMAN_LIVES", PV_MON );
+PV( int, pv_GAME_PACMAN_LEVEL, "{NAME}:GAME_PACMAN_LEVEL", PV_MON );
+
+PV( int, pv_GAME_GHOSTS_RUNNING, "{NAME}:GAME_GHOSTS_RUNNING", PV_MON );
+PV( int, pv_GAME_GHOSTS_SCATTER_COUNT, "{NAME}:GAME_GHOSTS_SCATTER_COUNT", PV_MON );
 
 PV( int, pv_GAME_GHOSTS_INKY_RELEASE, "{NAME}:GAME_GHOSTS_INKY_RELEASE", PV_MON );
 PV( int, pv_GAME_GHOSTS_CLYDE_RELEASE, "{NAME}:GAME_GHOSTS_CLYDE_RELEASE", PV_MON );
@@ -27,6 +31,8 @@ PV( int, pv_GAME_GHOSTS_BLINKY_RESPAWN, "{NAME}:GAME_GHOSTS_BLINKY_RESPAWN", PV_
 PV( int, pv_GAME_GHOSTS_PINKY_RESPAWN, "{NAME}:GAME_GHOSTS_PINKY_RESPAWN", PV_MON );
 PV( int, pv_GAME_GHOSTS_INKY_RESPAWN, "{NAME}:GAME_GHOSTS_INKY_RESPAWN", PV_MON );
 PV( int, pv_GAME_GHOSTS_CLYDE_RESPAWN, "{NAME}:GAME_GHOSTS_CLYDE_RESPAWN", PV_MON );
+
+PV( int, pv_VIS_FRUIT, "{NAME}:VIS_FRUIT", PV_MON );
 
 PV( int, pv_PACMAN_RESET_FOOD, "{NAME}:PACMAN_RESET_FOOD", PV_MON );
 PV( int, pv_PACMAN_USER_SCORE, "{NAME}:PACMAN_USER_SCORE", PV_MON );
@@ -79,6 +85,7 @@ PV( int, pv_GHOSTS_CLYDE_SPAWN_X1, "{NAME}:GHOSTS_CLYDE_SPAWN_X1", PV_MON);
 PV( int, pv_GHOSTS_CLYDE_SPAWN_Y1, "{NAME}:GHOSTS_CLYDE_SPAWN_Y1", PV_MON);
 
 PV( string, pv_LOGS, "{NAME}:SS_GAME_ENGINE", PV_NONE );
+PV( string, pv_GHOST_MODES, "{NAME}:SS_GHOST_MODES", PV_MON );
 
 #define PACMAN_GHOST_KILL_REWARD 200
 #define PACMAN_DEATH_ANIMATION_DELAY 0.25
@@ -99,6 +106,11 @@ ss game_logic {
             %% srand((unsigned) time(NULL));
             pvSet(pv_PACMAN_USER_DIRECTION, INVALID_DIRECTION);
             pvSet(pv_PACMAN_TRY_DIRECTION, INVALID_DIRECTION);
+
+            pvSet(pv_VIS_FRUIT, 0);
+
+            pvSet(pv_GAME_GHOSTS_RUNNING, 0);
+            pvSet(pv_GAME_GHOSTS_SCATTER_COUNT, 0);
 
             // Define spawn positions for the ghosts:
             // Blinky: Spawns outside the box, not moving around
@@ -127,8 +139,9 @@ ss game_logic {
         }
 
         when (pv_PACMAN_USER_DIRECTION != INVALID_DIRECTION && pv_PACMAN_TRY_DIRECTION != INVALID_DIRECTION){
-            if (pv_GAME_PACMAN_LIVES <= 0){
+            if (pv_GAME_PACMAN_LIVES < 0){
                 pvSet(pv_PACMAN_USER_SCORE, 0);
+                pvSet(pv_GAME_PACMAN_LEVEL, 1);
 
                 pvSet(pv_GHOSTS_COMMON_SCATTER_DELAY, GHOSTS_DEFAULT_SCATTER_DELAY);
                 pvSet(pv_GHOSTS_COMMON_CHASE_DELAY, GHOSTS_DEFAULT_CHASE_DELAY);
@@ -152,6 +165,7 @@ ss game_logic {
             pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
             pvSet(pv_GAME_GHOSTS_INKY_RELEASE, 1);
             pvSet(pv_GAME_STATE_INDICATOR, 1);
+            pvSet(pv_GAME_GHOSTS_RUNNING, 1);
             if (pv_GAME_WIN_CONDITION <= 0){ 
                 pvSet(pv_GAME_WIN_CONDITION, WIN_CONDITION);
             } else {
@@ -192,10 +206,12 @@ ss game_logic {
         } state RUN
 
         when (pv_GAME_FRIGHT_MODE == 1 && initial_fright == true){
+            pvSet(pv_GAME_GHOSTS_RUNNING, 0);
             initial_fright = false;
         } state FRIGHTENED
 
         when (pv_GAME_FRIGHT_MODE == 0 && initial_fright == false){
+            pvSet(pv_GAME_GHOSTS_RUNNING, 1);
             if (pv_GHOSTS_BLINKY_MODE == MODE_FRIGHT) {
                 pvSet(pv_GHOSTS_BLINKY_MODE, MODE_SCATTER);
             }
@@ -344,6 +360,8 @@ ss game_logic {
         entry {
             pvSetStr(pv_LOGS, "PACMAN_DEATH");
 
+            pvSet(pv_GAME_GHOSTS_RUNNING, 0);
+
             pvSet(pv_PACMAN_PACMAN_ABORT, 1);
             pvSet(pv_GHOSTS_BLINKY_MODE, MODE_WAIT);
             pvSet(pv_GHOSTS_PINKY_MODE, MODE_WAIT);
@@ -385,6 +403,22 @@ ss game_logic {
         entry {
             pvSetStr(pv_LOGS, "RESET");
         }
+
+        when (pv_GAME_WIN_CONDITION <= 0){
+            
+            pvSet(pv_GHOSTS_BLINKY_MODE, MODE_WAIT);
+            pvSet(pv_GHOSTS_PINKY_MODE, MODE_WAIT);
+            pvSet(pv_GHOSTS_INKY_MODE, MODE_WAIT);
+            pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
+            pvSet(pv_PACMAN_RESET_FOOD, 1);
+
+            pvSet(pv_GHOSTS_COMMON_CHASE_DELAY, pv_GHOSTS_COMMON_CHASE_DELAY - pv_GHOSTS_COMMON_CHASE_DELAY * 0.10);
+            pvSet(pv_GHOSTS_COMMON_SCATTER_DELAY, pv_GHOSTS_COMMON_SCATTER_DELAY - pv_GHOSTS_COMMON_SCATTER_DELAY * 0.10);
+            pvSet(pv_GHOSTS_COMMON_FRIGHT_DELAY, pv_GHOSTS_COMMON_FRIGHT_DELAY - pv_GHOSTS_COMMON_FRIGHT_DELAY * 0.10);
+        
+            pvSet(pv_GAME_PACMAN_LEVEL, pv_GAME_PACMAN_LEVEL + 1);
+            
+        } state INIT
     
         when (pv_GAME_PACMAN_LIVES == 0){
             pvSet(pv_GAME_WIN_CONDITION, WIN_CONDITION);
@@ -393,17 +427,102 @@ ss game_logic {
         } state INIT
 
         when (){
-            if(pv_GAME_WIN_CONDITION <= 0){
-                pvSet(pv_GHOSTS_BLINKY_MODE, MODE_WAIT);
-                pvSet(pv_GHOSTS_PINKY_MODE, MODE_WAIT);
-                pvSet(pv_GHOSTS_INKY_MODE, MODE_WAIT);
-                pvSet(pv_GHOSTS_CLYDE_MODE, MODE_WAIT);
-                pvSet(pv_PACMAN_RESET_FOOD, 1);
-                
-                pvSet(pv_GHOSTS_COMMON_CHASE_DELAY, pv_GHOSTS_COMMON_CHASE_DELAY - pv_GHOSTS_COMMON_CHASE_DELAY * 0.10);
-                pvSet(pv_GHOSTS_COMMON_SCATTER_DELAY, pv_GHOSTS_COMMON_SCATTER_DELAY - pv_GHOSTS_COMMON_SCATTER_DELAY * 0.10);
-                pvSet(pv_GHOSTS_COMMON_FRIGHT_DELAY, pv_GHOSTS_COMMON_FRIGHT_DELAY - pv_GHOSTS_COMMON_FRIGHT_DELAY * 0.10);
-            }
+
         } state INIT
     }
+}
+
+ss ghost_modes {
+    
+    state INIT {
+        entry {
+            pvSetStr(pv_GHOST_MODES, "INIT");
+        }
+
+        when (pv_GAME_GHOSTS_RUNNING == 1) {
+
+        } state SCATTER
+
+        when () {
+
+        } state WAIT_FOR_START
+    }
+
+    state SCATTER {
+        entry {
+            pvSetStr(pv_GHOST_MODES, "SCATTER");
+            pvSet(pv_GAME_GHOSTS_SCATTER_COUNT, pv_GAME_GHOSTS_SCATTER_COUNT + 1);
+            if (pv_GAME_GHOSTS_SCATTER_COUNT > 5){
+                pvSet(pv_GAME_GHOSTS_SCATTER_COUNT, 5);
+            }
+            if (pv_GAME_GHOSTS_SCATTER_COUNT < 5){
+                if (pv_GHOSTS_BLINKY_MODE == MODE_CHASE) {
+                    pvSet(pv_GHOSTS_BLINKY_MODE, MODE_SCATTER);
+                }
+                if (pv_GHOSTS_PINKY_MODE == MODE_CHASE) {
+                    pvSet(pv_GHOSTS_PINKY_MODE, MODE_SCATTER);
+                }
+                if (pv_GHOSTS_INKY_MODE == MODE_CHASE) {
+                    pvSet(pv_GHOSTS_INKY_MODE, MODE_SCATTER);
+                }
+                if (pv_GHOSTS_CLYDE_MODE == MODE_CHASE) {
+                    pvSet(pv_GHOSTS_CLYDE_MODE, MODE_SCATTER);
+                }
+            }
+        }
+
+        when (pv_GAME_GHOSTS_SCATTER_COUNT >= 5){
+
+        } state CHASE
+
+        when (pv_GAME_GHOSTS_RUNNING == 1 && delay(7)) {
+            
+        } state CHASE
+
+        when (pv_GAME_GHOSTS_RUNNING == 0){
+
+        } state WAIT_FOR_START
+    }
+
+    state CHASE {
+        entry {
+            pvSetStr(pv_GHOST_MODES, "CHASE");
+            if (pv_GHOSTS_BLINKY_MODE == MODE_SCATTER) {
+                pvSet(pv_GHOSTS_BLINKY_MODE, MODE_CHASE);
+            }
+            if (pv_GHOSTS_PINKY_MODE == MODE_SCATTER) {
+                pvSet(pv_GHOSTS_PINKY_MODE, MODE_CHASE);
+            }
+            if (pv_GHOSTS_INKY_MODE == MODE_SCATTER) {
+                pvSet(pv_GHOSTS_INKY_MODE, MODE_CHASE);
+            }
+            if (pv_GHOSTS_CLYDE_MODE == MODE_SCATTER) {
+                pvSet(pv_GHOSTS_CLYDE_MODE, MODE_CHASE);
+            }
+        }
+
+        when (pv_GAME_GHOSTS_RUNNING == 1 && delay(20)) {
+
+        } state SCATTER
+
+        when (pv_GAME_GHOSTS_RUNNING == 0){
+
+        } state WAIT_FOR_START
+    }
+
+    state WAIT_FOR_START {
+        entry {
+            pvSetStr(pv_GHOST_MODES, "WAIT_FOR_START");
+        }
+
+        when (pv_GAME_GHOSTS_RUNNING == 1) {
+
+        } state SCATTER
+
+        when (){
+
+        } state WAIT_FOR_START
+
+    }
+
 }

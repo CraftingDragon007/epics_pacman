@@ -1383,6 +1383,55 @@
       </property>
      </widget>
     </widget>
+    <widget class="caImage" name="caimage_24">
+     <property name="geometry">
+      <rect>
+       <x>426</x>
+       <y>540</y>
+       <width>50</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="filename" stdset="0">
+      <string notr="true">fruits.gif</string>
+     </property>
+     <property name="imageCalc">
+      <string notr="true">B+1</string>
+     </property>
+     <property name="frame">
+      <number>1</number>
+     </property>
+     <property name="visibility">
+      <enum>caImage::Visibility::Calc</enum>
+     </property>
+     <property name="visibilityCalc">
+      <string notr="true">A==1</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(NAME):VIS_FRUIT</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">$(NAME):FRUIT_TYPE</string>
+     </property>
+    </widget>
+    <zorder>caimage</zorder>
+    <zorder>cainclude</zorder>
+    <zorder>caframe_3</zorder>
+    <zorder>caframe_2</zorder>
+    <zorder>caimage_24</zorder>
+    <zorder>caimage_17</zorder>
+    <zorder>caimage_14</zorder>
+    <zorder>caimage_11</zorder>
+    <zorder>caimage_8</zorder>
+    <zorder>caimage_5</zorder>
+    <zorder>caimage_10</zorder>
+    <zorder>caimage_13</zorder>
+    <zorder>caimage_16</zorder>
+    <zorder>caimage_15</zorder>
+    <zorder>caimage_12</zorder>
+    <zorder>caimage_9</zorder>
+    <zorder>caimage_7</zorder>
+    <zorder>caimage_4</zorder>
    </widget>
    <widget class="caImage" name="caimage_2">
     <property name="geometry">
