@@ -1517,11 +1517,11 @@
       <height>22</height>
      </rect>
     </property>
-    <property name="shortcut" stdset="0">
-     <string>Up</string>
-    </property>
-    <property name="channel">
+    <property name="outputA">
      <string>$(NAME):PACMAN_TRY_DIRECTION_UP</string>
+    </property>
+    <property name="shortcut">
+     <string>Up</string>
     </property>
     <property name="valueOrCalc" stdset="0">
      <string>1</string>
@@ -1539,11 +1539,11 @@
       <height>22</height>
      </rect>
     </property>
-    <property name="shortcut" stdset="0">
-     <string>Right</string>
-    </property>
-    <property name="channel">
+    <property name="outputA">
      <string>$(NAME):PACMAN_TRY_DIRECTION_RIGHT</string>
+    </property>
+    <property name="shortcut">
+     <string>Right</string>
     </property>
     <property name="valueOrCalc" stdset="0">
      <string>1</string>
@@ -1561,11 +1561,11 @@
       <height>22</height>
      </rect>
     </property>
-    <property name="shortcut" stdset="0">
-     <string>Down</string>
-    </property>
-    <property name="channel">
+    <property name="outputA">
      <string>$(NAME):PACMAN_TRY_DIRECTION_DOWN</string>
+    </property>
+    <property name="shortcut">
+     <string>Down</string>
     </property>
     <property name="valueOrCalc" stdset="0">
      <string>1</string>
@@ -1583,11 +1583,11 @@
       <height>22</height>
      </rect>
     </property>
-    <property name="shortcut" stdset="0">
-     <string>Left</string>
-    </property>
-    <property name="channel">
+    <property name="outputA">
      <string>$(NAME):PACMAN_TRY_DIRECTION_LEFT</string>
+    </property>
+    <property name="shortcut">
+     <string>Left</string>
     </property>
     <property name="valueOrCalc" stdset="0">
      <string>1</string>
