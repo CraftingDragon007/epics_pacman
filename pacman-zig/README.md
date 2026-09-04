@@ -16,9 +16,12 @@ the package's matching debug source. This is necessary because the distro does
 not ship that registrar in a linkable library. Only one IOC using the `PACMAN`
 prefix and CA server port may run at a time.
 
-The new controller currently provides Pac-Man input/movement and a basic
-ghost chase loop using direct local EPICS database reads/writes. The map is a
-bounded default waveform and may be overwritten through
-`PACMAN:PACMAN_PLAY_FIELD`; porting the legacy maze literal, full ghost path
-selection, PNG waveform handling, food, fruit, and game-engine state machine
-remains follow-up work.
+The controller provides Pac-Man input/movement and a modular, tile-based ghost
+AI using direct local EPICS database reads/writes. Blinky, Pinky, Inky, and
+Clyde have distinct classic-inspired targets, with house release,
+scatter/chase cycles, frightened movement, return-home routing, portals, and
+directional animation. The canonical maze is published to
+`PACMAN:PACMAN_PLAY_FIELD` on startup.
+
+PNG waveform handling, food/fruit presentation, collision/life handling, and
+level-specific arcade timing remain follow-up work.

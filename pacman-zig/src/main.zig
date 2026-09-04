@@ -1,5 +1,8 @@
 const std = @import("std");
 const maze = @import("maze.zig");
+const game = @import("game_types.zig");
+const ghost_controller = @import("ghost.zig");
+const game_modes = @import("game_modes.zig");
 
 const c = @cImport({
     @cInclude("dbAccess.h");
@@ -18,17 +21,16 @@ const height = maze.height;
 const tiles = maze.tiles;
 const invalid_direction: i32 = -1;
 const pre_turn_window_pixels: i32 = 48;
-const Direction = enum(i32) { right = 0, left = 1, up = 2, down = 3 };
-const GhostMode = enum(i32) { wait = 0, scatter = 1, chase = 2, fright = 3, spawn = 4 };
+const Direction = game.Direction;
 
 const Pv = struct {
     prefix: []const u8,
 
-    fn name(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) ![:0]u8 {
+    pub fn name(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) ![:0]u8 {
         return std.fmt.allocPrintSentinel(allocator, "{s}:{s}", .{ self.prefix, suffix }, 0);
     }
 
-    fn addr(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !c.dbAddr {
+    pub fn addr(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !c.dbAddr {
         const pv_name = try self.name(allocator, suffix);
         defer allocator.free(pv_name);
         var result: c.dbAddr = undefined;
@@ -36,7 +38,7 @@ const Pv = struct {
         return result;
     }
 
-    fn getLong(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !i32 {
+    pub fn getLong(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !i32 {
         var address = try self.addr(allocator, suffix);
         var value: i32 = 0;
         var options: c_long = 0;
@@ -45,12 +47,12 @@ const Pv = struct {
         return value;
     }
 
-    fn putLong(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, value: i32) !void {
+    pub fn putLong(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, value: i32) !void {
         var address = try self.addr(allocator, suffix);
         if (c.dbPutField(&address, c.DBR_LONG, &value, 1) != 0) return error.EpicsWrite;
     }
 
-    fn getDouble(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !f64 {
+    pub fn getDouble(self: Pv, allocator: std.mem.Allocator, suffix: []const u8) !f64 {
         var address = try self.addr(allocator, suffix);
         var value: f64 = 0;
         var options: c_long = 0;
@@ -59,7 +61,7 @@ const Pv = struct {
         return value;
     }
 
-    fn putString(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, value: []const u8) !void {
+    pub fn putString(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, value: []const u8) !void {
         var address = try self.addr(allocator, suffix);
         var buffer: [40]u8 = [_]u8{0} ** 40;
         const n = @min(value.len, buffer.len - 1);
@@ -67,7 +69,7 @@ const Pv = struct {
         if (c.dbPutField(&address, c.DBR_STRING, &buffer, 1) != 0) return error.EpicsWrite;
     }
 
-    fn putShortArray(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, values: []const i16) !void {
+    pub fn putShortArray(self: Pv, allocator: std.mem.Allocator, suffix: []const u8, values: []const i16) !void {
         var address = try self.addr(allocator, suffix);
         if (c.dbPutField(&address, c.DBR_SHORT, values.ptr, @intCast(values.len)) != 0) return error.EpicsWrite;
     }
@@ -290,26 +292,6 @@ const Pacman = struct {
     }
 };
 
-const Ghost = struct {
-    label: []const u8,
-    x: i32 = 0, y: i32 = 0, dir: i32 = 0, next_ms: i64 = 0,
-    fn tick(self: *Ghost, pv: Pv, allocator: std.mem.Allocator, now_ms: i64) !void {
-        var suffix: [48]u8 = undefined;
-        const mode_name = try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_MODE", .{self.label});
-        const mode = try pv.getLong(allocator, mode_name);
-        if (mode == @intFromEnum(GhostMode.wait) or now_ms < self.next_ms) return;
-        const delay = switch (mode) { @intFromEnum(GhostMode.fright) => try pv.getDouble(allocator, "GHOSTS_COMMON_FRIGHT_DELAY"), @intFromEnum(GhostMode.spawn) => try pv.getDouble(allocator, "GHOSTS_COMMON_SPAWN_DELAY"), else => try pv.getDouble(allocator, "GHOSTS_COMMON_CHASE_DELAY") };
-        self.next_ms = now_ms + @as(i64, @intFromFloat(@max(delay, 0.001) * 1000));
-        const px = try pv.getLong(allocator, "PACMAN_USER_X");
-        const py = try pv.getLong(allocator, "PACMAN_USER_Y");
-        if (self.x == 0 and self.y == 0) { self.x = try pv.getLong(allocator, try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_X", .{self.label})); self.y = try pv.getLong(allocator, try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_Y", .{self.label})); }
-        if (self.x < px) { self.x += 1; self.dir = 0; } else if (self.x > px) { self.x -= 1; self.dir = 1; } else if (self.y < py) { self.y += 1; self.dir = 3; } else if (self.y > py) { self.y -= 1; self.dir = 2; }
-        try pv.putLong(allocator, try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_X", .{self.label}), self.x);
-        try pv.putLong(allocator, try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_Y", .{self.label}), self.y);
-        try pv.putLong(allocator, try std.fmt.bufPrint(&suffix, "GHOSTS_{s}_DIR", .{self.label}), self.dir);
-    }
-};
-
 fn checked(status: c_int, what: []const u8) !void { if (status != 0) { std.log.err("EPICS failed while {s}: {d}", .{ what, status }); return error.EpicsSetup; } }
 
 fn loadDatabase(allocator: std.mem.Allocator, epics_base: []const u8, db_dir: []const u8, prefix: []const u8) !void {
@@ -346,11 +328,14 @@ pub fn main() !void {
     var map = maze.cells;
     try pv.putShortArray(allocator, "PACMAN_PLAY_FIELD", &map);
     var pacman = Pacman{}; try pacman.reset(pv, allocator);
-    var ghosts = [_]Ghost{ .{ .label = "BLINKY" }, .{ .label = "PINKY" }, .{ .label = "INKY" }, .{ .label = "CLYDE" } };
-    try pv.putString(allocator, "SS_GAME_ENGINE", "INIT"); try pv.putString(allocator, "SS_GHOSTS", "READY"); try pv.putString(allocator, "SS_GHOST_MODES", "WAIT_FOR_START");
+    var ghosts = [_]ghost_controller.Ghost{ .init(.blinky), .init(.pinky), .init(.inky), .init(.clyde) };
+    var modes = game_modes.Controller{};
+    try modes.init(pv, allocator);
+    try pv.putString(allocator, "SS_GAME_ENGINE", "INIT"); try pv.putString(allocator, "SS_GHOSTS", "READY");
     var now_ms: i64 = 0;
     while (true) {
         try pacman.tick(pv, allocator, &map, now_ms);
+        try modes.tick(pv, allocator, now_ms);
         for (&ghosts) |*ghost| try ghost.tick(pv, allocator, now_ms);
         c.epicsThreadSleep(0.001);
         now_ms += 1;
