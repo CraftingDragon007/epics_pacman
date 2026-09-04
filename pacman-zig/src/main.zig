@@ -1,4 +1,5 @@
 const std = @import("std");
+const maze = @import("maze.zig");
 
 const c = @cImport({
     @cInclude("dbAccess.h");
@@ -12,10 +13,11 @@ const c = @cImport({
 
 extern fn softIoc_registerRecordDeviceDriver(base: ?*c.dbBase) c_int;
 
-const width = 28;
-const height = 31;
-const tiles = width * height;
+const width = maze.width;
+const height = maze.height;
+const tiles = maze.tiles;
 const invalid_direction: i32 = -1;
+const pre_turn_window_pixels: i32 = 48;
 const Direction = enum(i32) { right = 0, left = 1, up = 2, down = 3 };
 const GhostMode = enum(i32) { wait = 0, scatter = 1, chase = 2, fright = 3, spawn = 4 };
 
@@ -80,6 +82,7 @@ const Pacman = struct {
     target_x: i32 = -1,
     target_y: i32 = -1,
     next_move_ms: i64 = 0,
+    pending_direction: i32 = invalid_direction,
 
     fn tileAt(x: i32, y: i32) usize { return @intCast(y * width + x); }
 
@@ -95,7 +98,8 @@ const Pacman = struct {
     }
 
     fn walkable(map: []const i16, x: i32, y: i32) bool {
-        return x >= 0 and x < width and y >= 0 and y < height and map[tileAt(x, y)] == 0;
+        return x >= 0 and x < width and y >= 0 and y < height and
+            (map[tileAt(x, y)] == 0 or maze.isPortal(x, y));
     }
 
     fn chooseTarget(self: *Pacman, map: []const i16, dir: i32) void {
@@ -115,24 +119,150 @@ const Pacman = struct {
         self.target_y = ty;
     }
 
+    fn abs(value: i32) i32 {
+        return if (value < 0) -value else value;
+    }
+
+    /// Match the SNL turn rule: a buffered input takes effect when Pac-Man is
+    /// within two pixels of a crossing's centre line and the neighbouring tile
+    /// is a path/portal. The buffer survives earlier invalid positions.
+    fn canTurn(self: *Pacman, map: []const i16, dir: i32) bool {
+        const center_x = self.x + 25;
+        const center_y = self.y + 25;
+        const tile_x: i32 = @divTrunc(center_x, 32);
+        const tile_y: i32 = @divTrunc(center_y, 32);
+        const aligned_x = abs(center_x - (tile_x * 32 + 16)) <= 2;
+        const aligned_y = abs(center_y - (tile_y * 32 + 16)) <= 2;
+        return switch (dir) {
+            @intFromEnum(Direction.left) => aligned_y and walkable(map, tile_x - 1, tile_y),
+            @intFromEnum(Direction.right) => aligned_y and walkable(map, tile_x + 1, tile_y),
+            @intFromEnum(Direction.up) => aligned_x and walkable(map, tile_x, tile_y - 1),
+            @intFromEnum(Direction.down) => aligned_x and walkable(map, tile_x, tile_y + 1),
+            else => false,
+        };
+    }
+
+    fn snapForTurn(self: *Pacman, dir: i32) void {
+        const center_x = self.x + 25;
+        const center_y = self.y + 25;
+        const tile_x: i32 = @divTrunc(center_x, 32);
+        const tile_y: i32 = @divTrunc(center_y, 32);
+        if (dir == @intFromEnum(Direction.left) or dir == @intFromEnum(Direction.right)) {
+            self.y = tile_y * 32 + 16 - 25;
+        } else {
+            self.x = tile_x * 32 + 16 - 25;
+        }
+    }
+
+    fn directionDelta(dir: i32) struct { x: i32, y: i32 } {
+        return switch (dir) {
+            @intFromEnum(Direction.left) => .{ .x = -1, .y = 0 },
+            @intFromEnum(Direction.right) => .{ .x = 1, .y = 0 },
+            @intFromEnum(Direction.up) => .{ .x = 0, .y = -1 },
+            @intFromEnum(Direction.down) => .{ .x = 0, .y = 1 },
+            else => .{ .x = 0, .y = 0 },
+        };
+    }
+
+    fn turnAvailableAt(map: []const i16, tile_x: i32, tile_y: i32, turn: i32) bool {
+        const delta = directionDelta(turn);
+        return walkable(map, tile_x + delta.x, tile_y + delta.y);
+    }
+
+    /// A pre-turn can be queued only while approaching an opening within a
+    /// bounded 48-pixel window (about one and a half tiles).
+    /// the next intersection. This keeps controls responsive without allowing
+    /// a turn requested far down a corridor to take effect much later.
+    fn canScheduleTurn(self: *Pacman, map: []const i16, turn: i32) bool {
+        if (self.canTurn(map, turn)) return true;
+        if (self.direction == invalid_direction or turn == self.direction) return false;
+
+        const center_x = self.x + 25;
+        const center_y = self.y + 25;
+        const tile_x: i32 = @divTrunc(center_x, 32);
+        const tile_y: i32 = @divTrunc(center_y, 32);
+        const moving = directionDelta(self.direction);
+        // Around a tile boundary, the crossing may be represented either by
+        // the current tile or the immediately following one. Check both so
+        // the queueing window is continuous.
+        for ([_]struct { x: i32, y: i32 }{
+            .{ .x = tile_x, .y = tile_y },
+            .{ .x = tile_x + moving.x, .y = tile_y + moving.y },
+        }) |candidate| {
+            if (!turnAvailableAt(map, candidate.x, candidate.y, turn)) continue;
+            const distance_to_center = if (moving.x == 1)
+                (candidate.x * 32 + 16) - center_x
+            else if (moving.x == -1)
+                center_x - (candidate.x * 32 + 16)
+            else if (moving.y == 1)
+                (candidate.y * 32 + 16) - center_y
+            else
+                center_y - (candidate.y * 32 + 16);
+            if (distance_to_center >= 0 and distance_to_center <= pre_turn_window_pixels) return true;
+        }
+        return false;
+    }
+
+    fn clearAcceptedButton(pv: Pv, allocator: std.mem.Allocator, dir: i32) !void {
+        const suffix = switch (dir) {
+            @intFromEnum(Direction.left) => "PACMAN_TRY_DIRECTION_LEFT",
+            @intFromEnum(Direction.right) => "PACMAN_TRY_DIRECTION_RIGHT",
+            @intFromEnum(Direction.up) => "PACMAN_TRY_DIRECTION_UP",
+            @intFromEnum(Direction.down) => "PACMAN_TRY_DIRECTION_DOWN",
+            else => return,
+        };
+        try pv.putLong(allocator, suffix, 0);
+    }
+
     fn tick(self: *Pacman, pv: Pv, allocator: std.mem.Allocator, map: []const i16, now_ms: i64) !void {
         const abort = try pv.getLong(allocator, "PACMAN_PACMAN_ABORT");
         if (abort != 0) { self.state = .aborted; try pv.putString(allocator, "SS_PACMAN", "USER_ABORT"); return; }
         if (self.state == .aborted) return self.reset(pv, allocator);
 
-        var requested = try pv.getLong(allocator, "PACMAN_TRY_DIRECTION");
-        inline for ([_]struct { suffix: []const u8, dir: i32 }{
-            .{ .suffix = "PACMAN_TRY_DIRECTION_LEFT", .dir = 1 }, .{ .suffix = "PACMAN_TRY_DIRECTION_RIGHT", .dir = 0 },
-            .{ .suffix = "PACMAN_TRY_DIRECTION_UP", .dir = 2 }, .{ .suffix = "PACMAN_TRY_DIRECTION_DOWN", .dir = 3 },
-        }) |input| if (try pv.getLong(allocator, input.suffix) != 0) { requested = input.dir; try pv.putLong(allocator, input.suffix, 0); };
-        if (requested != invalid_direction and requested != self.direction) {
-            self.direction = requested;
-            self.chooseTarget(map, requested);
-            try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", requested);
-            try pv.putLong(allocator, "PACMAN_USER_DIRECTION", requested);
-            try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 0);
-            try pv.putString(allocator, "SS_PACMAN", "MOVE");
-            self.state = .moving;
+        // Preserve the original priority, but only latch a request while it
+        // is close enough to the next opening to be a genuine pre-turn.
+        var requested = invalid_direction;
+        if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_LEFT") != 0) {
+            requested = @intFromEnum(Direction.left);
+        } else if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_RIGHT") != 0) {
+            requested = @intFromEnum(Direction.right);
+        } else if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_UP") != 0) {
+            requested = @intFromEnum(Direction.up);
+        } else if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_DOWN") != 0) {
+            requested = @intFromEnum(Direction.down);
+        } else {
+            const direct_request = try pv.getLong(allocator, "PACMAN_TRY_DIRECTION");
+            if (direct_request != invalid_direction and direct_request != self.direction) requested = direct_request;
+        }
+        if (self.pending_direction == invalid_direction and requested != invalid_direction) {
+            if (self.canScheduleTurn(map, requested)) {
+                self.pending_direction = requested;
+            } else {
+                // Too early or into a wall: discard the command immediately.
+                try clearAcceptedButton(pv, allocator, requested);
+                try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", self.direction);
+            }
+        }
+
+        if (self.pending_direction != invalid_direction) {
+            if (self.canTurn(map, self.pending_direction)) {
+                self.snapForTurn(self.pending_direction);
+                self.direction = self.pending_direction;
+                self.chooseTarget(map, self.pending_direction);
+                try pv.putLong(allocator, "PACMAN_USER_X", self.x);
+                try pv.putLong(allocator, "PACMAN_USER_Y", self.y);
+                try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", self.pending_direction);
+                try pv.putLong(allocator, "PACMAN_USER_DIRECTION", self.pending_direction);
+                try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 0);
+                try pv.putString(allocator, "SS_PACMAN", "MOVE");
+                try clearAcceptedButton(pv, allocator, self.pending_direction);
+                self.pending_direction = invalid_direction;
+                self.state = .moving;
+            } else {
+                // A wall never interrupts movement; retain the request for the
+                // next opening and keep the public direction unchanged.
+                try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", self.direction);
+            }
         }
         if (self.state != .moving or now_ms < self.next_move_ms) return;
         const delay = try pv.getDouble(allocator, "PACMAN_MOVE_DELAY");
@@ -143,7 +273,20 @@ const Pacman = struct {
         if (self.y < ty) self.y += 1 else if (self.y > ty) self.y -= 1;
         try pv.putLong(allocator, "PACMAN_USER_X", self.x);
         try pv.putLong(allocator, "PACMAN_USER_Y", self.y);
-        if (self.x == tx and self.y == ty) { self.state = .blocked; try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 1); }
+        if (self.x == tx and self.y == ty) {
+            if (maze.isPortal(self.target_x, self.target_y)) {
+                // The two open edge cells on the tunnel row are a pair.  Warp
+                // to the opposite portal, retain direction, and continue.
+                self.x = if (self.direction == @intFromEnum(Direction.left)) (width - 1) * 32 + 16 - 25 else 16 - 25;
+                try pv.putLong(allocator, "PACMAN_USER_X", self.x);
+                self.chooseTarget(map, self.direction);
+                try pv.putString(allocator, "SS_PACMAN", "TELEPORT");
+            } else {
+                self.state = .blocked;
+                try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 1);
+                try pv.putString(allocator, "SS_PACMAN", "BLOCKED");
+            }
+        }
     }
 };
 
@@ -193,16 +336,6 @@ fn loadDatabase(allocator: std.mem.Allocator, epics_base: []const u8, db_dir: []
 
 /// Reuse the canonical map literal from the legacy boot script.  Keeping the
 /// map data separate from the controller lets both IOCs serve identical tiles.
-fn loadMap() [tiles]i16 {
-    // The record interface accepts a replaceable waveform.  Start with a
-    // bounded play area; deployments may overwrite it with the canonical map.
-    var result = [_]i16{0} ** tiles;
-    for (0..height) |y| for (0..width) |x| {
-        if (x == 0 or x == width - 1 or y == 0 or y == height - 1) result[y * width + x] = 1;
-    };
-    return result;
-}
-
 pub fn main() !void {
     var arena_state = std.heap.ArenaAllocator.init(std.heap.page_allocator); defer arena_state.deinit(); const allocator = arena_state.allocator();
     const prefix: []const u8 = "PACMAN";
@@ -210,7 +343,7 @@ pub fn main() !void {
     const db_dir: []const u8 = "../pacman-softIoc";
     try loadDatabase(allocator, epics_base, db_dir, prefix);
     const pv = Pv{ .prefix = prefix };
-    var map = loadMap();
+    var map = maze.cells;
     try pv.putShortArray(allocator, "PACMAN_PLAY_FIELD", &map);
     var pacman = Pacman{}; try pacman.reset(pv, allocator);
     var ghosts = [_]Ghost{ .{ .label = "BLINKY" }, .{ .label = "PINKY" }, .{ .label = "INKY" }, .{ .label = "CLYDE" } };
@@ -224,4 +357,41 @@ pub fn main() !void {
     }
 }
 
-test "walkable map bounds" { var map = [_]i16{1} ** tiles; map[Pacman.tileAt(1, 1)] = 0; try std.testing.expect(Pacman.walkable(&map, 1, 1)); try std.testing.expect(!Pacman.walkable(&map, -1, 1)); }
+test "maze exposes walls, paths, and side portals" {
+    try std.testing.expect(Pacman.walkable(&maze.cells, 1, 1));
+    try std.testing.expect(!Pacman.walkable(&maze.cells, 0, 0));
+    try std.testing.expect(maze.isPortal(0, 14));
+    try std.testing.expect(maze.isPortal(27, 14));
+}
+
+test "movement target stops at a wall and includes a side portal" {
+    var pacman = Pacman{ .x = 23, .y = 23 };
+    pacman.chooseTarget(&maze.cells, @intFromEnum(Direction.right));
+    try std.testing.expectEqual(@as(i32, 12), pacman.target_x);
+    try std.testing.expectEqual(@as(i32, 1), pacman.target_y);
+
+    pacman = .{ .x = 23, .y = 14 * 32 + 16 - 25 };
+    pacman.chooseTarget(&maze.cells, @intFromEnum(Direction.left));
+    try std.testing.expectEqual(@as(i32, 0), pacman.target_x);
+    try std.testing.expectEqual(@as(i32, 14), pacman.target_y);
+}
+
+test "wall-directed input is rejected while a centered opening can be pre-turned" {
+    // Tile (1,1) has an open corridor to the right and a wall above it.
+    var pacman = Pacman{ .x = 23, .y = 23, .direction = @intFromEnum(Direction.right) };
+    try std.testing.expect(!pacman.canTurn(&maze.cells, @intFromEnum(Direction.up)));
+    try std.testing.expect(pacman.canTurn(&maze.cells, @intFromEnum(Direction.right)));
+
+    // Two pixels before the vertical center line is still a legal pre-turn.
+    pacman.y = 21;
+    try std.testing.expect(pacman.canTurn(&maze.cells, @intFromEnum(Direction.right)));
+}
+
+test "pre-turn window starts only close to the opening" {
+    // On row 1, tile (6,1) opens downward. Moving right, its centre is x=208.
+    var pacman = Pacman{ .x = 103, .y = 23, .direction = @intFromEnum(Direction.right) };
+    try std.testing.expect(!pacman.canScheduleTurn(&maze.cells, @intFromEnum(Direction.down)));
+
+    pacman.x = 135; // centre x=160: 48 pixels before the opening centre
+    try std.testing.expect(pacman.canScheduleTurn(&maze.cells, @intFromEnum(Direction.down)));
+}
