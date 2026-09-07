@@ -12,9 +12,9 @@ pub const Controller = struct {
         const labels = [_]game.GhostId{ .blinky, .pinky, .inky, .clyde };
         const spawn = [_]struct { x0: i32, y0: i32, x1: i32, y1: i32 }{
             .{ .x0 = 423, .y0 = 345, .x1 = 423, .y1 = 345 },
-            .{ .x0 = 423, .y0 = 415, .x1 = 423, .y1 = 465 },
-            .{ .x0 = 359, .y0 = 415, .x1 = 359, .y1 = 465 },
-            .{ .x0 = 487, .y0 = 415, .x1 = 487, .y1 = 465 },
+            .{ .x0 = 423, .y0 = 415, .x1 = 423, .y1 = 455 },
+            .{ .x0 = 359, .y0 = 415, .x1 = 359, .y1 = 455 },
+            .{ .x0 = 487, .y0 = 415, .x1 = 487, .y1 = 455 },
         };
         for (labels, spawn) |id, position| {
             var name: [48]u8 = undefined;

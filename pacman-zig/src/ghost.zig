@@ -49,9 +49,9 @@ pub const Ghost = struct {
     fn spawnPoint(self: Ghost, second: bool) Point {
         return switch (self.id) {
             .blinky => .{ .x = 423, .y = 345 },
-            .pinky => .{ .x = 423, .y = if (second) 465 else 415 },
-            .inky => .{ .x = 359, .y = if (second) 465 else 415 },
-            .clyde => .{ .x = 487, .y = if (second) 465 else 415 },
+            .pinky => .{ .x = 423, .y = if (second) 455 else 415 },
+            .inky => .{ .x = 359, .y = if (second) 455 else 415 },
+            .clyde => .{ .x = 487, .y = if (second) 455 else 415 },
         };
     }
 
@@ -264,7 +264,7 @@ pub const Ghost = struct {
 test "house routes preserve legacy spawn positions and enter a path tile" {
     const blinky = Ghost.init(.blinky);
     try std.testing.expectEqual(Point{ .x = 423, .y = 345 }, blinky.spawnPoint(false));
-    try std.testing.expectEqual(Point{ .x = 359, .y = 465 }, Ghost.init(.inky).spawnPoint(true));
+    try std.testing.expectEqual(Point{ .x = 359, .y = 455 }, Ghost.init(.inky).spawnPoint(true));
     try std.testing.expect(grid.walkable(Ghost.maze_exit_tile));
     try std.testing.expect(grid.walkable(Ghost.return_entry_tile));
 }
