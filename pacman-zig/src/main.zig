@@ -3,6 +3,7 @@ const maze = @import("maze.zig");
 const game = @import("game_types.zig");
 const ghost_controller = @import("ghost.zig");
 const game_modes = @import("game_modes.zig");
+const collision = @import("collision.zig");
 
 const c = @cImport({
     @cInclude("dbAccess.h");
@@ -75,7 +76,7 @@ const Pv = struct {
     }
 };
 
-const PacmanState = enum { init, ready, moving, blocked, aborted };
+const PacmanState = enum { init, ready, moving, blocked, aborted, game_over };
 const Pacman = struct {
     state: PacmanState = .init,
     x: i32 = 426,
@@ -217,6 +218,7 @@ const Pacman = struct {
     }
 
     fn tick(self: *Pacman, pv: Pv, allocator: std.mem.Allocator, map: []const i16, now_ms: i64) !void {
+        if (self.state == .game_over) return;
         const abort = try pv.getLong(allocator, "PACMAN_PACMAN_ABORT");
         if (abort != 0) { self.state = .aborted; try pv.putString(allocator, "SS_PACMAN", "USER_ABORT"); return; }
         if (self.state == .aborted) return self.reset(pv, allocator);
@@ -292,6 +294,63 @@ const Pacman = struct {
     }
 };
 
+fn checkGhostCollisions(pv: Pv, allocator: std.mem.Allocator) !collision.Outcome {
+    const pacman_x = try pv.getLong(allocator, "PACMAN_USER_X");
+    const pacman_y = try pv.getLong(allocator, "PACMAN_USER_Y");
+    for ([_]game.GhostId{ .blinky, .pinky, .inky, .clyde }) |id| {
+        var name: [48]u8 = undefined;
+        const x_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_X", .{game.pvName(id)});
+        const ghost_x = try pv.getLong(allocator, x_name);
+        const y_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_Y", .{game.pvName(id)});
+        const ghost_y = try pv.getLong(allocator, y_name);
+        if (!collision.overlaps(pacman_x, pacman_y, ghost_x, ghost_y)) continue;
+        const mode_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_MODE", .{game.pvName(id)});
+        const mode: game.GhostMode = @enumFromInt(try pv.getLong(allocator, mode_name));
+        const outcome = collision.evaluate(id, mode);
+        switch (outcome) {
+            .none => {},
+            else => return outcome,
+        }
+    }
+    return .none;
+}
+
+fn resetRound(pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_modes.Controller, pv: Pv, allocator: std.mem.Allocator) !void {
+    for (ghosts) |*ghost| ghost.* = ghost_controller.Ghost.init(ghost.id);
+    try pacman.reset(pv, allocator);
+    try modes.init(pv, allocator);
+    try pv.putLong(allocator, "GAME_FRIGHT_MODE", 0);
+    try pv.putLong(allocator, "GAME_KILLED_GHOSTS_MULTIPLIER", 1);
+    try pv.putString(allocator, "SS_GAME_ENGINE", "ROUND_READY");
+}
+
+fn handleCollision(outcome: collision.Outcome, pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_modes.Controller, pv: Pv, allocator: std.mem.Allocator) !void {
+    switch (outcome) {
+        .none => {},
+        .ghost_eaten => |id| {
+            const multiplier = @max(try pv.getLong(allocator, "GAME_KILLED_GHOSTS_MULTIPLIER"), 1);
+            const score = try pv.getLong(allocator, "PACMAN_USER_SCORE");
+            try pv.putLong(allocator, "PACMAN_USER_SCORE", score + 200 * multiplier);
+            try pv.putLong(allocator, "GAME_KILLED_GHOSTS_MULTIPLIER", multiplier + 1);
+            try modes.ghostEaten(pv, allocator, id);
+            try pv.putString(allocator, "SS_GAME_ENGINE", "GHOST_EATEN");
+        },
+        .pacman_died => {
+            const lives = try pv.getLong(allocator, "GAME_PACMAN_LIVES");
+            const remaining = @max(lives - 1, 0);
+            try pv.putLong(allocator, "GAME_PACMAN_LIVES", remaining);
+            if (remaining == 0) {
+                pacman.state = .game_over;
+                try pv.putLong(allocator, "GAME_GHOSTS_RUNNING", 0);
+                try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 1);
+                try pv.putString(allocator, "SS_GAME_ENGINE", "GAME_OVER");
+            } else {
+                try resetRound(pacman, ghosts, modes, pv, allocator);
+            }
+        },
+    }
+}
+
 fn checked(status: c_int, what: []const u8) !void { if (status != 0) { std.log.err("EPICS failed while {s}: {d}", .{ what, status }); return error.EpicsSetup; } }
 
 fn loadDatabase(allocator: std.mem.Allocator, epics_base: []const u8, db_dir: []const u8, prefix: []const u8) !void {
@@ -337,6 +396,7 @@ pub fn main() !void {
         try pacman.tick(pv, allocator, &map, now_ms);
         try modes.tick(pv, allocator, now_ms);
         for (&ghosts) |*ghost| try ghost.tick(pv, allocator, now_ms);
+        try handleCollision(try checkGhostCollisions(pv, allocator), &pacman, &ghosts, &modes, pv, allocator);
         c.epicsThreadSleep(0.001);
         now_ms += 1;
     }

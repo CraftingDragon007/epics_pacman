@@ -6,9 +6,11 @@ pub const Controller = struct {
     phase_started_at_ms: i64 = 0,
     scattering: bool = true,
     frightened_until_ms: i64 = 0,
+    returning: [4]bool = [_]bool{false} ** 4,
+    return_release_at_ms: [4]i64 = [_]i64{0} ** 4,
 
     pub fn init(self: *Controller, pv: anytype, allocator: std.mem.Allocator) !void {
-        _ = self;
+        self.* = .{};
         const labels = [_]game.GhostId{ .blinky, .pinky, .inky, .clyde };
         const spawn = [_]struct { x0: i32, y0: i32, x1: i32, y1: i32 }{
             .{ .x0 = 423, .y0 = 345, .x1 = 423, .y1 = 345 },
@@ -47,6 +49,23 @@ pub const Controller = struct {
         try pv.putLong(allocator, field, @intFromEnum(mode));
     }
 
+    fn index(id: game.GhostId) usize {
+        return @intFromEnum(id);
+    }
+
+    /// Collision detection is the sole authorizer of MODE_SPAWN. This keeps
+    /// a user/UI write from trapping an ordinary ghost in the house, while
+    /// allowing a genuinely eaten frightened ghost to return safely.
+    pub fn ghostEaten(self: *Controller, pv: anytype, allocator: std.mem.Allocator, id: game.GhostId) !void {
+        const slot = index(id);
+        self.returning[slot] = true;
+        self.return_release_at_ms[slot] = 0;
+        try setMode(pv, allocator, id, .spawn);
+        var name: [48]u8 = undefined;
+        const respawn = try std.fmt.bufPrint(&name, "GAME_GHOSTS_{s}_RESPAWN", .{game.pvName(id)});
+        try pv.putLong(allocator, respawn, 1);
+    }
+
     pub fn tick(self: *Controller, pv: anytype, allocator: std.mem.Allocator, now_ms: i64) !void {
         if (!self.started) {
             if (try pv.getLong(allocator, "PACMAN_USER_DIRECTION") < 0) return;
@@ -56,7 +75,10 @@ pub const Controller = struct {
         }
         const elapsed = now_ms - self.started_at_ms;
         const fright_input = try pv.getLong(allocator, "GAME_FRIGHT_MODE");
-        if (fright_input != 0 and self.frightened_until_ms <= now_ms) self.frightened_until_ms = now_ms + 6_000;
+        if (fright_input != 0 and self.frightened_until_ms <= now_ms) {
+            self.frightened_until_ms = now_ms + 6_000;
+            try pv.putLong(allocator, "GAME_KILLED_GHOSTS_MULTIPLIER", 1);
+        }
         const frightened = now_ms < self.frightened_until_ms;
         if (!frightened and fright_input != 0) try pv.putLong(allocator, "GAME_FRIGHT_MODE", 0);
 
@@ -68,11 +90,23 @@ pub const Controller = struct {
         const normal_mode: game.GhostMode = if (self.scattering) .scatter else .chase;
         const ghosts = [_]game.GhostId{ .blinky, .pinky, .inky, .clyde };
         for (ghosts) |id| {
+            const slot = index(id);
+            if (self.returning[slot]) {
+                var name: [48]u8 = undefined;
+                const mode_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_MODE", .{game.pvName(id)});
+                if (try pv.getLong(allocator, mode_name) != @intFromEnum(game.GhostMode.wait)) continue;
+                if (self.return_release_at_ms[slot] == 0) {
+                    self.return_release_at_ms[slot] = now_ms + 2_000;
+                    const respawn = try std.fmt.bufPrint(&name, "GAME_GHOSTS_{s}_RESPAWN", .{game.pvName(id)});
+                    try pv.putLong(allocator, respawn, 0);
+                }
+                if (now_ms < self.return_release_at_ms[slot]) continue;
+                self.returning[slot] = false;
+                self.return_release_at_ms[slot] = 0;
+            }
             if (elapsed < releaseDelay(id)) continue;
-            // No ghost-eaten event exists yet, so MODE_SPAWN is never a
-            // valid externally sustained state.  Reasserting the controller
-            // mode prevents a stale/UI-written value from trapping a ghost
-            // in the return-to-house animation.
+            // Clear any unsupported spawn write, but preserve the state that
+            // `ghostEaten` explicitly authorized above.
             try setMode(pv, allocator, id, if (frightened) .fright else normal_mode);
         }
         try pv.putString(allocator, "SS_GHOST_MODES", if (frightened) "FRIGHTENED" else if (self.scattering) "SCATTER" else "CHASE");
