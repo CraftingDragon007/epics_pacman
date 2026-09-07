@@ -29,6 +29,54 @@ pub fn distanceSquared(a: grid.Tile, b: grid.Tile) i32 {
     return dx * dx + dy * dy;
 }
 
+/// Find the first step of a shortest path through the ordinary maze.  This is
+/// used for eaten ghosts only: their fixed house-door target can lie behind a
+/// wall, so the usual greedy arcade steering can otherwise bounce forever in
+/// a cul-de-sac that is locally closer to the door.
+pub fn returnDirection(start: grid.Tile, target: grid.Tile) ?game.Direction {
+    if (start.x == target.x and start.y == target.y) return null;
+
+    const Entry = struct {
+        tile: grid.Tile,
+        first: game.Direction,
+    };
+    const directions = [_]game.Direction{ .up, .left, .down, .right };
+    var seen = [_]bool{false} ** (grid.width * grid.height);
+    var queue: [grid.width * grid.height]Entry = undefined;
+    var head: usize = 0;
+    var tail: usize = 0;
+
+    const start_index = mazeIndex(start) orelse return null;
+    seen[start_index] = true;
+    for (directions) |direction| {
+        const next = grid.neighbor(start, direction);
+        const next_index = mazeIndex(next) orelse continue;
+        if (!grid.walkable(next) or seen[next_index]) continue;
+        if (next.x == target.x and next.y == target.y) return direction;
+        seen[next_index] = true;
+        queue[tail] = .{ .tile = next, .first = direction };
+        tail += 1;
+    }
+    while (head < tail) : (head += 1) {
+        const entry = queue[head];
+        for (directions) |direction| {
+            const next = grid.neighbor(entry.tile, direction);
+            const next_index = mazeIndex(next) orelse continue;
+            if (!grid.walkable(next) or seen[next_index]) continue;
+            if (next.x == target.x and next.y == target.y) return entry.first;
+            seen[next_index] = true;
+            queue[tail] = .{ .tile = next, .first = entry.first };
+            tail += 1;
+        }
+    }
+    return null;
+}
+
+fn mazeIndex(tile: grid.Tile) ?usize {
+    if (tile.x < 0 or tile.x >= grid.width or tile.y < 0 or tile.y >= grid.height) return null;
+    return @intCast(tile.y * grid.width + tile.x);
+}
+
 pub fn chooseDirection(current: grid.Tile, current_direction: game.Direction, target: Target, allow_reverse: bool, frightened: bool, seed: *u32) game.Direction {
     const order = [_]game.Direction{ .up, .left, .down, .right };
     var legal: [4]game.Direction = undefined;
@@ -64,4 +112,10 @@ test "classic personalities choose distinct targets" {
     const pac = grid.Tile{ .x = 10, .y = 10 };
     try std.testing.expectEqual(grid.Tile{ .x = 14, .y = 10 }, chaseTarget(.pinky, pac, .right, .{ .x = 5, .y = 5 }, .{ .x = 1, .y = 1 }));
     try std.testing.expectEqual(scatterTarget(.clyde), chaseTarget(.clyde, pac, .right, .{ .x = 5, .y = 5 }, .{ .x = 9, .y = 9 }));
+}
+
+test "return routing escapes a locally closer dead end" {
+    // At (15,20), left and up are walls; the route to the house door first
+    // goes right, away from the target, instead of oscillating at the end.
+    try std.testing.expectEqual(game.Direction.right, returnDirection(.{ .x = 15, .y = 20 }, .{ .x = 14, .y = 11 }).?);
 }

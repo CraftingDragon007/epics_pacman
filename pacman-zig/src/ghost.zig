@@ -25,8 +25,12 @@ pub const Ghost = struct {
     id: game.GhostId,
     direction: game.Direction = .up,
     phase: Phase = .waiting_in_house,
+    segment_origin: ?grid.Tile = null,
     next_tile: ?grid.Tile = null,
     waiting_for_second_spawn: bool = true,
+    // Blinky begins each round outside the house, but the original SNL IOC
+    // moves him to the in-house bobbing lane after Pacman eats him.
+    in_house_after_eaten: bool = false,
     next_move_ms: i64 = 0,
     frame: i32 = 0,
     next_frame_ms: i64 = 0,
@@ -48,10 +52,19 @@ pub const Ghost = struct {
 
     fn spawnPoint(self: Ghost, second: bool) Point {
         return switch (self.id) {
-            .blinky => .{ .x = 423, .y = 345 },
+            .blinky => .{ .x = 423, .y = if (self.in_house_after_eaten) (if (second) 455 else 415) else 345 },
             .pinky => .{ .x = 423, .y = if (second) 455 else 415 },
             .inky => .{ .x = 359, .y = if (second) 455 else 415 },
             .clyde => .{ .x = 487, .y = if (second) 455 else 415 },
+        };
+    }
+
+    /// The destination after returning through the gate.  All ghosts,
+    /// including a newly eaten Blinky, enter the house before waiting.
+    fn returnSpawnPoint(self: Ghost) Point {
+        return switch (self.id) {
+            .blinky => .{ .x = 423, .y = 415 },
+            else => self.spawnPoint(false),
         };
     }
 
@@ -131,7 +144,20 @@ pub const Ghost = struct {
 
     fn beginReturning(self: *Ghost) void {
         self.phase = .returning_to_entry;
+        self.segment_origin = null;
         self.next_tile = null;
+    }
+
+    /// A frightened transition reverses the current corridor segment instead
+    /// of throwing it away and snapping to a centre line.  Once the ghost
+    /// reaches that preceding tile, ordinary frightened path selection picks
+    /// one random legal non-reversing direction.
+    fn beginFrightened(self: *Ghost, x: i32, y: i32) void {
+        self.phase = .frightened;
+        self.direction = game.opposite(self.direction);
+        if (self.next_tile) |_| {
+            self.next_tile = self.segment_origin orelse grid.pixelToTile(x, y);
+        }
     }
 
     fn navigationTarget(self: Ghost, pv: anytype, allocator: std.mem.Allocator, mode: game.GhostMode, current: grid.Tile) !grid.Tile {
@@ -167,8 +193,15 @@ pub const Ghost = struct {
                 self.next_tile = null;
             }
         }
-        if (self.phase == .returning_to_entry and current.x == return_entry_tile.x and current.y == return_entry_tile.y and grid.centerDistance(x.*, y.*, return_entry_tile) == 0) {
+        if (self.phase == .returning_to_entry and current.x == return_entry_tile.x and current.y == return_entry_tile.y and grid.centerDistance(x.*, y.*, return_entry_tile) <= 1) {
+            // Navigation considers a tile reached one pixel early.  Use that
+            // same tolerance here, then finish the one-pixel alignment before
+            // taking the explicit house route through the gate.
+            const entry = tilePoint(return_entry_tile);
+            x.* = entry.x;
+            y.* = entry.y;
             self.phase = .returning_to_center;
+            self.segment_origin = null;
             self.next_tile = null;
             return;
         }
@@ -176,10 +209,14 @@ pub const Ghost = struct {
             const target = try self.navigationTarget(pv, allocator, mode, current);
             // Frightened ghosts reverse once when entering the phase, then
             // continue with the usual no-reversal constraint while choosing
-            // random legal turns. Returning ghosts may reverse to find the
-            // fixed route back to the door.
-            const allow_reverse = self.phase == .returning_to_entry;
-            self.direction = ai.chooseDirection(current, self.direction, target, allow_reverse, self.phase == .frightened, &self.random_seed);
+            // random legal turns. Eyes use a shortest path to the door: a
+            // greedy target choice can otherwise oscillate in a dead end.
+            if (self.phase == .returning_to_entry) {
+                self.direction = ai.returnDirection(current, return_entry_tile) orelse self.direction;
+            } else {
+                self.direction = ai.chooseDirection(current, self.direction, target, false, self.phase == .frightened, &self.random_seed);
+            }
+            self.segment_origin = current;
             self.next_tile = grid.neighbor(current, self.direction);
             const aligned = grid.tileToPixel(current);
             x.* = aligned.x;
@@ -216,22 +253,22 @@ pub const Ghost = struct {
             .aligning_to_grid => {
                 if (self.moveTowards(&x, &y, tilePoint(maze_exit_tile))) {
                     self.phase = normalPhase(mode);
+                    self.segment_origin = null;
                     self.next_tile = null;
                 }
                 moved = true;
             },
             .navigating => {
                 if (mode == .wait) {} else if (mode == .spawn) self.beginReturning() else if (mode == .fright) {
-                    self.phase = .frightened;
-                    self.direction = game.opposite(self.direction);
-                    self.next_tile = null;
+                    self.beginFrightened(x, y);
                 } else try self.tickNavigation(pv, allocator, mode, &x, &y);
                 moved = true;
             },
             .frightened => {
                 if (mode == .wait) {} else if (mode == .spawn) self.beginReturning() else if (mode != .fright) {
                     self.phase = .navigating;
-                    self.next_tile = null;
+                    // Finish the current frightened segment before normal
+                    // chase/scatter target selection resumes.
                 } else try self.tickNavigation(pv, allocator, mode, &x, &y);
                 moved = true;
             },
@@ -245,9 +282,11 @@ pub const Ghost = struct {
                 moved = true;
             },
             .returning_to_spawn => {
-                if (self.moveTowards(&x, &y, self.spawnPoint(false))) {
+                if (self.moveTowards(&x, &y, self.returnSpawnPoint())) {
+                    if (self.id == .blinky) self.in_house_after_eaten = true;
                     self.phase = .waiting_in_house;
                     self.waiting_for_second_spawn = true;
+                    self.segment_origin = null;
                     self.next_tile = null;
                     try pv.putLong(allocator, try self.suffix(&buf, "MODE"), @intFromEnum(game.GhostMode.wait));
                 }
@@ -269,9 +308,28 @@ test "house routes preserve legacy spawn positions and enter a path tile" {
     try std.testing.expect(grid.walkable(Ghost.return_entry_tile));
 }
 
+test "eaten blinky returns to the house rather than waiting at the door" {
+    var blinky = Ghost.init(.blinky);
+    try std.testing.expectEqual(Point{ .x = 423, .y = 415 }, blinky.returnSpawnPoint());
+    blinky.in_house_after_eaten = true;
+    try std.testing.expectEqual(Point{ .x = 423, .y = 415 }, blinky.spawnPoint(false));
+    try std.testing.expectEqual(Point{ .x = 423, .y = 455 }, blinky.spawnPoint(true));
+}
+
 test "tunnel transition warps instead of crossing the maze" {
     const left = grid.Tile{ .x = 0, .y = 14 };
     const right = Ghost.tilePoint(.{ .x = grid.width - 1, .y = 14 });
     try std.testing.expectEqual(right, Ghost.portalWarp(left, .{ .x = 0, .y = 439 }, .left).?);
     try std.testing.expectEqual(Point{ .x = 0, .y = 439 }, Ghost.portalWarp(.{ .x = grid.width - 1, .y = 14 }, right, .right).?);
+}
+
+test "frightened transition reverses the active segment without snapping" {
+    var ghost = Ghost.init(.inky);
+    ghost.direction = .right;
+    ghost.segment_origin = .{ .x = 5, .y = 10 };
+    ghost.next_tile = .{ .x = 6, .y = 10 };
+    ghost.beginFrightened(190, 311);
+    try std.testing.expectEqual(Phase.frightened, ghost.phase);
+    try std.testing.expectEqual(game.Direction.left, ghost.direction);
+    try std.testing.expectEqual(grid.Tile{ .x = 5, .y = 10 }, ghost.next_tile.?);
 }
