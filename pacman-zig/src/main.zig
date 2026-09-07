@@ -4,6 +4,7 @@ const game = @import("game_types.zig");
 const ghost_controller = @import("ghost.zig");
 const game_modes = @import("game_modes.zig");
 const collision = @import("collision.zig");
+const death_animation = @import("death_animation.zig");
 
 const c = @cImport({
     @cInclude("dbAccess.h");
@@ -76,7 +77,7 @@ const Pv = struct {
     }
 };
 
-const PacmanState = enum { init, ready, moving, blocked, aborted, game_over };
+const PacmanState = enum { init, ready, moving, blocked, aborted, dying, game_over };
 const Pacman = struct {
     state: PacmanState = .init,
     x: i32 = 426,
@@ -95,6 +96,8 @@ const Pacman = struct {
         try pv.putLong(allocator, "PACMAN_USER_Y", self.y);
         try pv.putLong(allocator, "PACMAN_USER_DIRECTION", invalid_direction);
         try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", invalid_direction);
+        try pv.putLong(allocator, "PACMAN_PACMAN_ABORT", 0);
+        try pv.putLong(allocator, "PACMAN_PACMAN_DEATH", -1);
         try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 3);
         try pv.putString(allocator, "SS_PACMAN", "READY");
         self.state = .ready;
@@ -324,7 +327,7 @@ fn resetRound(pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_
     try pv.putString(allocator, "SS_GAME_ENGINE", "ROUND_READY");
 }
 
-fn handleCollision(outcome: collision.Outcome, pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_modes.Controller, pv: Pv, allocator: std.mem.Allocator) !void {
+fn handleCollision(outcome: collision.Outcome, pacman: *Pacman, modes: *game_modes.Controller, death: *death_animation.Sequence, pv: Pv, allocator: std.mem.Allocator, now_ms: i64) !void {
     switch (outcome) {
         .none => {},
         .ghost_eaten => |id| {
@@ -339,14 +342,17 @@ fn handleCollision(outcome: collision.Outcome, pacman: *Pacman, ghosts: *[4]ghos
             const lives = try pv.getLong(allocator, "GAME_PACMAN_LIVES");
             const remaining = @max(lives - 1, 0);
             try pv.putLong(allocator, "GAME_PACMAN_LIVES", remaining);
-            if (remaining == 0) {
-                pacman.state = .game_over;
-                try pv.putLong(allocator, "GAME_GHOSTS_RUNNING", 0);
-                try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 1);
-                try pv.putString(allocator, "SS_GAME_ENGINE", "GAME_OVER");
-            } else {
-                try resetRound(pacman, ghosts, modes, pv, allocator);
+            pacman.state = .dying;
+            try pv.putLong(allocator, "PACMAN_PACMAN_ABORT", 1);
+            try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 1);
+            try pv.putLong(allocator, "GAME_GHOSTS_RUNNING", 0);
+            for ([_]game.GhostId{ .blinky, .pinky, .inky, .clyde }) |id| {
+                var name: [48]u8 = undefined;
+                const mode = try std.fmt.bufPrint(&name, "GHOSTS_{s}_MODE", .{game.pvName(id)});
+                try pv.putLong(allocator, mode, @intFromEnum(game.GhostMode.wait));
             }
+            try pv.putLong(allocator, "PACMAN_PACMAN_DEATH", death.begin(now_ms, remaining == 0));
+            try pv.putString(allocator, "SS_GAME_ENGINE", "PACMAN_DEATH");
         },
     }
 }
@@ -389,14 +395,29 @@ pub fn main() !void {
     var pacman = Pacman{}; try pacman.reset(pv, allocator);
     var ghosts = [_]ghost_controller.Ghost{ .init(.blinky), .init(.pinky), .init(.inky), .init(.clyde) };
     var modes = game_modes.Controller{};
+    var death = death_animation.Sequence{};
     try modes.init(pv, allocator);
     try pv.putString(allocator, "SS_GAME_ENGINE", "INIT"); try pv.putString(allocator, "SS_GHOSTS", "READY");
     var now_ms: i64 = 0;
     while (true) {
-        try pacman.tick(pv, allocator, &map, now_ms);
-        try modes.tick(pv, allocator, now_ms);
-        for (&ghosts) |*ghost| try ghost.tick(pv, allocator, now_ms);
-        try handleCollision(try checkGhostCollisions(pv, allocator), &pacman, &ghosts, &modes, pv, allocator);
+        if (death.active) {
+            if (death.tick(now_ms)) |frame| {
+                try pv.putLong(allocator, "PACMAN_PACMAN_DEATH", frame);
+                if (frame == -1) {
+                    if (death.game_over_after) {
+                        pacman.state = .game_over;
+                        try pv.putString(allocator, "SS_GAME_ENGINE", "GAME_OVER");
+                    } else {
+                        try resetRound(&pacman, &ghosts, &modes, pv, allocator);
+                    }
+                }
+            }
+        } else {
+            try pacman.tick(pv, allocator, &map, now_ms);
+            try modes.tick(pv, allocator, now_ms);
+            for (&ghosts) |*ghost| try ghost.tick(pv, allocator, now_ms);
+            try handleCollision(try checkGhostCollisions(pv, allocator), &pacman, &modes, &death, pv, allocator, now_ms);
+        }
         c.epicsThreadSleep(0.001);
         now_ms += 1;
     }
