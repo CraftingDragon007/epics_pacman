@@ -53,6 +53,13 @@ pub const Controller = struct {
             try pv.putLong(allocator, spawn_y1, position.y1);
             const mode_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_MODE", .{game.pvName(id)});
             try pv.putLong(allocator, mode_name, @intFromEnum(game.GhostMode.wait));
+            // These records drive the caQtDM ghost skin independently of
+            // position. Reset them too, otherwise a game-over layout can
+            // retain eyes/frame art from the final in-play direction.
+            const dir_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_DIR", .{game.pvName(id)});
+            try pv.putLong(allocator, dir_name, @intFromEnum(game.Direction.right));
+            const frame_name = try std.fmt.bufPrint(&name, "GHOSTS_{s}_FRAME", .{game.pvName(id)});
+            try pv.putLong(allocator, frame_name, 0);
         }
         // The legacy calcout records can pulse GAME_FRIGHT_MODE while their
         // inputs settle at IOC startup. Seed the four real power-pellet

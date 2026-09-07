@@ -19,7 +19,17 @@ pub const Sequence = struct {
 
     /// Returns a new UI frame only when it changes; -1 marks completion.
     pub fn tick(self: *Sequence, now_ms: i64) ?i32 {
-        if (!self.active or now_ms < self.next_frame_ms) return null;
+        if (!self.active) return null;
+        // Frame 20 is the final visible frame.  Complete on the following
+        // game-loop pass rather than waiting for another timer edge; this
+        // matches the SNL `>= 20` transition and cannot strand game over on
+        // the last animation frame.
+        if (self.frame >= 20) {
+            self.active = false;
+            self.frame = -1;
+            return -1;
+        }
+        if (now_ms < self.next_frame_ms) return null;
         if (self.frame < 20) {
             self.frame += 1;
             self.next_frame_ms = now_ms + 250;
@@ -38,5 +48,14 @@ test "death frames run from eight through twenty then restore the normal skin" {
     try std.testing.expectEqual(@as(i32, 9), sequence.tick(1_250).?);
     sequence.frame = 20;
     try std.testing.expectEqual(@as(i32, -1), sequence.tick(1_500).?);
+    try std.testing.expect(!sequence.active);
+}
+
+test "the final death frame never needs a further timer tick to complete" {
+    var sequence = Sequence{};
+    _ = sequence.begin(1_000, true);
+    sequence.frame = 20;
+    sequence.next_frame_ms = 99_999;
+    try std.testing.expectEqual(@as(i32, -1), sequence.tick(1_001).?);
     try std.testing.expect(!sequence.active);
 }

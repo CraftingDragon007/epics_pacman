@@ -103,6 +103,32 @@ const Pacman = struct {
         self.state = .ready;
     }
 
+    fn prepareGameOver(self: *Pacman, pv: Pv, allocator: std.mem.Allocator) !void {
+        self.state = .game_over;
+        try pv.putLong(allocator, "PACMAN_USER_DIRECTION", invalid_direction);
+        try pv.putLong(allocator, "PACMAN_TRY_DIRECTION", invalid_direction);
+        try pv.putLong(allocator, "PACMAN_TRY_DIRECTION_LEFT", 0);
+        try pv.putLong(allocator, "PACMAN_TRY_DIRECTION_RIGHT", 0);
+        try pv.putLong(allocator, "PACMAN_TRY_DIRECTION_UP", 0);
+        try pv.putLong(allocator, "PACMAN_TRY_DIRECTION_DOWN", 0);
+        try pv.putLong(allocator, "PACMAN_PACMAN_ABORT", 0);
+        try pv.putLong(allocator, "PACMAN_PACMAN_DEATH", -1);
+        try pv.putLong(allocator, "PACMAN_PACMAN_STATE", 3);
+        try pv.putString(allocator, "SS_PACMAN", "GAME_OVER");
+    }
+
+    /// A game over must remain still until a fresh player command arrives.
+    /// Checking both button and direct-direction PVs supports the two input
+    /// methods exposed by the existing UI.
+    fn startRequestedAfterGameOver(pv: Pv, allocator: std.mem.Allocator) !bool {
+        if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_LEFT") != 0) return true;
+        if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_RIGHT") != 0) return true;
+        if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_UP") != 0) return true;
+        if (try pv.getLong(allocator, "PACMAN_TRY_DIRECTION_DOWN") != 0) return true;
+        const direct = try pv.getLong(allocator, "PACMAN_TRY_DIRECTION");
+        return direct >= @intFromEnum(Direction.right) and direct <= @intFromEnum(Direction.down);
+    }
+
     fn walkable(map: []const i16, x: i32, y: i32) bool {
         return x >= 0 and x < width and y >= 0 and y < height and
             (map[tileAt(x, y)] == 0 or maze.isPortal(x, y));
@@ -327,6 +353,36 @@ fn resetRound(pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_
     try pv.putString(allocator, "SS_GAME_ENGINE", "ROUND_READY");
 }
 
+fn resetGameAfterGameOver(pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_modes.Controller, pv: Pv, allocator: std.mem.Allocator) !void {
+    for (ghosts) |*ghost| ghost.* = ghost_controller.Ghost.init(ghost.id);
+    try pacman.reset(pv, allocator);
+    try modes.init(pv, allocator);
+    // Pulse the legacy food reset calcouts so a new game restores all dots
+    // and four power pellets.  The mode controller's startup arming absorbs
+    // the records' resulting visibility updates.
+    try pv.putLong(allocator, "PACMAN_RESET_FOOD", 0);
+    try pv.putLong(allocator, "PACMAN_RESET_FOOD", 1);
+    try pv.putLong(allocator, "PACMAN_USER_SCORE", 0);
+    try pv.putLong(allocator, "GAME_PACMAN_LIVES", 3);
+    try pv.putLong(allocator, "GAME_KILLED_GHOSTS_MULTIPLIER", 1);
+    try pv.putString(allocator, "SS_GAME_ENGINE", "ROUND_READY");
+}
+
+/// The original game-over reset restores the board and all sprite positions,
+/// but leaves the completed game's score visible behind the GAME OVER label.
+/// A later player command starts the next game and clears that score.
+fn resetPositionsForGameOver(pacman: *Pacman, ghosts: *[4]ghost_controller.Ghost, modes: *game_modes.Controller, pv: Pv, allocator: std.mem.Allocator) !void {
+    for (ghosts) |*ghost| ghost.* = ghost_controller.Ghost.init(ghost.id);
+    try pacman.reset(pv, allocator);
+    try modes.init(pv, allocator);
+    try pv.putLong(allocator, "PACMAN_RESET_FOOD", 0);
+    try pv.putLong(allocator, "PACMAN_RESET_FOOD", 1);
+    try pacman.prepareGameOver(pv, allocator);
+    try pv.putLong(allocator, "GAME_PACMAN_LIVES", -1);
+    try pv.putLong(allocator, "GAME_GHOSTS_RUNNING", 0);
+    try pv.putString(allocator, "SS_GAME_ENGINE", "GAME_OVER");
+}
+
 fn handleCollision(outcome: collision.Outcome, pacman: *Pacman, modes: *game_modes.Controller, death: *death_animation.Sequence, pv: Pv, allocator: std.mem.Allocator, now_ms: i64) !void {
     switch (outcome) {
         .none => {},
@@ -405,12 +461,18 @@ pub fn main() !void {
                 try pv.putLong(allocator, "PACMAN_PACMAN_DEATH", frame);
                 if (frame == -1) {
                     if (death.game_over_after) {
-                        pacman.state = .game_over;
-                        try pv.putString(allocator, "SS_GAME_ENGINE", "GAME_OVER");
+                        // `-1` is the original UI's game-over sentinel. It
+                        // displays GAME OVER after resetting every sprite to
+                        // its opening position, then waits for new input.
+                        try resetPositionsForGameOver(&pacman, &ghosts, &modes, pv, allocator);
                     } else {
                         try resetRound(&pacman, &ghosts, &modes, pv, allocator);
                     }
                 }
+            }
+        } else if (pacman.state == .game_over) {
+            if (try Pacman.startRequestedAfterGameOver(pv, allocator)) {
+                try resetGameAfterGameOver(&pacman, &ghosts, &modes, pv, allocator);
             }
         } else {
             try pacman.tick(pv, allocator, &map, now_ms);
