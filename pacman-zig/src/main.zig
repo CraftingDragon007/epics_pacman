@@ -5,6 +5,7 @@ const ghost_controller = @import("ghost.zig");
 const game_modes = @import("game_modes.zig");
 const collision = @import("collision.zig");
 const death_animation = @import("death_animation.zig");
+const build_options = @import("build_options");
 
 const c = @cImport({
     @cInclude("dbAccess.h");
@@ -442,7 +443,7 @@ fn loadDatabase(allocator: std.mem.Allocator, epics_base: []const u8, db_dir: []
 pub fn main() !void {
     var arena_state = std.heap.ArenaAllocator.init(std.heap.page_allocator); defer arena_state.deinit(); const allocator = arena_state.allocator();
     const prefix: []const u8 = "PACMAN";
-    const epics_base: []const u8 = "/usr/lib/epics";
+    const epics_base: []const u8 = build_options.epics_base;
     const db_dir: []const u8 = "../pacman-softIoc";
     try loadDatabase(allocator, epics_base, db_dir, prefix);
     const pv = Pv{ .prefix = prefix };

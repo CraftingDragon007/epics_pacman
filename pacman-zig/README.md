@@ -10,11 +10,39 @@ cd pacman-zig
 zig build run
 ```
 
-The current build targets the installed EPICS Base 7 package at
-`/usr/lib/epics`; its generated standard-record registrar is compiled from
-the package's matching debug source. This is necessary because the distro does
-not ship that registrar in a linkable library. Only one IOC using the `PACMAN`
-prefix and CA server port may run at a time.
+## Configuring EPICS Base
+
+Pass the EPICS Base location and host architecture as Zig build options:
+
+```sh
+zig build run -Depics-base=/opt/epics/base-7.0.9 -Depics-host-arch=linux-x86_64
+```
+
+If your shell already defines the usual EPICS variables, pass them through
+directly:
+
+```sh
+zig build run -Depics-base="$EPICS_BASE" -Depics-host-arch="$EPICS_HOST_ARCH"
+```
+
+The executable receives the selected Base path at compile time, so it loads
+the matching `dbd/base.dbd` at runtime too. This replaces the previous
+`/usr/lib/epics` hard-code.
+
+EPICS Base normally generates `softIoc_registerRecordDeviceDriver.cpp` in its
+source/build tree. If it is not located at
+`$EPICS_BASE/modules/database/src/std/O.$EPICS_HOST_ARCH/`, point the build at
+it explicitly:
+
+```sh
+zig build run \
+  -Depics-base=/opt/epics/base-7.0.9 \
+  -Depics-host-arch=linux-x86_64 \
+  -Depics-registrar=/opt/epics/base-7.0.9/modules/database/src/std/O.linux-x86_64/softIoc_registerRecordDeviceDriver.cpp
+```
+
+The default remains `/usr/lib/epics` and its matching registrar source. Only
+one IOC using the `PACMAN` prefix and CA server port may run at a time.
 
 The controller provides Pac-Man input/movement and a modular, tile-based ghost
 AI using direct local EPICS database reads/writes. Blinky, Pinky, Inky, and
